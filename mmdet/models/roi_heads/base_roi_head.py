@@ -11,11 +11,9 @@ class BaseRoIHead(nn.Module, metaclass=ABCMeta):
     def __init__(self,
                  bbox_roi_extractor=None,
                  bbox_head=None,
-                 fsr_generator=None,
                  mask_roi_extractor=None,
                  mask_head=None,
                  shared_head=None,
-                 dis_head=None,
                  train_cfg=None,
                  test_cfg=None):
         super(BaseRoIHead, self).__init__()
@@ -29,12 +27,6 @@ class BaseRoIHead(nn.Module, metaclass=ABCMeta):
 
         if mask_head is not None:
             self.init_mask_head(mask_roi_extractor, mask_head)
-
-        if fsr_generator is not None:
-            self.init_fsr_generator(fsr_generator)
-
-        if dis_head is not None:
-            self.init_dis_head(dis_head)
 
         self.init_assigner_sampler()
 
@@ -50,14 +42,6 @@ class BaseRoIHead(nn.Module, metaclass=ABCMeta):
     def with_shared_head(self):
         return hasattr(self, 'shared_head') and self.shared_head is not None
 
-    @property
-    def with_fsr_generator(self):
-        return hasattr(self, 'fsr_generator') and self.fsr_generator is not None
-
-    @property
-    def with_dis_head(self):
-        return hasattr(self, 'fsr_generator') and self.fsr_generator is not None
-
     @abstractmethod
     def init_weights(self, pretrained):
         pass
@@ -68,14 +52,6 @@ class BaseRoIHead(nn.Module, metaclass=ABCMeta):
 
     @abstractmethod
     def init_mask_head(self):
-        pass
-
-    @abstractmethod
-    def init_fsr_generator(self):
-        pass
-
-    @abstractmethod
-    def init_dis_head(self):
         pass
 
     @abstractmethod

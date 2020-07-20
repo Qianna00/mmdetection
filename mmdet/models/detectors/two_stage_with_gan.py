@@ -55,6 +55,16 @@ class TwoStageGanDetector(BaseDetector):
     def with_roi_head(self):
         return hasattr(self, 'roi_head') and self.roi_head is not None
 
+    @property
+    def with_fsr_generator(self):
+        return hasattr(self.roi_head,
+                       'fsr_generator') and self.roi_head.fsr_generator is not None
+
+    @property
+    def with_dis_head(self):
+        return hasattr(self.roi_head,
+                       'dis_head') and self.roi_head.dis_head is not None
+
     def init_weights(self, pretrained=None):
         super(TwoStageGanDetector, self).init_weights(pretrained)
         self.backbone.init_weights(pretrained=pretrained)

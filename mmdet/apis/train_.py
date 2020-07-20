@@ -16,48 +16,6 @@ from ..mmcv.multi_optim_runner import MultiOptimRunner
 from mmcv.runner.checkpoint import save_checkpoint
 
 
-def set_random_seed(seed, deterministic=False):
-    """Set random seed.
-
-    Args:
-        seed (int): Seed to be used.
-        deterministic (bool): Whether to set the deterministic option for
-            CUDNN backend, i.e., set `torch.backends.cudnn.deterministic`
-            to True and `torch.backends.cudnn.benchmark` to False.
-            Default: False.
-    """
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-    if deterministic:
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
-
-
-def parse_losses(losses):
-    log_vars = OrderedDict()
-    for loss_name, loss_value in losses.items():
-        if isinstance(loss_value, torch.Tensor):
-            log_vars[loss_name] = loss_value.mean()
-        elif isinstance(loss_value, list):
-            log_vars[loss_name] = sum(_loss.mean() for _loss in loss_value)
-        else:
-            raise TypeError(f'{loss_name} is not a tensor or list of tensors')
-
-    loss = sum(_value for _key, _value in log_vars.items() if 'loss' in _key)
-
-    log_vars['loss'] = loss
-    for loss_name, loss_value in log_vars.items():
-        # reduce loss when distributed training
-        if dist.is_available() and dist.is_initialized():
-            loss_value = loss_value.data.clone()
-            dist.all_reduce(loss_value.div_(dist.get_world_size()))
-        log_vars[loss_name] = loss_value.item()
-
-    return loss, log_vars
-
-
 def parse_losses_m(losses):
     log_vars = OrderedDict()
     for loss_name, loss_value in losses.items():
@@ -84,7 +42,7 @@ def parse_losses_m(losses):
     return loss, log_vars
 
 
-def batch_processor(model, data, train_mode):
+def batch_processor_m(model, data, train_mode):
     """Process a data batch.
 
     This method is required as an argument of Runner, which defines how to
@@ -101,7 +59,7 @@ def batch_processor(model, data, train_mode):
         dict: A dict containing losses and log vars.
     """
     losses = model(**data)
-    loss, log_vars = parse_losses(losses)
+    loss, log_vars = parse_losses_m(losses)
 
     outputs = dict(
         loss=loss, log_vars=log_vars, num_samples=len(data['img'].data))
@@ -109,7 +67,7 @@ def batch_processor(model, data, train_mode):
     return outputs
 
 
-def train_detector(model,
+def train_detector_m(model,
                    dataset,
                    cfg,
                    distributed=False,
@@ -194,7 +152,7 @@ def train_detector(model,
     # build runner
     runner = MultiOptimRunner(
         model,
-        batch_processor,
+        batch_processor_m,
         optimizer_b,
         optimizer_g,
         optimizer_d,

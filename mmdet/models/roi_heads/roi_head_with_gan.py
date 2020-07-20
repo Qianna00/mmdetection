@@ -10,6 +10,39 @@ from .test_mixins import BBoxTestMixin, MaskTestMixin
 class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
     """Simplest base roi head including one bbox head and one mask head.
     """
+    def __init__(self,
+                 bbox_roi_extractor=None,
+                 bbox_head=None,
+                 fsr_generator=None,
+                 mask_roi_extractor=None,
+                 mask_head=None,
+                 shared_head=None,
+                 dis_head=None,
+                 train_cfg=None,
+                 test_cfg=None
+                 ):
+        BaseRoIHead.__init__(self,
+                             bbox_roi_extractor=bbox_roi_extractor,
+                             bbox_head=bbox_head,
+                             mask_roi_extractor=mask_roi_extractor,
+                             mask_head=mask_head,
+                             shared_head=shared_head,
+                             train_cfg=train_cfg,
+                             test_cfg=test_cfg)
+
+        if fsr_generator is not None:
+            self.init_fsr_generator(fsr_generator)
+
+        if dis_head is not None:
+            self.init_dis_head(dis_head)
+
+    @property
+    def with_fsr_generator(self):
+        return hasattr(self, 'fsr_generator') and self.fsr_generator is not None
+
+    @property
+    def with_dis_head(self):
+        return hasattr(self, 'fsr_generator') and self.fsr_generator is not None
 
     def init_assigner_sampler(self):
         self.bbox_assigner = None

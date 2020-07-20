@@ -10,7 +10,7 @@ from mmcv import Config, DictAction
 from mmcv.runner import init_dist
 
 from mmdet import __version__
-from mmdet.apis.train_ import set_random_seed, train_detector
+from mmdet.apis import set_random_seed, train_detector_m
 from mmdet.datasets import build_dataset
 from mmdet.models import build_detector
 from mmdet.utils import collect_env, get_root_logger
@@ -147,7 +147,7 @@ def main():
             CLASSES=datasets[0].CLASSES)
     # add an attribute for visualization convenience
     model.CLASSES = datasets[0].CLASSES
-    train_detector(
+    train_detector_m(
         model,
         datasets,
         cfg,
