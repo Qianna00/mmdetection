@@ -16,63 +16,6 @@ from ..mmcv.multi_optim_runner import MultiOptimRunner
 from mmcv.runner.checkpoint import save_checkpoint
 
 
-def parse_losses_m(losses):
-    log_vars = OrderedDict()
-    for loss_name, loss_value in losses.items():
-        print(loss_name)
-        if isinstance(loss_value, torch.Tensor):
-            print(loss_value.shape)
-            log_vars[loss_name] = loss_value.mean()
-        elif isinstance(loss_value, list):
-            print(len(loss_value), loss_value[0].shape)
-            log_vars[loss_name] = sum(_loss.mean() for _loss in loss_value)
-        else:
-            raise TypeError(f'{loss_name} is not a tensor or list of tensors')
-
-    # loss = sum(_value for _key, _value in log_vars.items() if 'loss' in _key)
-    loss_b = log_vars['loss_bbox_lr']
-    loss_g = log_vars['loss_bbox_lr'] + log_vars['loss_gen']
-    loss_d = log_vars['loss_dis']
-
-    log_vars['loss_b'] = loss_b
-    log_vars['loss_g'] = loss_g
-    log_vars['loss_d'] = loss_d
-
-    for loss_name, loss_value in log_vars.items():
-        # reduce loss when distributed training
-        if dist.is_available() and dist.is_initialized():
-            loss_value = loss_value.data.clone()
-            dist.all_reduce(loss_value.div_(dist.get_world_size()))
-        log_vars[loss_name] = loss_value.item()
-
-    return loss_b, loss_g, loss_d, log_vars
-
-
-def batch_processor_m(model, data, train_mode):
-    """Process a data batch.
-
-    This method is required as an argument of Runner, which defines how to
-    process a data batch and obtain proper outputs. The first 3 arguments of
-    batch_processor are fixed.
-
-    Args:
-        model (nn.Module): A PyTorch model.
-        data (dict): The data batch in a dict.
-        train_mode (bool): Training mode or not. It may be useless for some
-            models.
-
-    Returns:
-        dict: A dict containing losses and log vars.
-    """
-    losses = model(**data)
-    # loss, log_vars = parse_losses_m(losses)
-    loss_b, loss_g, loss_d, log_vars = parse_losses_m(losses)
-    outputs = dict(
-        loss_b=loss_b, loss_g=loss_g, loss_d=loss_d, log_vars=log_vars, num_samples=len(data['img'].data))
-
-    return outputs
-
-
 def train_detector_m(model,
                    dataset,
                    cfg,
@@ -158,7 +101,6 @@ def train_detector_m(model,
     # build runner
     runner = MultiOptimRunner(
         model,
-        batch_processor_m,
         optimizer_b,
         optimizer_g,
         optimizer_d,

@@ -9,7 +9,6 @@ class MultiOptimRunner(EpochBasedRunner):
 
     def __init__(self,
                  model,
-                 batch_processor=None,
                  optimizer_b=None,
                  optimizer_g=None,
                  optimizer_d=None,
@@ -17,7 +16,7 @@ class MultiOptimRunner(EpochBasedRunner):
                  logger=None,
                  meta=None):
         optimizer = {"optimizer_b": optimizer_b, "optimizer_g": optimizer_g, "optimizer_d": optimizer_d}
-        super(MultiOptimRunner, self).__init__(model=model, batch_processor=batch_processor, optimizer=optimizer,
+        super(MultiOptimRunner, self).__init__(model=model, optimizer=optimizer,
                                                work_dir=work_dir, logger=logger, meta=meta)
 
     def register_hook(self, hook, priority='HIGH'):
