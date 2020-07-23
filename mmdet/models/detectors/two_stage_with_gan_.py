@@ -7,7 +7,7 @@ from .base import BaseDetector
 
 
 @DETECTORS.register_module()
-class TwoStageGanDetector(BaseDetector):
+class TwoStageGanDetector2(BaseDetector):
     """Base class for two-stage detectors.
 
     Two-stage detectors typically consisting of a region proposal network and a
@@ -22,7 +22,7 @@ class TwoStageGanDetector(BaseDetector):
                  train_cfg=None,
                  test_cfg=None,
                  pretrained=None):
-        super(TwoStageGanDetector, self).__init__()
+        super(TwoStageGanDetector2, self).__init__()
         self.backbone = build_backbone(backbone)
 
         if neck is not None:
@@ -66,7 +66,7 @@ class TwoStageGanDetector(BaseDetector):
                        'dis_head') and self.roi_head.dis_head is not None
 
     def init_weights(self, pretrained=None):
-        super(TwoStageGanDetector, self).init_weights(pretrained)
+        super(TwoStageGanDetector2, self).init_weights(pretrained)
         self.backbone.init_weights(pretrained=pretrained)
         if self.with_neck:
             if isinstance(self.neck, nn.Sequential):

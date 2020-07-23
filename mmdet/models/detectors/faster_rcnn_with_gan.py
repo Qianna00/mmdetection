@@ -1,8 +1,8 @@
 from ..builder import DETECTORS
-from .two_stage_with_gan import TwoStageGanDetector
+from .two_stage_with_gan_ import TwoStageGanDetector2
 
 @DETECTORS.register_module()
-class FasterRCNNGan(TwoStageGanDetector):
+class FasterRCNNGan(TwoStageGanDetector2):
 
     def __init__(self,
                  backbone,
