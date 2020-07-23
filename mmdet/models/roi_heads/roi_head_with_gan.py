@@ -1,6 +1,7 @@
 import torch
 import numpy as np
-from mmdet.core import bbox2result, bbox2roi, build_assigner, build_sampler
+from mmdet.core import bbox2result, bbox2roi, build_assigner, build_sampler, bbox_mapping, \
+    merge_aug_bboxes, multiclass_nms
 from ..builder import HEADS, build_head, build_roi_extractor, build_neck
 from .base_roi_head import BaseRoIHead
 from .test_mixins import BBoxTestMixin, MaskTestMixin
@@ -76,15 +77,15 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             self.shared_head.init_weights(pretrained=pretrained)
         if self.with_bbox:
             self.bbox_roi_extractor.init_weights()
-            self.bbox_head.init_weights()
+            self.bbox_head.init_weights(pretrained)
             if self.with_fsr_generator:
-                self.fsr_generator.init_weights()
+                self.fsr_generator.init_weights(pretrained)
         if self.with_mask:
             self.mask_head.init_weights()
             if not self.share_roi_extractor:
                 self.mask_roi_extractor.init_weights()
         if self.with_dis_head:
-            self.dis_head.init_weights()
+            self.dis_head.init_weights(pretrained)
 
 
     def forward_dummy(self, x, proposals):
@@ -161,7 +162,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             bbox_results = self._bbox_forward_train(x, sampling_results,
                                                     gt_bboxes, gt_labels,
                                                     img_metas, x_lr)
-            losses.update(bbox_results['loss_bbox'])
+            # losses.update(bbox_results['loss_bbox'])
             if self.with_dis_head:
                 losses.update(bbox_results['loss_bbox_lr'])
                 losses.update(bbox_results['loss_gen'])
@@ -178,12 +179,12 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         return losses
 
-    def _bbox_forward(self, x, rois, x_lr):
+    def _bbox_forward(self, x, rois, x_lr=None):
         # TODO: a more flexible way to decide which feature maps to use
         bbox_feats = self.bbox_roi_extractor(x[1], rois)
         if self.with_fsr_generator:
-            bbox_feats_sub, bbox_feats = self.bbox_roi_extractor(x, rois)
-            bbox_feats = self.fsr_generator((bbox_feats_sub, bbox_feats))
+            # bbox_feats_sub, bbox_feats = self.bbox_roi_extractor(x, rois)
+            # bbox_feats = self.fsr_generator((bbox_feats_sub, bbox_feats))
             if x_lr is not None:
                 bbox_feats_sub_lr, bbox_feats_lr = self.bbox_roi_extractor(x_lr, rois, for_lr=True)
                 bbox_feats_lr = self.fsr_generator((bbox_feats_sub_lr, bbox_feats_lr))
@@ -191,10 +192,11 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             bbox_feats = self.shared_head(bbox_feats)
             if x_lr is not None:
                 bbox_feats_lr = self.shared_head(bbox_feats_lr)
-        cls_score, bbox_pred = self.bbox_head(bbox_feats)
+        """cls_score, bbox_pred = self.bbox_head(bbox_feats)
 
         bbox_results = dict(
-            cls_score=cls_score, bbox_pred=bbox_pred, bbox_feats=bbox_feats)
+            cls_score=cls_score, bbox_pred=bbox_pred, bbox_feats=bbox_feats)"""
+        bbox_results = dict(bbox_feats=bbox_feats)
         if x_lr is not None:
             cls_score_lr, bbox_pred_lr = self.bbox_head(bbox_feats_lr)
             bbox_results.update(cls_score_lr=cls_score_lr)
@@ -215,23 +217,44 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         bbox_targets = self.bbox_head.get_targets(sampling_results, gt_bboxes,
                                                   gt_labels, self.train_cfg)
-        loss_bbox = self.bbox_head.loss(bbox_results['cls_score'],
+        """loss_bbox = self.bbox_head.loss(bbox_results['cls_score'],
                                         bbox_results['bbox_pred'], rois,
                                         *bbox_targets)
-        bbox_results.update(loss_bbox=loss_bbox)
+        bbox_results.update(loss_bbox=loss_bbox)"""
         if x_lr is not None:
-            loss_bbox_lr = self.bbox_head.loss(bbox_results['cls_score_lr'],
-                                               bbox_results['bbox_pred_lr'], rois,
-                                               *bbox_targets)
-            target_ones = torch.Tensor(np.ones((rois.shape[0], 1)))
-            target_zeros = torch.Tensor(np.zeros((rois.shape[0], 1)))
+            areas = torch.mul((rois[:, 3] - rois[:, 1]), rois[:, 4] - rois[:, 2])
+            rois_index_hr = torch.where(areas > 96 * 96)
+            rois_index_sr = torch.where(areas <= 96 * 96 * 4)
+            rois_index_large = rois_index_hr
+            rois_index_small = torch.where(areas <= 96*96)
+            cls_score_lr = bbox_results['cls_score_lr'][rois_index_small]
+            bbox_pred_lr = bbox_results['bbox_pred_lr'][rois_index_small]
 
-            loss_g_dis = self.dis_head.loss(bbox_results['dis_score_sr'], target_ones)
+            labels_lr = bbox_targets[0][rois_index_small]
+            label_weights_lr = bbox_targets[1][rois_index_small]
+            bbox_targets_lr = bbox_targets[2][rois_index_small]
+            bbox_weights_lr = bbox_targets[3][rois_index_small]
+            bbox_targets_lr = labels_lr, label_weights_lr, bbox_targets_lr, bbox_weights_lr
+
+            loss_bbox_lr = self.bbox_head.loss(cls_score_lr,
+                                               bbox_pred_lr, rois[rois_index_small],
+                                               *bbox_targets_lr)
+            # target_ones = torch.Tensor(np.ones((rois.shape[0], 1)))
+            # target_zeros = torch.Tensor(np.zeros((rois.shape[0], 1)))
+
+            target_ones_g = torch.Tensor(np.ones((rois_index_sr.shape[0], 1)))
+            target_ones_d = torch.Tensor(np.ones((rois_index_hr.shape[0], 1)))
+            target_zeros_d = torch.Tensor(np.zeros((rois_index_sr.shape[0], 1)))
+            dis_score_sr = bbox_results['dis_score_sr'][rois_index_sr]
+            dis_score_hr = bbox_results['dis_score_hr'][rois_index_hr]
+
+            loss_g_dis = self.dis_head.loss(dis_score_sr, target_ones_g)
             loss_gen = loss_bbox_lr + loss_g_dis
-            loss_dis = (self.dis_head.loss(bbox_results['dis_score_sr'], target_zeros) + self.dis_head.loss(
-                bbox_results['dis_score_hr'], target_ones)) / 2
+            loss_dis = (self.dis_head.loss(dis_score_sr, target_zeros_d) + self.dis_head.loss(
+                dis_score_hr, target_ones_d)) / 2
             bbox_results.update(loss_gen=loss_gen)
             bbox_results.update(loss_dis=loss_dis)
+            bbox_results.update(loss_bbox_lr=loss_bbox_lr)
 
         return bbox_results
 
@@ -360,3 +383,78 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             return bbox_results, segm_results
         else:
             return bbox_results
+
+    def simple_test_bboxes(self,
+                           x,
+                           img_metas,
+                           proposals,
+                           rcnn_test_cfg,
+                           rescale=False):
+        """Test only det bboxes without augmentation."""
+        rois = bbox2roi(proposals)
+        bbox_results = self._bbox_forward_test(x, rois)
+
+        img_shape = img_metas[0]['img_shape']
+        scale_factor = img_metas[0]['scale_factor']
+        det_bboxes, det_labels = self.bbox_head.get_bboxes(
+            rois,
+            bbox_results['cls_score'],
+            bbox_results['bbox_pred'],
+            img_shape,
+            scale_factor,
+            rescale=rescale,
+            cfg=rcnn_test_cfg)
+        return det_bboxes, det_labels
+
+    def aug_test_bboxes(self, feats, img_metas, proposal_list, rcnn_test_cfg):
+        aug_bboxes = []
+        aug_scores = []
+        for x, img_meta in zip(feats, img_metas):
+            # only one image in the batch
+            img_shape = img_meta[0]['img_shape']
+            scale_factor = img_meta[0]['scale_factor']
+            flip = img_meta[0]['flip']
+            flip_direction = img_meta[0]['flip_direction']
+            # TODO more flexible
+            proposals = bbox_mapping(proposal_list[0][:, :4], img_shape,
+                                     scale_factor, flip, flip_direction)
+            rois = bbox2roi([proposals])
+            # recompute feature maps to save GPU memory
+            bbox_results = self._bbox_forward_test(x, rois)
+            bboxes, scores = self.bbox_head.get_bboxes(
+                rois,
+                bbox_results['cls_score'],
+                bbox_results['bbox_pred'],
+                img_shape,
+                scale_factor,
+                rescale=False,
+                cfg=None)
+            aug_bboxes.append(bboxes)
+            aug_scores.append(scores)
+        # after merging, bboxes will be rescaled to the original image size
+        merged_bboxes, merged_scores = merge_aug_bboxes(
+            aug_bboxes, aug_scores, img_metas, rcnn_test_cfg)
+        det_bboxes, det_labels = multiclass_nms(merged_bboxes, merged_scores,
+                                                rcnn_test_cfg.score_thr,
+                                                rcnn_test_cfg.nms,
+                                                rcnn_test_cfg.max_per_img)
+        return det_bboxes, det_labels
+
+    def _bbox_forward_test(self, x, rois):
+        # TODO: a more flexible way to decide which feature maps to use
+        bbox_feats = self.bbox_roi_extractor(x[1], rois)
+        if self.with_fsr_generator:
+            bbox_feats_sub, bbox_feats = self.bbox_roi_extractor(x, rois)
+            bbox_feats_sr = self.fsr_generator((bbox_feats_sub, bbox_feats))
+            areas = torch.mul((rois[:, 3] - rois[:, 1]), rois[:, 4] - rois[:, 2])
+            rois_small_index = torch.where(areas < 96*96)
+            bbox_feats[rois_small_index] = bbox_feats_sr[rois_small_index]
+        if self.with_shared_head:
+            bbox_feats = self.shared_head(bbox_feats)
+
+        cls_score, bbox_pred = self.bbox_head(bbox_feats)
+
+        bbox_results = dict(
+            cls_score=cls_score, bbox_pred=bbox_pred, bbox_feats=bbox_feats)
+
+        return bbox_results

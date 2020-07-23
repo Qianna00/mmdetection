@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from mmcv.cnn import normal_init
+from mmcv.runner import load_checkpoint
+from mmdet.utils import get_root_logger
 
 from mmdet.ops import batched_nms
 from ..builder import HEADS
@@ -23,10 +25,16 @@ class RPNHead(RPNTestMixin, AnchorHead):
                                  self.num_anchors * self.cls_out_channels, 1)
         self.rpn_reg = nn.Conv2d(self.feat_channels, self.num_anchors * 4, 1)
 
-    def init_weights(self):
-        normal_init(self.rpn_conv, std=0.01)
-        normal_init(self.rpn_cls, std=0.01)
-        normal_init(self.rpn_reg, std=0.01)
+    def init_weights(self, pretrained=None):
+        if isinstance(pretrained, str):
+            logger = get_root_logger()
+            load_checkpoint(self, pretrained, strict=False, logger=logger)
+        elif pretrained is None:
+            normal_init(self.rpn_conv, std=0.01)
+            normal_init(self.rpn_cls, std=0.01)
+            normal_init(self.rpn_reg, std=0.01)
+        else:
+            raise TypeError('pretrained must be a str or None')
 
     def forward_single(self, x):
         x = self.rpn_conv(x)

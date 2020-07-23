@@ -29,9 +29,15 @@ def parse_losses_m(losses):
         else:
             raise TypeError(f'{loss_name} is not a tensor or list of tensors')
 
-    loss = sum(_value for _key, _value in log_vars.items() if 'loss' in _key)
+    # loss = sum(_value for _key, _value in log_vars.items() if 'loss' in _key)
+    loss_b = log_vars['loss_bbox_lr']
+    loss_g = log_vars['loss_bbox_lr'] + log_vars['loss_gen']
+    loss_d = log_vars['loss_dis']
 
-    log_vars['loss'] = loss
+    log_vars['loss_b'] = loss_b
+    log_vars['loss_g'] = loss_g
+    log_vars['loss_d'] = loss_d
+
     for loss_name, loss_value in log_vars.items():
         # reduce loss when distributed training
         if dist.is_available() and dist.is_initialized():
@@ -39,7 +45,7 @@ def parse_losses_m(losses):
             dist.all_reduce(loss_value.div_(dist.get_world_size()))
         log_vars[loss_name] = loss_value.item()
 
-    return loss, log_vars
+    return loss_b, loss_g, loss_d, log_vars
 
 
 def batch_processor_m(model, data, train_mode):
@@ -59,10 +65,10 @@ def batch_processor_m(model, data, train_mode):
         dict: A dict containing losses and log vars.
     """
     losses = model(**data)
-    loss, log_vars = parse_losses_m(losses)
-
+    # loss, log_vars = parse_losses_m(losses)
+    loss_b, loss_g, loss_d, log_vars = parse_losses_m(losses)
     outputs = dict(
-        loss=loss, log_vars=log_vars, num_samples=len(data['img'].data))
+        loss_b=loss_b, loss_g=loss_g, loss_d=loss_d, log_vars=log_vars, num_samples=len(data['img'].data))
 
     return outputs
 
@@ -104,12 +110,12 @@ def train_detector_m(model,
     ]
 
     params_b = []
-    for key, value in dict(model.backbone.named_parameters()).items():
+    """for key, value in dict(model.backbone.named_parameters()).items():
         if value.requires_grad:
             params_b += [{'params': [value]}]
     for key, value in dict(model.rpn_head.named_parameters()).items():
         if value.requires_grad:
-            params_b += [{'params': [value]}]
+            params_b += [{'params': [value]}]"""
     for key, value in dict(model.roi_head.shared_head.named_parameters()).items():
         if value.requires_grad:
             params_b += [{'params': [value]}]

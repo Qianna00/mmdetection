@@ -5,8 +5,8 @@ _base_ = [
 ]
 norm_cfg = dict(type='BN', requires_grad=False)
 model = dict(
-    type='FasterRCNN',
-    pretrained='open-mmlab://detectron2/resnet50_caffe',
+    type='FasterRCNNGan',
+    pretrained='/root/data/zq/mmdetection/outputs/latest.pth',
     backbone=dict(
         type='ResNet',
         depth=50,
@@ -26,7 +26,7 @@ model = dict(
             type='AnchorGenerator',
             scales=[2, 4, 8, 16, 32],
             ratios=[0.5, 1.0, 2.0],
-            strides=[16]),
+            strides=[32]),
         bbox_coder=dict(
             type='DeltaXYWHBBoxCoder',
             target_means=[.0, .0, .0, .0],
@@ -47,7 +47,7 @@ model = dict(
             norm_eval=True),
         bbox_roi_extractor=dict(
             type='BaseSubRoIExtractor',
-            roi_layer=dict(type='RoIPool', out_size=14),
+            roi_layer=dict(type='RoIPool', out_size=14, use_torchvision=True),
             out_channels=1024,
             featmap_strides=[2, 4, 16, 32]),
         fsr_generator=dict(

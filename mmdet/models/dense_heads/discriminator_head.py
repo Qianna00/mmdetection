@@ -2,6 +2,8 @@ from ..builder import HEADS
 import torch.nn as nn
 import torch
 from ..builder import build_loss
+from mmcv.runner import load_checkpoint
+from mmdet.utils import get_root_logger
 
 
 @HEADS.register_module()
@@ -31,10 +33,16 @@ class DisHead(nn.Module):
 
         return x
 
-    def init_weights(self):
-        for m in self.dis_net:
-            nn.init.normal_(m.weight, 0, 0.01)
-            nn.init.constant_(m.bias, 0)
+    def init_weights(self, pretrained=None):
+        if isinstance(pretrained, str):
+            logger = get_root_logger()
+            load_checkpoint(self, pretrained, strict=False, logger=logger)
+        elif pretrained is None:
+            for m in self.dis_net:
+                nn.init.normal_(m.weight, 0, 0.01)
+                nn.init.constant_(m.bias, 0)
+        else:
+            raise TypeError('pretrained must be a str or None')
 
     def loss(self, dis_score, targets):
 

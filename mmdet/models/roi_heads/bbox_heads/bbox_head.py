@@ -7,6 +7,8 @@ from mmdet.core import (auto_fp16, build_bbox_coder, force_fp32, multi_apply,
                         multiclass_nms)
 from mmdet.models.builder import HEADS, build_loss
 from mmdet.models.losses import accuracy
+from mmcv.runner import load_checkpoint
+from mmdet.utils import get_root_logger
 
 
 @HEADS.register_module()
@@ -63,14 +65,20 @@ class BBoxHead(nn.Module):
             self.fc_reg = nn.Linear(in_channels, out_dim_reg)
         self.debug_imgs = None
 
-    def init_weights(self):
+    def init_weights(self, pretrained=None):
         # conv layers are already initialized by ConvModule
-        if self.with_cls:
-            nn.init.normal_(self.fc_cls.weight, 0, 0.01)
-            nn.init.constant_(self.fc_cls.bias, 0)
-        if self.with_reg:
-            nn.init.normal_(self.fc_reg.weight, 0, 0.001)
-            nn.init.constant_(self.fc_reg.bias, 0)
+        if isinstance(pretrained, str):
+            logger = get_root_logger()
+            load_checkpoint(self, pretrained, strict=False, logger=logger)
+        elif pretrained is None:
+            if self.with_cls:
+                nn.init.normal_(self.fc_cls.weight, 0, 0.01)
+                nn.init.constant_(self.fc_cls.bias, 0)
+            if self.with_reg:
+                nn.init.normal_(self.fc_reg.weight, 0, 0.001)
+                nn.init.constant_(self.fc_reg.bias, 0)
+        else:
+            raise TypeError('pretrained must be a str or None')
 
     @auto_fp16()
     def forward(self, x):

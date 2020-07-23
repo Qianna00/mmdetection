@@ -48,11 +48,11 @@ class MultiOptimRunner(EpochBasedRunner):
         if not inserted:
             self._hooks.insert(0, hook)
 
-    def register_optimizer_hook(self, optimizer_config, priority='NORMAL'):
+    def register_optimizer_hook(self, optimizer_config, priority='NORMAL', optim_type="OptimHookB"):
         if optimizer_config is None:
             return
         if isinstance(optimizer_config, dict):
-            optimizer_config.setdefault('type', 'OptimizerHook')
+            optimizer_config.setdefault('type', optim_type)
             hook = mmcv.build_from_cfg(optimizer_config, HOOKS)
         else:
             hook = optimizer_config
@@ -68,9 +68,9 @@ class MultiOptimRunner(EpochBasedRunner):
                                 momentum_config=None):
         self.register_lr_hook(lr_config)
         self.register_momentum_hook(momentum_config)
-        self.register_optimizer_hook(optimizer_b_config, priority="LOW")
-        self.register_optimizer_hook(optimizer_g_config, priority="HIGH")
-        self.register_optimizer_hook(optimizer_d_config, priority="NORMAL")
+        self.register_optimizer_hook(optimizer_b_config, priority="LOW", optim_type="OptimHookB")
+        self.register_optimizer_hook(optimizer_g_config, priority="HIGH", optim_type="OptimHookG")
+        self.register_optimizer_hook(optimizer_d_config, priority="NORMAL", optim_type="OptimHookD")
         self.register_checkpoint_hook(checkpoint_config)
         self.register_hook(IterTimerHook())
         self.register_logger_hooks(log_config)

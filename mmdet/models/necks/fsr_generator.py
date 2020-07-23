@@ -5,6 +5,8 @@ from mmcv.cnn import ConvModule, xavier_init
 from mmcv.cnn import constant_init, kaiming_init
 from mmdet.core import auto_fp16
 from ..builder import NECKS
+from mmcv.runner import load_checkpoint
+from mmdet.utils import get_root_logger
 
 
 class ResidualBlock(nn.Module):
@@ -45,12 +47,18 @@ class FSRGenerator(nn.Module):
 
         return feat_sr
 
-    def init_weights(self):
-        for m in self.res_blocks:
-            for n in m.conv_block:
-                if isinstance(n, nn.Conv2d):
-                    kaiming_init(n)
-                elif isinstance(n, nn.BatchNorm2d):
-                    constant_init(n, 1)
+    def init_weights(self, pretrained=None):
+        if isinstance(pretrained, str):
+            logger = get_root_logger()
+            load_checkpoint(self, pretrained, strict=False, logger=logger)
+        elif pretrained is None:
+            for m in self.res_blocks:
+                for n in m.conv_block:
+                    if isinstance(n, nn.Conv2d):
+                        kaiming_init(n)
+                    elif isinstance(n, nn.BatchNorm2d):
+                        constant_init(n, 1)
+        else:
+            raise TypeError('pretrained must be a str or None')
 
 
