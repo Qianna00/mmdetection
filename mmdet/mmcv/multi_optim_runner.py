@@ -22,6 +22,25 @@ class MultiOptimRunner(EpochBasedRunner):
         super(MultiOptimRunner, self).__init__(model=model, optimizer=optimizer,
                                                work_dir=work_dir, logger=logger, meta=meta)
 
+    def current_lr(self):
+        """Get current learning rates.
+
+        Returns:
+            list[float] | dict[str, list[float]]: Current learning rates of all
+                param groups. If the runner has a dict of optimizers, this
+                method will return a dict.
+        """
+        if isinstance(self.optimizer_b, torch.optim.Optimizer):
+            lr = [group['lr'] for group in self.optimizer_b.param_groups]
+        elif isinstance(self.optimizer_b, dict):
+            lr = dict()
+            for name, optim in self.optimizer_b.items():
+                lr[name] = [group['lr'] for group in optim.param_groups]
+        else:
+            raise RuntimeError(
+                'lr is not applicable because optimizer does not exist.')
+        return lr
+
     def register_hook(self, hook, priority='HIGH'):
         """Register a hook into the hook list.
 
