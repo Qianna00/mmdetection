@@ -61,7 +61,7 @@ class MultiOptimRunner(EpochBasedRunner):
             # the string will not be changed if it contains capital letters.
             if policy_type == policy_type.lower():
                 policy_type = policy_type.title()
-            hook_type = 'Multi' + policy_type + 'LrUpdaterHook'
+            hook_type = policy_type + 'LrUpdaterHook'
             lr_config['type'] = hook_type + type
             hook = mmcv.build_from_cfg(lr_config, HOOKS)
         else:
