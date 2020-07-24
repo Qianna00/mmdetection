@@ -15,6 +15,9 @@ class MultiOptimRunner(EpochBasedRunner):
                  work_dir=None,
                  logger=None,
                  meta=None):
+        self.optimizer_b = optimizer_b
+        self.optimizer_g = optimizer_g
+        self.optimizer_d = optimizer_d
         optimizer = {"optimizer_b": optimizer_b, "optimizer_g": optimizer_g, "optimizer_d": optimizer_d}
         super(MultiOptimRunner, self).__init__(model=model, optimizer=optimizer,
                                                work_dir=work_dir, logger=logger, meta=meta)
@@ -47,6 +50,44 @@ class MultiOptimRunner(EpochBasedRunner):
         if not inserted:
             self._hooks.insert(0, hook)
 
+    def register_lr_hook(self, lr_config, type='B'):
+        if isinstance(lr_config, dict):
+            assert 'policy' in lr_config
+            policy_type = lr_config.pop('policy')
+            # If the type of policy is all in lower case, e.g., 'cyclic',
+            # then its first letter will be capitalized, e.g., to be 'Cyclic'.
+            # This is for the convenient usage of Lr updater.
+            # Since this is not applicable for `CosineAnealingLrUpdater`,
+            # the string will not be changed if it contains capital letters.
+            if policy_type == policy_type.lower():
+                policy_type = policy_type.title()
+            hook_type = 'Multi' + policy_type + 'LrUpdaterHook'
+            lr_config['type'] = hook_type + type
+            hook = mmcv.build_from_cfg(lr_config, HOOKS)
+        else:
+            hook = lr_config
+        self.register_hook(hook)
+
+    def register_momentum_hook(self, momentum_config):
+        if momentum_config is None:
+            return
+        if isinstance(momentum_config, dict):
+            assert 'policy' in momentum_config
+            policy_type = momentum_config.pop('policy')
+            # If the type of policy is all in lower case, e.g., 'cyclic',
+            # then its first letter will be capitalized, e.g., to be 'Cyclic'.
+            # This is for the convenient usage of momentum updater.
+            # Since this is not applicable for `CosineAnealingMomentumUpdater`,
+            # the string will not be changed if it contains capital letters.
+            if policy_type == policy_type.lower():
+                policy_type = policy_type.title()
+            hook_type = policy_type + 'MomentumUpdaterHook'
+            momentum_config['type'] = hook_type
+            hook = mmcv.build_from_cfg(momentum_config, HOOKS)
+        else:
+            hook = momentum_config
+        self.register_hook(hook)
+
     def register_optimizer_hook(self, optimizer_config, priority='NORMAL', optim_type="OptimHookB"):
         if optimizer_config is None:
             return
@@ -58,14 +99,18 @@ class MultiOptimRunner(EpochBasedRunner):
         self.register_hook(hook, priority)
 
     def register_training_hooks(self,
-                                lr_config,
+                                lr_config_b,
+                                lr_config_g=None,
+                                lr_config_d=None,
                                 optimizer_b_config=None,
                                 optimizer_g_config=None,
                                 optimizer_d_config=None,
                                 checkpoint_config=None,
                                 log_config=None,
                                 momentum_config=None):
-        self.register_lr_hook(lr_config)
+        self.register_lr_hook(lr_config_b, type='B')
+        self.register_lr_hook(lr_config_g, type='G')
+        self.register_lr_hook(lr_config_d, type='D')
         self.register_momentum_hook(momentum_config)
         self.register_optimizer_hook(optimizer_b_config, priority="LOW", optim_type="OptimHookB")
         self.register_optimizer_hook(optimizer_g_config, priority="HIGH", optim_type="OptimHookG")
