@@ -56,7 +56,6 @@ class RoIPool(nn.Module):
         super(RoIPool, self).__init__()
 
         self.out_size = _pair(out_size)
-        print(self.out_size, print(_pair(self.out_size)))
         self.spatial_scale = float(spatial_scale)
         self.use_torchvision = use_torchvision
 
