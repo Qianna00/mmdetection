@@ -320,7 +320,7 @@ class ResNetM(nn.Module):
         else:
             raise TypeError('pretrained must be a str or None')
 
-    def forward(self, x):
+    def forward(self, x, for_lr=False):
         if self.deep_stem:
             x = self.stem(x)
         else:
@@ -329,7 +329,8 @@ class ResNetM(nn.Module):
             x = self.relu(x)
         x = self.maxpool(x)
         outs = []
-        outs.append(x)
+        if for_lr:
+            outs.append(x)
         for i, layer_name in enumerate(self.res_layers):
             res_layer = getattr(self, layer_name)
             x = res_layer(x)

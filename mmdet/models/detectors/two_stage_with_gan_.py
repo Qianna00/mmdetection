@@ -145,18 +145,18 @@ class TwoStageGanDetector2(BaseDetector):
             dict[str, Tensor]: a dictionary of loss components
         """
         self.backbone.eval()
-        x = self.extract_feat(img)
+        x = self.backbone(img)
         x_lr = None
         if self.with_dis_head:
-            x_lr = self.extract_feat(img_lr)
+            x_lr = self.backbone(img_lr, for_lr=True)
 
         losses = dict()
 
         # RPN forward and loss(inference)
         if self.with_rpn:
             self.rpn_head.eval()
-            proposal_cfg = self.train_cfg.get('rpn_proposal',
-                                              self.test_cfg.rpn)
+            # proposal_cfg = self.train_cfg.get('rpn_proposal',
+                                              # self.test_cfg.rpn)
             proposal_list = self.rpn_head.simple_test_rpn(tuple([x_lr[1]]), img_metas)
             """rpn_losses, proposal_list = self.rpn_head.forward_train(
                 x,
