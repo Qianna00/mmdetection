@@ -167,3 +167,25 @@ optimizer_config_b = dict(grad_clip=None)
 optimizer_config_g = dict(grad_clip=None)
 optimizer_config_d = dict(grad_clip=None)
 
+lr_config_b = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=500,
+    warmup_ratio=0.001,
+    step=[8, 11])
+
+lr_config_g = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=500,
+    warmup_ratio=0.001,
+    step=[8, 11])
+
+lr_config_d = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=500,
+    warmup_ratio=0.001,
+    step=[8, 11])
+
+total_epochs = 12
