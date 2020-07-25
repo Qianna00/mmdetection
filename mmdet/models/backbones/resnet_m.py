@@ -295,7 +295,6 @@ class ResNetM(nn.Module):
                 param.requires_grad = False
 
     def init_weights(self, pretrained=None):
-        print("checkpoint file exists?", osp.exists(pretrained))
         if isinstance(pretrained, str):
             logger = get_root_logger()
             load_checkpoint(self, pretrained, strict=False, logger=logger)
