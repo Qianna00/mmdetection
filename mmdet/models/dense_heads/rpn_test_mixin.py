@@ -22,7 +22,10 @@ class RPNTestMixin(object):
             return proposal_list
 
     def simple_test_rpn(self, x, img_metas):
-        rpn_outs = self(x)
+        if isinstance(x, tuple):
+            rpn_outs = self(x)
+        else:
+            rpn_outs = self.forward_single(x)
         proposal_list = self.get_bboxes(*rpn_outs, img_metas)
         return proposal_list
 

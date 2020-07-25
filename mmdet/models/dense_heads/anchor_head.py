@@ -113,7 +113,6 @@ class AnchorHead(BaseDenseHead):
         return cls_score, bbox_pred
 
     def forward(self, feats):
-        print("feats:", feats.shape)
         return multi_apply(self.forward_single, feats)
 
     def get_anchors(self, featmap_sizes, img_metas, device='cuda'):
