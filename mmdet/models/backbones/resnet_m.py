@@ -10,6 +10,7 @@ from mmdet.utils import get_root_logger
 from ..builder import BACKBONES
 from ..utils import ResLayerM
 from .resnet import BasicBlock, Bottleneck
+import os.path as osp
 
 
 @BACKBONES.register_module()
@@ -294,6 +295,7 @@ class ResNetM(nn.Module):
                 param.requires_grad = False
 
     def init_weights(self, pretrained=None):
+        print("checkpoint file exists?", osp.exists(pretrained))
         if isinstance(pretrained, str):
             logger = get_root_logger()
             load_checkpoint(self, pretrained, strict=False, logger=logger)
