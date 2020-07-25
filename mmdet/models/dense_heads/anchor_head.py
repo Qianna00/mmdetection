@@ -474,12 +474,9 @@ class AnchorHead(BaseDenseHead):
             >>> assert len(det_bboxes) == len(det_labels) == cfg.max_per_img
         """
         assert len(cls_scores) == len(bbox_preds)
-        print(cls_scores[0].shape, cls_scores)
         num_levels = len(cls_scores)
-
         device = cls_scores[0].device
         featmap_sizes = [cls_scores[i].shape[-2:] for i in range(num_levels)]
-        print(featmap_sizes)
         mlvl_anchors = self.anchor_generator.grid_anchors(
             featmap_sizes, device=device)
 
