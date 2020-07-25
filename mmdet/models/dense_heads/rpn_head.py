@@ -37,6 +37,7 @@ class RPNHead(RPNTestMixin, AnchorHead):
             raise TypeError('pretrained must be a str or None')
 
     def forward_single(self, x):
+        print(x.shape)
         x = self.rpn_conv(x)
         x = F.relu(x, inplace=True)
         rpn_cls_score = self.rpn_cls(x)

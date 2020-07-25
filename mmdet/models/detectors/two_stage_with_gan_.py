@@ -150,8 +150,6 @@ class TwoStageGanDetector2(BaseDetector):
         if self.with_dis_head:
             x_lr = self.extract_feat(img_lr)
 
-        print(x_lr[0].shape, x_lr[1].shape)
-
         losses = dict()
 
         # RPN forward and loss(inference)
