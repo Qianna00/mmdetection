@@ -186,7 +186,6 @@ class AnchorGenerator(object):
                 are the sizes of the corresponding feature lavel,
                 num_base_anchors is the number of anchors for that level.
         """
-        print(self.num_levels, len(featmap_sizes))
         assert self.num_levels == len(featmap_sizes)
         multi_level_anchors = []
         for i in range(self.num_levels):
