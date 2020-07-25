@@ -157,7 +157,7 @@ class TwoStageGanDetector2(BaseDetector):
             self.rpn_head.eval()
             proposal_cfg = self.train_cfg.get('rpn_proposal',
                                               self.test_cfg.rpn)
-            proposal_list = self.rpn_head.simple_test_rpn(tuple(x_lr[1]), img_metas)
+            proposal_list = self.rpn_head.simple_test_rpn(tuple(x_lr[1],), img_metas)
             """rpn_losses, proposal_list = self.rpn_head.forward_train(
                 x,
                 img_metas,
