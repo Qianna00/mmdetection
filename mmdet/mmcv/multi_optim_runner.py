@@ -106,7 +106,7 @@ class MultiOptimRunner(EpochBasedRunner):
             hook = momentum_config
         self.register_hook(hook)
 
-    def _register_optimizer_hook(self, optimizer_config, priority='NORMAL', optim_type="OptimHookB"):
+    def register_optimizer_hook(self, optimizer_config, priority='NORMAL', optim_type="OptimHookB"):
         if optimizer_config is None:
             return
         if isinstance(optimizer_config, dict):
@@ -116,7 +116,7 @@ class MultiOptimRunner(EpochBasedRunner):
             hook = optimizer_config
         self.register_hook(hook, priority)
 
-    def _register_training_hooks(self,
+    def register_training_hooks(self,
                                 lr_config_b,
                                 lr_config_g=None,
                                 lr_config_d=None,
@@ -130,9 +130,9 @@ class MultiOptimRunner(EpochBasedRunner):
         self.register_lr_hook(lr_config_g, type='G')
         self.register_lr_hook(lr_config_d, type='D')
         self.register_momentum_hook(momentum_config)
-        self._register_optimizer_hook(optimizer_b_config, priority="LOW", optim_type="OptimHookB")
-        self._register_optimizer_hook(optimizer_g_config, priority="HIGH", optim_type="OptimHookG")
-        self._register_optimizer_hook(optimizer_d_config, priority="NORMAL", optim_type="OptimHookD")
+        self.register_optimizer_hook(optimizer_b_config, priority="LOW", optim_type="OptimHookB")
+        self.register_optimizer_hook(optimizer_g_config, priority="HIGH", optim_type="OptimHookG")
+        self.register_optimizer_hook(optimizer_d_config, priority="NORMAL", optim_type="OptimHookD")
         self.register_checkpoint_hook(checkpoint_config)
         self.register_hook(IterTimerHook())
         self.register_logger_hooks(log_config)
