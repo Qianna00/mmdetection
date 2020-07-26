@@ -18,9 +18,8 @@ class MultiOptimRunner(EpochBasedRunner):
         self.optimizer_b = optimizer_b
         self.optimizer_g = optimizer_g
         self.optimizer_d = optimizer_d
-        optimizer = {"optimizer_b": optimizer_b, "optimizer_g": optimizer_g, "optimizer_d": optimizer_d}
-        super(MultiOptimRunner, self).__init__(model=model, optimizer=optimizer,
-                                               work_dir=work_dir, logger=logger, meta=meta)
+        # optimizer = {"optimizer_b": optimizer_b, "optimizer_g": optimizer_g, "optimizer_d": optimizer_d}
+        super(MultiOptimRunner, self).__init__(model=model, work_dir=work_dir, logger=logger, meta=meta)
 
     def current_lr(self):
         """Get current learning rates.
