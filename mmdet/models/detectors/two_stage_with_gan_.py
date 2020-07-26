@@ -173,8 +173,10 @@ class TwoStageGanDetector2(BaseDetector):
             else:
                 proposal_list = proposals
 
-        roi_losses = self.roi_head.forward_train(x, img_metas, proposal_list, gt_bboxes, gt_labels,
-                                                 gt_bboxes_ignore, gt_masks, x_lr, **kwargs)
+        with torch.autograd.set_detect_anomaly(True):
+
+            roi_losses = self.roi_head.forward_train(x, img_metas, proposal_list, gt_bboxes, gt_labels,
+                                                     gt_bboxes_ignore, gt_masks, x_lr, **kwargs)
 
         losses.update(roi_losses)
 
