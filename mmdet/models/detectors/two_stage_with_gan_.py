@@ -147,11 +147,9 @@ class TwoStageGanDetector2(BaseDetector):
             dict[str, Tensor]: a dictionary of loss components
         """
         x = self.backbone(img)
-        x.requires_grad_(False)
         x_lr = None
         if self.with_dis_head:
             x_lr = self.backbone(img_lr, for_lr=True)
-            x_lr.requires_grad_(False)
         losses = dict()
 
         # RPN forward and loss(inference)
@@ -173,12 +171,12 @@ class TwoStageGanDetector2(BaseDetector):
         else:
             proposal_list = proposals
 
-        roi_losses = self.roi_head.forward_train(x, img_metas, proposal_list, gt_bboxes, gt_labels,
+        roi_losses, feats = self.roi_head.forward_train(x, img_metas, proposal_list, gt_bboxes, gt_labels,
                                                      gt_bboxes_ignore, gt_masks, x_lr, **kwargs)
 
         losses.update(roi_losses)
 
-        return losses
+        return losses, feats
 
     async def async_simple_test(self,
                                 img,
@@ -235,9 +233,9 @@ class TwoStageGanDetector2(BaseDetector):
                 raise TypeError(f'{loss_name} is not a tensor or list of tensors')
 
         # loss = sum(_value for _key, _value in log_vars.items() if 'loss' in _key)
-        loss_b = log_vars['loss_b']
-        loss_g = log_vars['loss_g']
-        loss_d = log_vars['loss_d']
+        loss_b = log_vars['loss_cls'] + log_vars['loss_bbox']
+        # loss_g = log_vars['loss_g']
+        # loss_d = log_vars['loss_d']
 
         for loss_name, loss_value in log_vars.items():
             # reduce loss when distributed training
@@ -246,7 +244,8 @@ class TwoStageGanDetector2(BaseDetector):
                 dist.all_reduce(loss_value.div_(dist.get_world_size()))
             log_vars[loss_name] = loss_value.item()
 
-        return loss_b, loss_g, loss_d, log_vars
+        # return loss_b, loss_g, loss_d, log_vars
+        return loss_b, log_vars
 
     def train_step(self, data, optimizer):
         """The iteration step during training.
@@ -275,11 +274,12 @@ class TwoStageGanDetector2(BaseDetector):
                 DDP, it means the batch size on each GPU), which is used for \
                 averaging the logs.
         """
-        losses = self(**data)
-        loss_b, loss_g, loss_d, log_vars = self._parse_losses(losses)
-
+        losses, feats = self(**data)
+        # loss_b, loss_g, loss_d, log_vars = self._parse_losses(losses)
+        loss_b, log_vars = self._parse_losses(losses)
         outputs = dict(
-            loss_b=loss_b, loss_g=loss_g, loss_d=loss_d, log_vars=log_vars, num_samples=len(data['img'].data))
+            loss_b=loss_b, log_vars=log_vars, num_samples=len(data['img'].data))
+        outputs.update(feats)
 
         return outputs
 
