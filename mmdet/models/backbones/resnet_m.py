@@ -240,7 +240,7 @@ class ResNetM(nn.Module):
                     padding=1,
                     bias=False),
                 build_norm_layer(self.norm_cfg, stem_channels // 2)[1],
-                nn.ReLU(inplace=True),
+                nn.ReLU(),
                 build_conv_layer(
                     self.conv_cfg,
                     stem_channels // 2,
@@ -250,7 +250,7 @@ class ResNetM(nn.Module):
                     padding=1,
                     bias=False),
                 build_norm_layer(self.norm_cfg, stem_channels // 2)[1],
-                nn.ReLU(inplace=True),
+                nn.ReLU(),
                 build_conv_layer(
                     self.conv_cfg,
                     stem_channels // 2,
@@ -260,7 +260,7 @@ class ResNetM(nn.Module):
                     padding=1,
                     bias=False),
                 build_norm_layer(self.norm_cfg, stem_channels)[1],
-                nn.ReLU(inplace=True))
+                nn.ReLU())
         else:
             self.conv1 = build_conv_layer(
                 self.conv_cfg,
@@ -273,7 +273,7 @@ class ResNetM(nn.Module):
             self.norm1_name, norm1 = build_norm_layer(
                 self.norm_cfg, stem_channels, postfix=1)
             self.add_module(self.norm1_name, norm1)
-            self.relu = nn.ReLU(inplace=True)
+            self.relu = nn.ReLU()
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
     def _freeze_stages(self):
