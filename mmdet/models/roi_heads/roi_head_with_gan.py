@@ -182,7 +182,6 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
     def _bbox_forward(self, x, rois, x_lr=None):
         # TODO: a more flexible way to decide which feature maps to use
         bbox_feats = self.bbox_roi_extractor(x, rois)
-        print(bbox_feats.shape)
         if self.with_fsr_generator:
             # bbox_feats_sub, bbox_feats = self.bbox_roi_extractor(x, rois)
             # bbox_feats = self.fsr_generator((bbox_feats_sub, bbox_feats))
@@ -245,9 +244,9 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             # target_ones = torch.Tensor(np.ones((rois.shape[0], 1)))
             # target_zeros = torch.Tensor(np.zeros((rois.shape[0], 1)))
 
-            target_ones_g = torch.Tensor(np.ones((rois_index_sr[0].shape[0], 1)))
-            target_ones_d = torch.Tensor(np.ones((rois_index_hr[0].shape[0], 1)))
-            target_zeros_d = torch.Tensor(np.zeros((rois_index_sr[0].shape[0], 1)))
+            target_ones_g = torch.Tensor(np.ones((rois_index_sr[0].shape[0], 1))).cuda()
+            target_ones_d = torch.Tensor(np.ones((rois_index_hr[0].shape[0], 1))).cuda()
+            target_zeros_d = torch.Tensor(np.zeros((rois_index_sr[0].shape[0], 1))).cuda()
             dis_score_sr = bbox_results['dis_score_sr'][rois_index_sr]
             dis_score_hr = bbox_results['dis_score_hr'][rois_index_hr]
 
