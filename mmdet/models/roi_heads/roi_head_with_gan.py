@@ -187,16 +187,16 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             # bbox_feats = self.fsr_generator((bbox_feats_sub, bbox_feats))
             if x_lr is not None:
                 bbox_feats_sub_lr, bbox_feats_lr = self.bbox_roi_extractor(x_lr, rois, for_lr=True)
-                bbox_feats_lr = self.fsr_generator((bbox_feats_sub_lr, bbox_feats_lr))
-        if self.with_shared_head:
-            bbox_feats = self.shared_head(bbox_feats)
-            if x_lr is not None:
-                bbox_feats_lr = self.shared_head(bbox_feats_lr)
+                bbox_feats_sr = self.fsr_generator((bbox_feats_sub_lr, bbox_feats_lr))
         """cls_score, bbox_pred = self.bbox_head(bbox_feats)
 
         bbox_results = dict(
             cls_score=cls_score, bbox_pred=bbox_pred, bbox_feats=bbox_feats)"""
         bbox_results = dict(bbox_feats=bbox_feats)
+        if self.with_shared_head:
+            # bbox_feats = self.shared_head(bbox_feats)
+            if x_lr is not None:
+                bbox_feats_lr = self.shared_head(bbox_feats_sr)
         if x_lr is not None:
             cls_score_lr, bbox_pred_lr = self.bbox_head(bbox_feats_lr)
             bbox_results.update(cls_score_lr=cls_score_lr)
@@ -206,8 +206,9 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             dis_score_hr = self.dis_head(bbox_feats)
             bbox_results.update(dis_score_hr=dis_score_hr)
             if x_lr is not None:
-                dis_score_sr = self.dis_head(bbox_feats_lr)
+                dis_score_sr = self.dis_head(bbox_feats_sr)
                 bbox_results.update(dis_score_sr=dis_score_sr)
+
         return bbox_results
 
     def _bbox_forward_train(self, x, sampling_results, gt_bboxes, gt_labels,
