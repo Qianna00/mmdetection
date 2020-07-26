@@ -164,9 +164,9 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
                                                     img_metas, x_lr)
             losses.update(bbox_results['loss_bbox_lr'])
             if self.with_dis_head:
-                losses.update(bbox_results['loss_det'])
-                losses.update(bbox_results['loss_gen'])
-                losses.update(bbox_results['loss_dis'])
+                losses.update(loss_b=bbox_results['loss_det'])
+                losses.update(loss_g=bbox_results['loss_gen'])
+                losses.update(loss_d=bbox_results['loss_dis'])
 
         # mask head forward and loss
         if self.with_mask:

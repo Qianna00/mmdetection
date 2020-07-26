@@ -238,9 +238,9 @@ class TwoStageGanDetector2(BaseDetector):
                 raise TypeError(f'{loss_name} is not a tensor or list of tensors')
 
         # loss = sum(_value for _key, _value in log_vars.items() if 'loss' in _key)
-        loss_b = log_vars['loss_det']
-        loss_g = log_vars['loss_gen']
-        loss_d = log_vars['loss_dis']
+        loss_b = log_vars['loss_b']
+        loss_g = log_vars['loss_g']
+        loss_d = log_vars['loss_d']
 
         for loss_name, loss_value in log_vars.items():
             # reduce loss when distributed training
