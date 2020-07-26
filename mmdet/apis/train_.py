@@ -8,7 +8,7 @@ import torch.distributed as dist
 from mmcv.parallel import MMDataParallel, MMDistributedDataParallel
 from mmcv.runner import (DistSamplerSeedHook, OptimizerHook, Runner,
                          build_optimizer)
-
+from mmcv.runner.hooks.optimizer import OptimHookB, OptimHookG, OptimHookD
 from mmdet.core import DistEvalHook, EvalHook, Fp16OptimizerHook
 from mmdet.datasets import build_dataloader, build_dataset
 from mmdet.utils import get_root_logger
@@ -121,9 +121,9 @@ def train_detector_m(model,
         optimizer_config_d = Fp16OptimizerHook(
             **cfg.optimizer_config_d, **fp16_cfg, distributed=distributed)
     elif distributed and 'type' not in cfg.optimizer_config_b:
-        optimizer_config_b = OptimizerHook(**cfg.optimizer_config_b)
-        optimizer_config_g = OptimizerHook(**cfg.optimizer_config_g)
-        optimizer_config_d = OptimizerHook(**cfg.optimizer_config_d)
+        optimizer_config_b = OptimHookB(**cfg.optimizer_config_b)
+        optimizer_config_g = OptimHookG(**cfg.optimizer_config_g)
+        optimizer_config_d = OptimHookD(**cfg.optimizer_config_d)
     else:
         optimizer_config_b = cfg.optimizer_config_b
         optimizer_config_g = cfg.optimizer_config_g
