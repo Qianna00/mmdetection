@@ -216,7 +216,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
                 # dis_score_sr = self.dis_head(bbox_feats_sr)
                 # bbox_results.update(dis_score_sr=dis_score_sr)
             bbox_results.update(bbox_feats=bbox_feats)
-            bbox_results.update(bbox_feats_sr=bbox_feats_sr)
+            bbox_results.update(bbox_feats_lr=bbox_feats_sr)
 
         return bbox_results
 
