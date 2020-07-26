@@ -10,7 +10,7 @@ from mmdet.utils import get_root_logger
 class DisHead(nn.Module):
     def __init__(self, in_features,
                  loss_dis=dict(type="CrossEntropyLoss",
-                               use_sigmoid=False,
+                               use_sigmoid=True,
                                loss_weight=1.0)):
         super(DisHead, self).__init__()
 
@@ -29,7 +29,7 @@ class DisHead(nn.Module):
         x = self.avg_pool(x)
         x = torch.flatten(x, start_dim=1)
         x = self.dis_net(x)
-        x = torch.sigmoid(x)
+        # x = torch.sigmoid(x)
 
         return x
 
