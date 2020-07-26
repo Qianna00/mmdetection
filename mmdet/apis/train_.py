@@ -133,6 +133,7 @@ def train_detector_m(model,
     runner.register_training_hooks(cfg.lr_config_b, cfg.lr_config_g, cfg.lr_config_d, optimizer_config_b, optimizer_config_g, optimizer_config_d,
                                    cfg.checkpoint_config, cfg.log_config,
                                    cfg.get('momentum_config', None))
+    print(runner.hooks)
     if distributed:
         runner.register_hook(DistSamplerSeedHook())
 
