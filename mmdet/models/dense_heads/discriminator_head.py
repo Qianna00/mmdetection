@@ -14,7 +14,7 @@ class DisHead(nn.Module):
                                loss_weight=1.0)):
         super(DisHead, self).__init__()
 
-        self.avg_pool = nn.AvgPool2d(kernel_size=7)
+        self.avg_pool = nn.AvgPool2d(kernel_size=14)
         self.dis_net = nn.Sequential(
             nn.Linear(in_features, 4096),
             nn.Linear(4096, 1024),
