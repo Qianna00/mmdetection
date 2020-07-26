@@ -204,10 +204,10 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             bbox_results.update(bbox_pred_lr=bbox_pred_lr)
 
         if self.with_dis_head:
-            dis_score_hr = self.dis_head(bbox_feats)
+            dis_score_hr = self.dis_head(bbox_feats.detach())
             bbox_results.update(dis_score_hr=dis_score_hr)
             if x_lr is not None:
-                dis_score_sr = self.dis_head(bbox_feats_sr)
+                dis_score_sr = self.dis_head(bbox_feats_sr.detach())
                 bbox_results.update(dis_score_sr=dis_score_sr)
 
         return bbox_results
