@@ -162,9 +162,9 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             bbox_results = self._bbox_forward_train(x, sampling_results,
                                                     gt_bboxes, gt_labels,
                                                     img_metas, x_lr)
-            # losses.update(bbox_results['loss_bbox'])
+            losses.update(bbox_results['loss_bbox_lr'])
             if self.with_dis_head:
-                losses.update(bbox_results['loss_bbox_lr'])
+                losses.update(bbox_results['loss_det'])
                 losses.update(bbox_results['loss_gen'])
                 losses.update(bbox_results['loss_dis'])
 
@@ -248,11 +248,13 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             dis_score_hr = bbox_results['dis_score_hr'][rois_index_hr]
 
             loss_g_dis = self.dis_head.loss(dis_score_sr, target_ones_g)
-            loss_gen = loss_bbox_lr + loss_g_dis
+            loss_gen = loss_bbox_lr['loss_cls'] + loss_bbox_lr['loss_bbox'] + loss_g_dis
             loss_dis = (self.dis_head.loss(dis_score_sr, target_zeros_d) + self.dis_head.loss(
                 dis_score_hr, target_ones_d)) / 2
+            loss_det = loss_bbox_lr['loss_cls'] + loss_bbox_lr['loss_bbox']
             bbox_results.update(loss_gen=loss_gen)
             bbox_results.update(loss_dis=loss_dis)
+            bbox_results.update(loss_det=loss_det)
             bbox_results.update(loss_bbox_lr=loss_bbox_lr)
 
         return bbox_results
