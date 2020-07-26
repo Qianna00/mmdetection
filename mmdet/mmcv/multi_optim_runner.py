@@ -116,7 +116,7 @@ class MultiOptimRunner(EpochBasedRunner):
             hook = optimizer_config
         self.register_hook(hook, priority)
 
-    def register_training_hooks(self,
+    def _register_training_hooks(self,
                                 lr_config_b,
                                 lr_config_g=None,
                                 lr_config_d=None,
