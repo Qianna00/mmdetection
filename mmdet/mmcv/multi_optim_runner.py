@@ -3,6 +3,12 @@ from mmcv.runner import EpochBasedRunner
 from mmcv.runner.hooks import IterTimerHook, HOOKS, Hook
 from mmcv.runner.priority import get_priority
 import torch
+import os.path as osp
+from mmcv.runner.checkpoint import save_checkpoint
+import time
+from mmcv.parallel import is_module_wrapper
+from torch.optim import Optimizer
+from mmcv.runner.checkpoint import weights_to_cpu
 
 
 class MultiOptimRunner(EpochBasedRunner):
@@ -136,3 +142,90 @@ class MultiOptimRunner(EpochBasedRunner):
         self.register_checkpoint_hook(checkpoint_config)
         self.register_hook(IterTimerHook())
         self.register_logger_hooks(log_config)
+
+    def save_checkpoint(self,
+                        out_dir,
+                        filename_tmpl='epoch_{}.pth',
+                        save_optimizer=True,
+                        meta=None,
+                        create_symlink=True):
+        """Save the checkpoint.
+
+        Args:
+            out_dir (str): The directory that checkpoints are saved.
+            filename_tmpl (str, optional): The checkpoint filename template,
+                which contains a placeholder for the epoch number.
+                Defaults to 'epoch_{}.pth'.
+            save_optimizer (bool, optional): Whether to save the optimizer to
+                the checkpoint. Defaults to True.
+            meta (dict, optional): The meta information to be saved in the
+                checkpoint. Defaults to None.
+            create_symlink (bool, optional): Whether to create a symlink
+                "latest.pth" to point to the latest checkpoint.
+                Defaults to True.
+        """
+        if meta is None:
+            meta = dict(epoch=self.epoch + 1, iter=self.iter)
+        else:
+            meta.update(epoch=self.epoch + 1, iter=self.iter)
+
+        filename = filename_tmpl.format(self.epoch + 1)
+        filepath = osp.join(out_dir, filename)
+        optimizer_b = self.optimizer_b if save_optimizer else None
+        optimizer_g = self.optimizer_g if save_optimizer else None
+        optimizer_d = self.optimizer_g if save_optimizer else None
+        _save_checkpoint(self.model, filepath, optimizer_b=optimizer_b, meta=meta)
+        # in some environments, `os.symlink` is not supported, you may need to
+        # set `create_symlink` to False
+        if create_symlink:
+            mmcv.symlink(filename, osp.join(out_dir, 'latest.pth'))
+
+def _save_checkpoint(model, filename, optimizer_b=None, optimizer_g=None, optimizer_d=None, meta=None):
+    """Save checkpoint to file.
+
+    The checkpoint will have 3 fields: ``meta``, ``state_dict`` and
+    ``optimizer``. By default ``meta`` will contain version and time info.
+
+    Args:
+        model (Module): Module whose params are to be saved.
+        filename (str): Checkpoint filename.
+        optimizer (:obj:`Optimizer`, optional): Optimizer to be saved.
+        meta (dict, optional): Metadata to be saved in checkpoint.
+    """
+    if meta is None:
+        meta = {}
+    elif not isinstance(meta, dict):
+        raise TypeError(f'meta must be a dict or None, but got {type(meta)}')
+    meta.update(mmcv_version=mmcv.__version__, time=time.asctime())
+
+    mmcv.mkdir_or_exist(osp.dirname(filename))
+    if is_module_wrapper(model):
+        model = model.module
+
+    checkpoint = {
+        'meta': meta,
+        'state_dict': weights_to_cpu(model.state_dict())
+    }
+    # save optimizer state dict in the checkpoint
+    if isinstance(optimizer_b, Optimizer):
+        checkpoint['optimizer_b'] = optimizer_b.state_dict()
+    elif isinstance(optimizer_b, dict):
+        checkpoint['optimizer_b'] = {}
+        for name, optim in optimizer_b.items():
+            checkpoint['optimizer_b'][name] = optim.state_dict()
+    if isinstance(optimizer_g, Optimizer):
+        checkpoint['optimizer_g'] = optimizer_g.state_dict()
+    elif isinstance(optimizer_g, dict):
+        checkpoint['optimizer_g'] = {}
+        for name, optim in optimizer_g.items():
+            checkpoint['optimizer_g'][name] = optim.state_dict()
+    if isinstance(optimizer_d, Optimizer):
+        checkpoint['optimizer_d'] = optimizer_d.state_dict()
+    elif isinstance(optimizer_d, dict):
+        checkpoint['optimizer_d'] = {}
+        for name, optim in optimizer_d.items():
+            checkpoint['optimizer_d'][name] = optim.state_dict()
+    # immediately flush buffer
+    with open(filename, 'wb') as f:
+        torch.save(checkpoint, f)
+        f.flush()
