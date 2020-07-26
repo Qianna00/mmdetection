@@ -227,12 +227,9 @@ class TwoStageGanDetector2(BaseDetector):
     def _parse_losses(self, losses):
         log_vars = OrderedDict()
         for loss_name, loss_value in losses.items():
-            print(loss_name)
             if isinstance(loss_value, torch.Tensor):
-                print(loss_value.shape)
                 log_vars[loss_name] = loss_value.mean()
             elif isinstance(loss_value, list):
-                print(len(loss_value), loss_value[0].shape)
                 log_vars[loss_name] = sum(_loss.mean() for _loss in loss_value)
             else:
                 raise TypeError(f'{loss_name} is not a tensor or list of tensors')
