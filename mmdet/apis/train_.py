@@ -135,7 +135,6 @@ def train_detector_m(model,
                                    cfg.get('momentum_config', None))
     if distributed:
         runner.register_hook(DistSamplerSeedHook())
-    print(runner.hooks)
     # register eval hooks
     if validate:
         val_dataset = build_dataset(cfg.data.val, dict(test_mode=True))
