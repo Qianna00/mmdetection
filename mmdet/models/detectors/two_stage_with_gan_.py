@@ -146,32 +146,32 @@ class TwoStageGanDetector2(BaseDetector):
         Returns:
             dict[str, Tensor]: a dictionary of loss components
         """
-        with torch.no_grad():
-            x = self.backbone(img)
-            x_lr = None
-            if self.with_dis_head:
-                x_lr = self.backbone(img_lr, for_lr=True)
+        x = self.backbone(img)
+        x.requires_grad_(False)
+        x_lr = None
+        if self.with_dis_head:
+            x_lr = self.backbone(img_lr, for_lr=True)
+            x_lr.requires_grad_(False)
+        losses = dict()
 
-            losses = dict()
-
-            # RPN forward and loss(inference)
-            if self.with_rpn:
-                # self.rpn_head.eval()
-                proposal_cfg = self.train_cfg.get('rpn_proposal',
+        # RPN forward and loss(inference)
+        if self.with_rpn:
+            # self.rpn_head.eval()
+            proposal_cfg = self.train_cfg.get('rpn_proposal',
                                                   self.test_cfg.rpn)
-                # proposal_list = self.rpn_head.simple_test_rpn(tuple([x_lr[1]]), img_metas)
-                """rpn_losses, proposal_list = self.rpn_head.forward_train(
+            # proposal_list = self.rpn_head.simple_test_rpn(tuple([x_lr[1]]), img_metas)
+            """rpn_losses, proposal_list = self.rpn_head.forward_train(
                     tuple([x_lr[1]]),
                     img_metas,
                     gt_bboxes,
                     gt_labels=None,
                     gt_bboxes_ignore=gt_bboxes_ignore,
                     proposal_cfg=proposal_cfg)"""
-                # losses.update(rpn_losses)
-                rpn_outs = self.rpn_head(tuple([x_lr[1]]))
-                proposal_list = self.rpn_head.get_bboxes(*rpn_outs, img_metas, cfg=proposal_cfg)
-            else:
-                proposal_list = proposals
+            # losses.update(rpn_losses)
+            rpn_outs = self.rpn_head(tuple([x_lr[1]]))
+            proposal_list = self.rpn_head.get_bboxes(*rpn_outs, img_metas, cfg=proposal_cfg)
+        else:
+            proposal_list = proposals
 
         roi_losses = self.roi_head.forward_train(x, img_metas, proposal_list, gt_bboxes, gt_labels,
                                                      gt_bboxes_ignore, gt_masks, x_lr, **kwargs)
