@@ -237,25 +237,21 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             rois_index_sr = torch.where(areas <= 96 * 96 * 4)
             # rois_index_large = rois_index_hr
             rois_index_small = torch.where(areas <= 96*96)
-            cls_score_lr = bbox_results['cls_score_lr'][rois_index_small]
-            bbox_pred_lr = bbox_results['bbox_pred_lr'][rois_index_small]
 
             bbox_targets_lr = bbox_targets[0][rois_index_small], bbox_targets[1][rois_index_small], \
                               bbox_targets[2][rois_index_small], bbox_targets[3][rois_index_small]
 
-            loss_bbox_lr = self.bbox_head.loss(cls_score_lr,
-                                               bbox_pred_lr, rois[rois_index_small],
+            loss_bbox_lr = self.bbox_head.loss(bbox_results['cls_score_lr'][rois_index_small],
+                                               bbox_results['bbox_pred_lr'][rois_index_small],
+                                               rois[rois_index_small],
                                                *bbox_targets_lr)
             # target_ones = torch.Tensor(np.ones((rois.shape[0], 1)))
             # target_zeros = torch.Tensor(np.zeros((rois.shape[0], 1)))
-            bbox_feats = bbox_results['bbox_feats'][rois_index_hr]
-            bbox_feats_lr = bbox_results['bbox_feats_lr'][rois_index_sr]
-            num_rois_sr = rois_index_sr[0].shape[0]
-            num_rois_hr = rois_index_hr[0].shape[0]
-            bbox_results.update(num_rois_hr=num_rois_hr)
-            bbox_results.update(num_rois_sr=num_rois_sr)
-            bbox_results.update(bbox_feats=bbox_feats)
-            bbox_results.update(bbox_feats_lr=bbox_feats_lr)
+
+            bbox_results.update(num_rois_hr=rois_index_hr[0].shape[0])
+            bbox_results.update(num_rois_sr=rois_index_sr[0].shape[0])
+            bbox_results.update(bbox_feats=bbox_results['bbox_feats'][rois_index_hr])
+            bbox_results.update(bbox_feats_lr=bbox_results['bbox_feats_lr'][rois_index_sr])
 
             # target_ones_g = torch.Tensor(np.ones((rois_index_sr[0].shape[0], 1))).cuda().long()
             # target_ones_d = torch.Tensor(np.ones((rois_index_hr[0].shape[0], 1))).cuda().long()
