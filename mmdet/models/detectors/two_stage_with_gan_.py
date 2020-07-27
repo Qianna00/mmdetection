@@ -148,7 +148,7 @@ class TwoStageGanDetector2(BaseDetector):
         """
         with torch.no_grad():
             x = self.backbone(img)
-            x_lr = None
+            # x_lr = None
             if self.with_dis_head:
                 x_lr = self.backbone(img_lr, for_lr=True)
             losses = dict()

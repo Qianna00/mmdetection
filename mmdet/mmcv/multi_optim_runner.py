@@ -127,8 +127,8 @@ class MultiOptimRunner(EpochBasedRunner):
                                 lr_config_g=None,
                                 lr_config_d=None,
                                 optimizer_b_config=None,
-                                optimizer_g_config=None,
-                                optimizer_d_config=None,
+                               #  optimizer_g_config=None,
+                               #  optimizer_d_config=None,
                                 checkpoint_config=None,
                                 log_config=None,
                                 momentum_config=None):

@@ -116,21 +116,21 @@ def train_detector_m(model,
     if fp16_cfg is not None:
         optimizer_config_b = Fp16OptimizerHook(
             **cfg.optimizer_config_b, **fp16_cfg, distributed=distributed)
-        optimizer_config_g = Fp16OptimizerHook(
-            **cfg.optimizer_config_g, **fp16_cfg, distributed=distributed)
-        optimizer_config_d = Fp16OptimizerHook(
-            **cfg.optimizer_config_d, **fp16_cfg, distributed=distributed)
+        # optimizer_config_g = Fp16OptimizerHook(
+            # **cfg.optimizer_config_g, **fp16_cfg, distributed=distributed)
+        # optimizer_config_d = Fp16OptimizerHook(
+            # **cfg.optimizer_config_d, **fp16_cfg, distributed=distributed)
     elif distributed and 'type' not in cfg.optimizer_config_b:
         optimizer_config_b = OptimHookB(**cfg.optimizer_config_b)
-        optimizer_config_g = OptimHookG(**cfg.optimizer_config_g)
-        optimizer_config_d = OptimHookD(**cfg.optimizer_config_d)
+        # optimizer_config_g = OptimHookG(**cfg.optimizer_config_g)
+        # optimizer_config_d = OptimHookD(**cfg.optimizer_config_d)
     else:
         optimizer_config_b = cfg.optimizer_config_b
-        optimizer_config_g = cfg.optimizer_config_g
-        optimizer_config_d = cfg.optimizer_config_d
+        # optimizer_config_g = cfg.optimizer_config_g
+        # optimizer_config_d = cfg.optimizer_config_d
 
     # register hooks
-    runner.register_training_hooks(cfg.lr_config_b, cfg.lr_config_g, cfg.lr_config_d, optimizer_config_b, optimizer_config_g, optimizer_config_d,
+    runner.register_training_hooks(cfg.lr_config_b, cfg.lr_config_g, cfg.lr_config_d, optimizer_config_b,
                                    cfg.checkpoint_config, cfg.log_config,
                                    cfg.get('momentum_config', None))
     if distributed:
