@@ -56,7 +56,7 @@ class BBoxHead(nn.Module):
         if self.with_avg_pool:
             self.avg_pool = nn.AvgPool2d(self.roi_feat_size)
         else:
-            in_channels *= self.roi_feat_area
+            in_channels = in_channels * self.roi_feat_area
         if self.with_cls:
             # need to add background class
             self.fc_cls = nn.Linear(in_channels, num_classes + 1)
