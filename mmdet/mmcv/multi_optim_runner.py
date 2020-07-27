@@ -127,8 +127,8 @@ class MultiOptimRunner(EpochBasedRunner):
                                 lr_config_g=None,
                                 lr_config_d=None,
                                 optimizer_b_config=None,
-                               #  optimizer_g_config=None,
-                               #  optimizer_d_config=None,
+                                optimizer_g_config=None,
+                                optimizer_d_config=None,
                                 checkpoint_config=None,
                                 log_config=None,
                                 momentum_config=None):
@@ -136,9 +136,9 @@ class MultiOptimRunner(EpochBasedRunner):
         self.register_lr_hook(lr_config_g, type='G')
         self.register_lr_hook(lr_config_d, type='D')
         self.register_momentum_hook(momentum_config)
-        # self.register_optimizer_hook(optimizer_b_config, priority="HIGH", optim_type="OptimHookB")
-        # self.register_optimizer_hook(optimizer_g_config, priority="LOW", optim_type="OptimHookG")
-        # self.register_optimizer_hook(optimizer_d_config, priority="NORMAL", optim_type="OptimHookD")
+        self.register_optimizer_hook(optimizer_b_config, priority="HIGH", optim_type="OptimHookB")
+        self.register_optimizer_hook(optimizer_g_config, priority="LOW", optim_type="OptimHookG")
+        self.register_optimizer_hook(optimizer_d_config, priority="NORMAL", optim_type="OptimHookD")
         self.register_optimizer_hook(optimizer_b_config, priority="NORMAL", optim_type="MultiOptimHook")
         self.register_checkpoint_hook(checkpoint_config)
         self.register_hook(IterTimerHook())
@@ -175,7 +175,8 @@ class MultiOptimRunner(EpochBasedRunner):
         optimizer_b = self.optimizer_b if save_optimizer else None
         optimizer_g = self.optimizer_g if save_optimizer else None
         optimizer_d = self.optimizer_g if save_optimizer else None
-        _save_checkpoint(self.model, filepath, optimizer_b=optimizer_b, meta=meta)
+        _save_checkpoint(self.model, filepath, optimizer_b=optimizer_b, optimizer_g=optimizer_g,
+                         optimizer_d=optimizer_d, meta=meta)
         # in some environments, `os.symlink` is not supported, you may need to
         # set `create_symlink` to False
         if create_symlink:
