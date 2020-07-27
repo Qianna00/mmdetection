@@ -172,12 +172,12 @@ class TwoStageGanDetector2(BaseDetector):
             else:
                 proposal_list = proposals
 
-        roi_losses, feats = self.roi_head.forward_train(x, img_metas, proposal_list, gt_bboxes, gt_labels,
+        roi_losses = self.roi_head.forward_train(x, img_metas, proposal_list, gt_bboxes, gt_labels,
                                                      gt_bboxes_ignore, gt_masks, x_lr, **kwargs)
 
         losses.update(roi_losses)
 
-        return losses, feats
+        return losses
 
     async def async_simple_test(self,
                                 img,
