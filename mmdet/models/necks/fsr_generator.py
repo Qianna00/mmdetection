@@ -43,7 +43,7 @@ class FSRGenerator(nn.Module):
         feat = torch.cat((pooled_regions, pooled_regions_sub), dim=1)  # 将channel所在维度concat
 
         feat_sr = self.res_blocks(feat)
-        feat_sr = feat_sr[:, :1024, :, :]  # 只取 feat_base部分，通道数为1024
+        feat_sr = feat_sr[:, :1024, :, :]
 
         return feat_sr
 
