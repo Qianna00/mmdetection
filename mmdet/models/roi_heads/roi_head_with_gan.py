@@ -241,8 +241,6 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         bbox_results.update(loss_bbox=loss_bbox)
         # if x_lr is not None:
 
-
-
         """loss_bbox_lr = self.bbox_head.loss(bbox_results['cls_score_lr'][rois_index_small],
                                                bbox_results['bbox_pred_lr'][rois_index_small],
                                                rois[rois_index_small],

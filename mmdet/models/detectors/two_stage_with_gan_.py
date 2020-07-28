@@ -167,7 +167,7 @@ class TwoStageGanDetector2(BaseDetector):
                         gt_bboxes_ignore=gt_bboxes_ignore,
                         proposal_cfg=proposal_cfg)"""
                 # losses.update(rpn_losses)
-                rpn_outs = self.rpn_head(tuple([x_lr[1]]))
+                rpn_outs = self.rpn_head(tuple([x[1]]))
                 proposal_list = self.rpn_head.get_bboxes(*rpn_outs, img_metas, cfg=proposal_cfg)
             else:
                 proposal_list = proposals
