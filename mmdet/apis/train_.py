@@ -74,6 +74,12 @@ def train_detector_m(model,
         for key, value in dict(model.roi_head.fsr_generator.named_parameters()).items():
             if value.requires_grad:
                 params_g += [{'params': [value]}]
+        for key, value in dict(model.roi_head.shared_head.named_parameters()).items():
+            if value.requires_grad:
+                params_g += [{'params': [value]}]
+        for key, value in dict(model.roi_head.bbox_head.named_parameters()).items():
+            if value.requires_grad:
+                params_g += [{'params': [value]}]
         optimizer_g = torch.optim.SGD(params_g, lr=cfg.optimizer.lr, momentum=cfg.optimizer.momentum,
                                       weight_decay=cfg.optimizer.weight_decay)
     if model.roi_head.with_dis_head:
