@@ -150,7 +150,7 @@ class TwoStageGanDetector2(BaseDetector):
             x = self.backbone(img)
             # x_lr = None
             if self.with_dis_head:
-                x_lr = self.backbone(img_lr, for_lr=True)
+                x_lr = self.backbone(img_lr)
             losses = dict()
 
             # RPN forward and loss(inference)
