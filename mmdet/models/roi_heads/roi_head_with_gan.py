@@ -190,11 +190,11 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         # bbox_feats = self.bbox_roi_extractor(x, rois)
         if self.with_fsr_generator:
-            bbox_feats_sub, bbox_feats = self.bbox_roi_extractor(x, rois)
-            bbox_feats_hr = self.fsr_generator((bbox_feats_sub, bbox_feats))
+            bbox_feats_sub_hr, bbox_feats_hr = self.bbox_roi_extractor(x, rois)
+            bbox_feats_hr = self.fsr_generator((bbox_feats_sub_hr, bbox_feats_hr))
             if x_lr is not None:
                 bbox_feats_sub_lr, bbox_feats_lr = self.bbox_roi_extractor(x_lr, rois[rois_index_sr], for_lr=True)
-                bbox_feats_sr = self.fsr_generator((bbox_feats_sub_lr, bbox_feats_lr))
+                bbox_feats_lr = self.fsr_generator((bbox_feats_sub_lr, bbox_feats_lr))
         """cls_score, bbox_pred = self.bbox_head(bbox_feats)
 
         bbox_results = dict(
@@ -214,7 +214,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             dis_score_hr = self.dis_head(bbox_feats_hr[rois_index_hr])
             bbox_results.update(dis_score_hr=dis_score_hr)
             if x_lr is not None:
-                dis_score_sr = self.dis_head(bbox_feats_sr)
+                dis_score_sr = self.dis_head(bbox_feats_lr)
                 bbox_results.update(dis_score_sr=dis_score_sr)
             """bbox_results.update(bbox_feats=bbox_feats)
             bbox_results.update(bbox_feats_lr=bbox_feats_sr)"""
