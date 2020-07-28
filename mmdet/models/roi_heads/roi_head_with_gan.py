@@ -259,7 +259,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         # dis_score_sr = bbox_results['dis_score_sr'][rois_index_sr]
         # dis_score_hr = bbox_results['dis_score_hr'][rois_index_hr]
 
-        loss_g_dis = self.dis_head.loss(self.dis_head(bbox_results['bbox_feats_hr'][rois_index_hr]), target_ones_g)
+        loss_g_dis = self.dis_head.loss(self.dis_head(bbox_results['bbox_feats_lr'][rois_index_sr]), target_ones_g)
         loss_det = loss_bbox['loss_cls'] + loss_bbox['loss_bbox']
         loss_gen = loss_det + loss_g_dis
         loss_dis = (self.dis_head.loss(self.dis_head(bbox_results['bbox_feats_lr'].detach()), target_zeros_d) +
