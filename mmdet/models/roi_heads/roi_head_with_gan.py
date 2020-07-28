@@ -230,21 +230,20 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         rois_index_small = torch.where(areas <= 96 * 96)
 
         bbox_results = self._bbox_forward(x, rois, rois_index_hr, rois_index_sr, rois_index_small, x_lr)
-        for res in sampling_results:
-            print(res.bboxes.shape)
 
-        bbox_targets = self.bbox_head.get_targets([sampling_results[i] for i in list(rois_index_small[0])],
+        bbox_targets = self.bbox_head.get_targets(sampling_results,
                                                   gt_bboxes, gt_labels, self.train_cfg)
+        bbox_targets = bbox_targets[0][rois_index_small], bbox_targets[1][rois_index_small], \
+                       bbox_targets[2][rois_index_small], bbox_targets[3][rois_index_small]
         loss_bbox = self.bbox_head.loss(bbox_results['cls_score'],
                                         bbox_results['bbox_pred'], rois[rois_index_small],
                                         *bbox_targets)
         bbox_results.update(loss_bbox=loss_bbox)
         # if x_lr is not None:
 
-        """bbox_targets_lr = bbox_targets[0][rois_index_small], bbox_targets[1][rois_index_small], \
-                              bbox_targets[2][rois_index_small], bbox_targets[3][rois_index_small]
 
-            loss_bbox_lr = self.bbox_head.loss(bbox_results['cls_score_lr'][rois_index_small],
+
+        """loss_bbox_lr = self.bbox_head.loss(bbox_results['cls_score_lr'][rois_index_small],
                                                bbox_results['bbox_pred_lr'][rois_index_small],
                                                rois[rois_index_small],
                                                *bbox_targets_lr)"""
