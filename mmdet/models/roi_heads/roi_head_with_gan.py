@@ -163,15 +163,15 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             bbox_results = self._bbox_forward_train(x, sampling_results,
                                                     gt_bboxes, gt_labels,
                                                     img_metas, x_lr)
-            losses.update(bbox_results['loss_bbox'])
+            # losses.update(bbox_results['loss_bbox'])
             """if self.with_dis_head:
                 feats.update(bbox_feats=bbox_results['bbox_feats'])
                 feats.update(bbox_feats_lr=bbox_results['bbox_feats_lr'])
                 feats.update(num_rois_hr=bbox_results['num_rois_hr'])
                 feats.update(num_rois_sr=bbox_results['num_rois_sr'])"""
             if self.with_dis_head:
-                losses.update(loss_b=bbox_results['loss_det'])
-                losses.update(loss_g=bbox_results['loss_gen'])
+                # losses.update(loss_b=bbox_results['loss_det'])
+                # losses.update(loss_g=bbox_results['loss_gen'])
                 losses.update(loss_d=bbox_results['loss_dis'])
 
         # mask head forward and loss
