@@ -191,6 +191,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         # bbox_feats = self.bbox_roi_extractor(x, rois)
         if self.with_fsr_generator:
             bbox_feats_sub_hr, bbox_feats_hr = self.bbox_roi_extractor(x, rois)
+            print(type(bbox_feats_hr))
             bbox_feats_hr = self.fsr_generator((bbox_feats_sub_hr, bbox_feats_hr))
             if x_lr is not None:
                 bbox_feats_sub_lr, bbox_feats_lr = self.bbox_roi_extractor(x_lr, rois[rois_index_sr], for_lr=True)
