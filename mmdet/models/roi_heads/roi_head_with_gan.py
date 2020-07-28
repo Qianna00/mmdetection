@@ -192,13 +192,9 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         if self.with_fsr_generator:
             bbox_feats_sub_hr, bbox_feats_hr = self.bbox_roi_extractor(x, rois)
             bbox_feats_hr = self.fsr_generator((bbox_feats_sub_hr, bbox_feats_hr))
-            del bbox_feats_sub_hr
-            torch.cuda.empty_cache()
             if x_lr is not None:
                 bbox_feats_sub_lr, bbox_feats_lr = self.bbox_roi_extractor(x_lr, rois[rois_index_sr], for_lr=True)
                 bbox_feats_lr = self.fsr_generator((bbox_feats_sub_lr, bbox_feats_lr))
-                del bbox_feats_sub_lr
-                torch.cuda.empty_cache()
         """cls_score, bbox_pred = self.bbox_head(bbox_feats)
 
         bbox_results = dict(
@@ -211,8 +207,6 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
                 # bbox_feats_lr = self.shared_head(bbox_feats_sr[rois_index_small])
         # if x_lr is not None:
         cls_score, bbox_pred = self.bbox_head(bbox_feats[rois_index_small])
-        del bbox_feats
-        torch.cuda.empty_cache()
         bbox_results.update(cls_score=cls_score)
         bbox_results.update(bbox_pred=bbox_pred)
 
