@@ -211,11 +211,13 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         bbox_results.update(bbox_pred=bbox_pred)
 
         if self.with_dis_head:
-            dis_score_hr = self.dis_head(bbox_feats_hr[rois_index_hr])
-            bbox_results.update(dis_score_hr=dis_score_hr)
+            # dis_score_hr = self.dis_head(bbox_feats_hr[rois_index_hr])
+            # bbox_results.update(dis_score_hr=dis_score_hr)
+            bbox_results.update(bbox_feats_hr=bbox_feats_hr)
             if x_lr is not None:
-                dis_score_sr = self.dis_head(bbox_feats_lr)
-                bbox_results.update(dis_score_sr=dis_score_sr)
+                # dis_score_sr = self.dis_head(bbox_feats_lr)
+                # bbox_results.update(dis_score_sr=dis_score_sr)
+                bbox_results.update(bbox_feats_lr=bbox_feats_lr)
             """bbox_results.update(bbox_feats=bbox_feats)
             bbox_results.update(bbox_feats_lr=bbox_feats_sr)"""
 
@@ -257,11 +259,12 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         # dis_score_sr = bbox_results['dis_score_sr'][rois_index_sr]
         # dis_score_hr = bbox_results['dis_score_hr'][rois_index_hr]
 
-        loss_g_dis = self.dis_head.loss(bbox_results['dis_score_sr'], target_ones_g)
+        loss_g_dis = self.dis_head.loss(self.dis_head(bbox_results['bbox_feats_hr'][rois_index_hr]), target_ones_g)
         loss_det = loss_bbox['loss_cls'] + loss_bbox['loss_bbox']
         loss_gen = loss_det + loss_g_dis
-        loss_dis = (self.dis_head.loss(bbox_results['dis_score_sr'], target_zeros_d) + self.dis_head.loss(
-                bbox_results['dis_score_hr'], target_ones_d)) / 2
+        loss_dis = (self.dis_head.loss(self.dis_head(bbox_results['bbox_feats_lr'].detach()), target_zeros_d) +
+                    self.dis_head.loss(self.dis_head(bbox_results['bbox_feats_hr'][rois_index_hr].detach()),
+                                       target_ones_d)) / 2
         bbox_results.update(loss_gen=loss_gen)
         bbox_results.update(loss_dis=loss_dis)
         bbox_results.update(loss_det=loss_det)
