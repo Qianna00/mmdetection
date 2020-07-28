@@ -231,7 +231,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         bbox_results = self._bbox_forward(x, rois, rois_index_hr, rois_index_sr, rois_index_small, x_lr)
         for res in sampling_results:
-            print(res.bboxes)
+            print(res.bboxes.shape)
 
         bbox_targets = self.bbox_head.get_targets([sampling_results[i] for i in list(rois_index_small[0])],
                                                   gt_bboxes, gt_labels, self.train_cfg)
