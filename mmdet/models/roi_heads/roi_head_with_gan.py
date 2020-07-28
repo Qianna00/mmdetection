@@ -233,14 +233,14 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         bbox_results = self._bbox_forward(x, rois, rois_index_hr, rois_index_sr, rois_index_small, x_lr)
 
-        bbox_targets = self.bbox_head.get_targets(sampling_results,
+        """bbox_targets = self.bbox_head.get_targets(sampling_results,
                                                   gt_bboxes, gt_labels, self.train_cfg)
         bbox_targets = bbox_targets[0][rois_index_small], bbox_targets[1][rois_index_small], \
                        bbox_targets[2][rois_index_small], bbox_targets[3][rois_index_small]
         loss_bbox = self.bbox_head.loss(bbox_results['cls_score'],
                                         bbox_results['bbox_pred'], rois[rois_index_small],
                                         *bbox_targets)
-        bbox_results.update(loss_bbox=loss_bbox)
+        bbox_results.update(loss_bbox=loss_bbox)"""
         # if x_lr is not None:
 
         """loss_bbox_lr = self.bbox_head.loss(bbox_results['cls_score_lr'][rois_index_small],
@@ -260,15 +260,15 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         # dis_score_hr = bbox_results['dis_score_hr'][rois_index_hr]
 
         loss_g_dis = self.dis_head.loss(self.dis_head(bbox_results['bbox_feats_lr'][rois_index_sr]), target_ones_g)
-        loss_det = loss_bbox['loss_cls'] + loss_bbox['loss_bbox']
-        loss_gen = loss_det + loss_g_dis
+        # loss_det = loss_bbox['loss_cls'] + loss_bbox['loss_bbox']
+        # loss_gen = loss_det + loss_g_dis
         loss_dis = (self.dis_head.loss(self.dis_head(bbox_results['bbox_feats_lr'].detach()), target_zeros_d) +
                     self.dis_head.loss(self.dis_head(bbox_results['bbox_feats_hr'][rois_index_hr].detach()),
                                        target_ones_d)) / 2
-        bbox_results.update(loss_gen=loss_gen)
+        # bbox_results.update(loss_gen=loss_gen)
         bbox_results.update(loss_dis=loss_dis)
-        bbox_results.update(loss_det=loss_det)
-        bbox_results.update(loss_bbox=loss_bbox)
+        # bbox_results.update(loss_det=loss_det)
+        # bbox_results.update(loss_bbox=loss_bbox)
 
         return bbox_results
 

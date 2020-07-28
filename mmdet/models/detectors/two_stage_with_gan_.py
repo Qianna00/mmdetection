@@ -235,8 +235,8 @@ class TwoStageGanDetector2(BaseDetector):
 
         # loss = sum(_value for _key, _value in log_vars.items() if 'loss' in _key)
         # loss_b = log_vars['loss_cls'] + log_vars['loss_bbox']
-        loss_b = log_vars['loss_b']
-        loss_g = log_vars['loss_g']
+        """loss_b = log_vars['loss_b']
+        loss_g = log_vars['loss_g']"""
         loss_d = log_vars['loss_d']
 
         for loss_name, loss_value in log_vars.items():
@@ -246,7 +246,7 @@ class TwoStageGanDetector2(BaseDetector):
                 dist.all_reduce(loss_value.div_(dist.get_world_size()))
             log_vars[loss_name] = loss_value.item()
 
-        return loss_b, loss_g, loss_d, log_vars
+        return loss_d, log_vars
         # return loss_b, log_vars
 
     def train_step(self, data, optimizer):
@@ -278,9 +278,9 @@ class TwoStageGanDetector2(BaseDetector):
         """
         losses = self(**data)
         # loss_b, loss_g, loss_d, log_vars = self._parse_losses(losses)
-        loss_b, loss_g, loss_d, log_vars = self._parse_losses(losses)
+        loss_d, log_vars = self._parse_losses(losses)
         outputs = dict(
-            loss_b=loss_b, loss_g=loss_g, loss_d=loss_d, log_vars=log_vars, num_samples=len(data['img'].data))
+            loss_d=loss_d, log_vars=log_vars, num_samples=len(data['img'].data))
         # outputs.update(feats)
 
         return outputs
