@@ -139,7 +139,7 @@ class MultiOptimRunner(EpochBasedRunner):
         self.register_optimizer_hook(optimizer_b_config, priority="HIGH", optim_type="OptimHookB")
         self.register_optimizer_hook(optimizer_g_config, priority="LOW", optim_type="OptimHookG")
         self.register_optimizer_hook(optimizer_d_config, priority="NORMAL", optim_type="OptimHookD")
-        self.register_optimizer_hook(optimizer_b_config, priority="NORMAL", optim_type="MultiOptimHook")
+        # self.register_optimizer_hook(optimizer_b_config, priority="NORMAL", optim_type="MultiOptimHook")
         self.register_checkpoint_hook(checkpoint_config)
         self.register_hook(IterTimerHook())
         self.register_logger_hooks(log_config)
