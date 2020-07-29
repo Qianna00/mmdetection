@@ -256,6 +256,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         target_ones_g = torch.Tensor(np.ones((rois_index_sr[0].shape[0], 1))).cuda().long()
         target_ones_d = torch.Tensor(np.ones((rois_index_hr[0].shape[0], 1))).cuda().long()
         target_zeros_d = torch.Tensor(np.zeros((rois_index_sr[0].shape[0], 1))).cuda().long()
+        print(type(target_ones_g))
         # dis_score_sr = bbox_results['dis_score_sr'][rois_index_sr]
         # dis_score_hr = bbox_results['dis_score_hr'][rois_index_hr]
 
