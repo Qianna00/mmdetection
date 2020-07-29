@@ -202,11 +202,11 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         # bbox_results = dict(bbox_feats=bbox_feats)
         bbox_results = {}
         if self.with_shared_head:
-            bbox_feats = self.shared_head(bbox_feats_hr)
+            bbox_feats = self.shared_head(bbox_feats_hr[rois_index_small])
             # if x_lr is not None:
                 # bbox_feats_lr = self.shared_head(bbox_feats_sr[rois_index_small])
         # if x_lr is not None:
-        cls_score, bbox_pred = self.bbox_head(bbox_feats[rois_index_small])
+        cls_score, bbox_pred = self.bbox_head(bbox_feats)
         bbox_results.update(cls_score=cls_score)
         bbox_results.update(bbox_pred=bbox_pred)
 
