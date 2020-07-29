@@ -185,7 +185,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         return losses
 
-    def _bbox_forward(self, x, rois, rois_index_hr, rois_index_sr, rois_index_small, x_lr=None):
+    def _bbox_forward(self, x, rois, rois_index_sr, rois_index_small, x_lr=None):
         # TODO: a more flexible way to decide which feature maps to use
 
         # bbox_feats = self.bbox_roi_extractor(x, rois)
@@ -231,7 +231,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         rois_index_sr = torch.where(areas <= 96 * 96 * 4)
         rois_index_small = torch.where(areas <= 96 * 96)
 
-        bbox_results = self._bbox_forward(x, rois, rois_index_hr, rois_index_sr, rois_index_small, x_lr)
+        bbox_results = self._bbox_forward(x, rois, rois_index_sr, rois_index_small, x_lr)
 
         bbox_targets = self.bbox_head.get_targets(sampling_results,
                                                   gt_bboxes, gt_labels, self.train_cfg)
