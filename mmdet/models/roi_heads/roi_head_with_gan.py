@@ -215,8 +215,8 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             bbox_results.update(dis_score_hr=dis_score_hr)
             # bbox_results.update(bbox_feats_hr=bbox_feats_hr)
             if x_lr is not None:
-                dis_score_sr = self.dis_head(bbox_feats_lr)
-                gen_score_sr = self.dis_head(bbox_feats_lr.detach())
+                dis_score_sr = self.dis_head(bbox_feats_lr.detach())
+                gen_score_sr = self.dis_head(bbox_feats_lr)
                 bbox_results.update(dis_score_sr=dis_score_sr)
                 bbox_results.update(gen_score_sr=gen_score_sr)
                 # bbox_results.update(bbox_feats_lr=bbox_feats_lr)
