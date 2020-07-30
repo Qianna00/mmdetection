@@ -160,9 +160,9 @@ data = dict(
 evaluation = dict(interval=1, metric='bbox')
 
 # optimizer
-optimizer_b = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
-optimizer_g = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
-optimizer_d = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
+optimizer_b = dict(type='SGD', lr=0.001, momentum=0.9, weight_decay=0.0001)
+optimizer_g = dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001)
+optimizer_d = dict(type='SGD', lr=0.003, momentum=0.9, weight_decay=0.0001)
 optimizer_config_b = dict(grad_clip=None)
 optimizer_config_g = dict(grad_clip=None)
 optimizer_config_d = dict(grad_clip=None)

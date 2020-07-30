@@ -76,19 +76,19 @@ def train_detector_m(model,
                 params_g += [{'params': [value]}]
         for key, value in dict(model.roi_head.shared_head.named_parameters()).items():
             if value.requires_grad:
-                params_g += [{'params': [value]}]
+                params_g += [{'params': [value], 'lr': cfg.optimizer_b.lr}]
         for key, value in dict(model.roi_head.bbox_head.named_parameters()).items():
             if value.requires_grad:
-                params_g += [{'params': [value]}]
-        optimizer_g = torch.optim.SGD(params_g, lr=cfg.optimizer.lr, momentum=cfg.optimizer.momentum,
-                                      weight_decay=cfg.optimizer.weight_decay)
+                params_g += [{'params': [value], 'lr': cfg.optimizer_b.lr}]
+        optimizer_g = torch.optim.SGD(params_g, lr=cfg.optimizer_g.lr, momentum=cfg.optimizer_g.momentum,
+                                      weight_decay=cfg.optimizer_g.weight_decay)
     if model.roi_head.with_dis_head:
         params_d = []
         for key, value in dict(model.roi_head.dis_head.named_parameters()).items():
             if value.requires_grad:
                 params_d += [{'params': [value]}]
-        optimizer_d = torch.optim.SGD(params_d, lr=cfg.optimizer.lr, momentum=cfg.optimizer.momentum,
-                                      weight_decay=cfg.optimizer.weight_decay)
+        optimizer_d = torch.optim.SGD(params_d, lr=cfg.optimizer_d.lr, momentum=cfg.optimizer_d.momentum,
+                                      weight_decay=cfg.optimizer_d.weight_decay)
 
     # put model on gpus
     if distributed:
