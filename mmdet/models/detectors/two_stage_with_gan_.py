@@ -204,7 +204,7 @@ class TwoStageGanDetector2(BaseDetector):
         x = self.extract_feat(img)
 
         if proposals is None:
-            proposal_list = self.rpn_head.simple_test_rpn(tuple(x[1]), img_metas)
+            proposal_list = self.rpn_head.simple_test_rpn(tuple([x[1]]), img_metas)
         else:
             proposal_list = proposals
 
