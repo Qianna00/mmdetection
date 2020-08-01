@@ -213,6 +213,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         if self.with_dis_head:
             if rois_index_hr[0].shape[0] == 0:
                 print("There is no roi larger than 96*96")
+            print(bbox_feats_hr[rois_index_hr].shape)
             dis_score_hr = self.dis_head(bbox_feats_hr[rois_index_hr])
             bbox_results.update(dis_score_hr=dis_score_hr)
             # bbox_results.update(bbox_feats_hr=bbox_feats_hr)
