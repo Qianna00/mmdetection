@@ -464,7 +464,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
     def _bbox_forward_test(self, x, rois):
         # TODO: a more flexible way to decide which feature maps to use
-        bbox_feats = self.bbox_roi_extractor(x[1], rois)
+        # bbox_feats = self.bbox_roi_extractor(x[1], rois)
         if self.with_fsr_generator:
             bbox_feats_sub, bbox_feats = self.bbox_roi_extractor(x, rois)
             bbox_feats_sr = self.fsr_generator((bbox_feats_sub, bbox_feats))
