@@ -467,10 +467,10 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         # bbox_feats = self.bbox_roi_extractor(x[1], rois)
         if self.with_fsr_generator:
             bbox_feats_sub, bbox_feats = self.bbox_roi_extractor(x, rois)
-            bbox_feats_sr = self.fsr_generator((bbox_feats_sub, bbox_feats))
-            areas = torch.mul((rois[:, 3] - rois[:, 1]), rois[:, 4] - rois[:, 2])
-            rois_small_index = torch.where(areas < 96*96)
-            bbox_feats[rois_small_index] = bbox_feats_sr[rois_small_index]
+            # bbox_feats_sr = self.fsr_generator((bbox_feats_sub, bbox_feats))
+            # areas = torch.mul((rois[:, 3] - rois[:, 1]), rois[:, 4] - rois[:, 2])
+            # rois_small_index = torch.where(areas < 96*96)
+            # bbox_feats[rois_small_index] = bbox_feats_sr[rois_small_index]
         if self.with_shared_head:
             bbox_feats = self.shared_head(bbox_feats)
 
