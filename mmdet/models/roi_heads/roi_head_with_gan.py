@@ -415,6 +415,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         """Test only det bboxes without augmentation."""
         rois = bbox2roi(proposals)
         bbox_results = self._bbox_forward_test(x, rois)
+        print(bbox_results)
 
         img_shape = img_metas[0]['img_shape']
         scale_factor = img_metas[0]['scale_factor']
@@ -465,6 +466,8 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
     def _bbox_forward_test(self, x, rois):
         # TODO: a more flexible way to decide which feature maps to use
         # bbox_feats = self.bbox_roi_extractor(x[1], rois)
+        print(x)
+        print(rois)
         if self.with_fsr_generator:
             bbox_feats_sub, bbox_feats = self.bbox_roi_extractor(x, rois)
             # bbox_feats_sr = self.fsr_generator((bbox_feats_sub, bbox_feats))
