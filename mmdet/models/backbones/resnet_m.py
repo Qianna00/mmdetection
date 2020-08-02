@@ -329,7 +329,7 @@ class ResNetM(nn.Module):
             x = self.relu(x)
         x = self.maxpool(x)
         outs = []
-        outs.append(x)
+        # outs.append(x)
         for i, layer_name in enumerate(self.res_layers):
             res_layer = getattr(self, layer_name)
             x = res_layer(x)
