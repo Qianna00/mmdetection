@@ -156,7 +156,7 @@ class ResNetM(nn.Module):
             self.add_module(layer_name, res_layer)
             self.res_layers.append(layer_name)
 
-        # self._freeze_stages()
+        self._freeze_stages()
 
         self.feat_dim = self.block.expansion * base_channels * 2**(
             len(self.stage_blocks) - 1)
