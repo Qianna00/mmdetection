@@ -6,7 +6,7 @@ _base_ = [
 norm_cfg = dict(type='BN', requires_grad=False)
 model = dict(
     type='FasterRCNNGan',
-    pretrained='/root/data/zq/mmdetection/outputs1/epoch_12_new.pth',
+    pretrained='/root/data/zq/mmdetection/outputs1/epoch_12.pth',
     backbone=dict(
         type='ResNetM',
         depth=50,
