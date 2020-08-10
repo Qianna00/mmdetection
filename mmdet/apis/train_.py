@@ -159,6 +159,5 @@ def train_detector_m(model,
         runner.resume(cfg.resume_from)
     elif cfg.load_from:
         runner.load_checkpoint(cfg.load_from)
-    print(runner.hooks)
     with torch.autograd.set_detect_anomaly(True):
         runner.run(data_loaders, cfg.workflow, cfg.total_epochs)
