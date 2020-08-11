@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from mmdet.core import bbox2result, bbox2roi, build_assigner, build_sampler, bbox_mapping, \
     merge_aug_bboxes, multiclass_nms
-from ..builder import HEADS, build_head, build_roi_extractor, build_neck
+from ..builder import HEADS, build_head, build_roi_extractor, build_neck, build_shared_head
 from .base_roi_head import BaseRoIHead
 from .test_mixins import BBoxTestMixin, MaskTestMixin
 
@@ -23,16 +23,19 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
                  train_cfg=None,
                  test_cfg=None
                  ):
-        BaseRoIHead.__init__(self,
-                             bbox_roi_extractor=bbox_roi_extractor,
-                             bbox_head=bbox_head,
-                             mask_roi_extractor=mask_roi_extractor,
-                             mask_head=mask_head,
-                             shared_head=shared_head,
-                             train_cfg=train_cfg,
-                             test_cfg=test_cfg)
+        super(RoIHeadGan, self).__init__()
+        self.train_cfg = train_cfg
+        self.test_cfg = test_cfg
+        if shared_head is not None:
+            self.shared_head = build_shared_head(shared_head)
+
         if bbox_head is not None:
-            self.init_bbox_head2(bbox_roi_extractor, bbox_head, bbox_head_large)
+            self.init_bbox_head(bbox_roi_extractor, bbox_head, bbox_head_large)
+
+        if mask_head is not None:
+            self.init_mask_head(mask_roi_extractor, mask_head)
+
+        self.init_assigner_sampler()
 
         if fsr_generator is not None:
             self.init_fsr_generator(fsr_generator)
@@ -56,7 +59,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             self.bbox_sampler = build_sampler(
                 self.train_cfg.sampler, context=self)
 
-    def init_bbox_head2(self, bbox_roi_extractor, bbox_head, bbox_head_large):
+    def init_bbox_head(self, bbox_roi_extractor, bbox_head, bbox_head_large):
         self.bbox_roi_extractor = build_roi_extractor(bbox_roi_extractor)
         self.bbox_head = build_head(bbox_head)
         self.bbox_head_large = build_head(bbox_head_large)
