@@ -32,7 +32,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
                              train_cfg=train_cfg,
                              test_cfg=test_cfg)
         if bbox_head is not None:
-            self._init_bbox_head(bbox_roi_extractor, bbox_head, bbox_head_large)
+            self.init_bbox_head2(bbox_roi_extractor, bbox_head, bbox_head_large)
 
         if fsr_generator is not None:
             self.init_fsr_generator(fsr_generator)
@@ -56,7 +56,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             self.bbox_sampler = build_sampler(
                 self.train_cfg.sampler, context=self)
 
-    def _init_bbox_head(self, bbox_roi_extractor, bbox_head, bbox_head_large):
+    def init_bbox_head2(self, bbox_roi_extractor, bbox_head, bbox_head_large):
         self.bbox_roi_extractor = build_roi_extractor(bbox_roi_extractor)
         self.bbox_head = build_head(bbox_head)
         self.bbox_head_large = build_head(bbox_head_large)
