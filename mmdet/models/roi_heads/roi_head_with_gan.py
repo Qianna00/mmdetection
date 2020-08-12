@@ -249,11 +249,11 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         bbox_targets = self.bbox_head.get_targets(sampling_results,
                                                   gt_bboxes, gt_labels, self.train_cfg)
-        print("rois:", rois)
-        print("bbox_targets:", bbox_targets)
+        print("bbox_pred:", bbox_results['bbox_pred'])
+        print("bbox_targets:", bbox_targets[2])
         bbox_targets = bbox_targets[0][rois_index_small], bbox_targets[1][rois_index_small], \
                        bbox_targets[2][rois_index_small], bbox_targets[3][rois_index_small]
-        print("bbox_targets_small:", bbox_targets)
+        print("bbox_targets_small:", bbox_targets[2])
         loss_bbox = self.bbox_head.loss(bbox_results['cls_score'],
                                         bbox_results['bbox_pred'], rois[rois_index_small],
                                         *bbox_targets)
@@ -437,6 +437,8 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             scale_factor,
             rescale=rescale,
             cfg=rcnn_test_cfg)
+        print("det_bboxes:", det_bboxes)
+        print("det_labels:", det_labels)
         return det_bboxes, det_labels
 
     def aug_test_bboxes(self, feats, img_metas, proposal_list, rcnn_test_cfg):
