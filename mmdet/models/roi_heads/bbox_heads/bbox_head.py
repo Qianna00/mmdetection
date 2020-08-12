@@ -115,9 +115,6 @@ class BBoxHead(nn.Module):
                 pos_bbox_targets = pos_gt_bboxes
             bbox_targets[:num_pos, :] = pos_bbox_targets
             bbox_weights[:num_pos, :] = 1
-            print("pos_bboxes:", pos_bboxes)
-            print("pos_gt_bboxes:", pos_gt_bboxes)
-            print("pos_bbox_targets:", pos_bbox_targets)
         if num_neg > 0:
             label_weights[-num_neg:] = 1.0
 
@@ -146,7 +143,6 @@ class BBoxHead(nn.Module):
             label_weights = torch.cat(label_weights, 0)
             bbox_targets = torch.cat(bbox_targets, 0)
             bbox_weights = torch.cat(bbox_weights, 0)
-        print("bbox_targets:", bbox_targets)
         return labels, label_weights, bbox_targets, bbox_weights
 
     @force_fp32(apply_to=('cls_score', 'bbox_pred'))
@@ -196,7 +192,6 @@ class BBoxHead(nn.Module):
                     reduction_override=reduction_override)
             else:
                 losses['loss_bbox'] = bbox_pred.sum() * 0
-            print('loss_bbox:', losses['loss_bbox'])
         return losses
 
     @force_fp32(apply_to=('cls_score', 'bbox_pred'))

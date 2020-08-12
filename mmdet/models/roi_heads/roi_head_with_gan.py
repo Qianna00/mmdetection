@@ -249,8 +249,11 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         bbox_targets = self.bbox_head.get_targets(sampling_results,
                                                   gt_bboxes, gt_labels, self.train_cfg)
+        print("rois:", rois)
+        print("bbox_targets:", bbox_targets)
         bbox_targets = bbox_targets[0][rois_index_small], bbox_targets[1][rois_index_small], \
                        bbox_targets[2][rois_index_small], bbox_targets[3][rois_index_small]
+        print("bbox_targets_small:", bbox_targets)
         loss_bbox = self.bbox_head.loss(bbox_results['cls_score'],
                                         bbox_results['bbox_pred'], rois[rois_index_small],
                                         *bbox_targets)
