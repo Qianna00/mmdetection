@@ -130,6 +130,8 @@ class BBoxHead(nn.Module):
         neg_bboxes_list = [res.neg_bboxes for res in sampling_results]
         pos_gt_bboxes_list = [res.pos_gt_bboxes for res in sampling_results]
         pos_gt_labels_list = [res.pos_gt_labels for res in sampling_results]
+        print("pos_bboxes_list:", pos_bboxes_list)
+        print("pos_gt_bboxes_list:", pos_gt_bboxes_list)
         labels, label_weights, bbox_targets, bbox_weights = multi_apply(
             self._get_target_single,
             pos_bboxes_list,
