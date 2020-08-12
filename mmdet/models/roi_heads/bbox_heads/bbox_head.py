@@ -192,6 +192,7 @@ class BBoxHead(nn.Module):
                     reduction_override=reduction_override)
             else:
                 losses['loss_bbox'] = bbox_pred.sum() * 0
+            print('loss_bbox:', losses['loss_bbox'])
         return losses
 
     @force_fp32(apply_to=('cls_score', 'bbox_pred'))
