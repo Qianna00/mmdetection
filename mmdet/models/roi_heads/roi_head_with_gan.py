@@ -239,7 +239,6 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
     def _bbox_forward_train(self, x, sampling_results, gt_bboxes, gt_labels,
                             img_metas, x_lr):
-        print("the length of sampling_results:", sampling_results[0].pos_bboxes.shape[0])
         rois = bbox2roi([res.bboxes for res in sampling_results])
         areas = torch.mul((rois[:, 3] - rois[:, 1]), rois[:, 4] - rois[:, 2])
         rois_index_hr = torch.where(areas > 96 * 96)
@@ -250,11 +249,8 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         bbox_targets = self.bbox_head.get_targets(sampling_results,
                                                   gt_bboxes, gt_labels, self.train_cfg)
-        print("bbox_pred:", bbox_results['bbox_pred'])
-        print("bbox_targets:", bbox_targets[2])
         bbox_targets = bbox_targets[0][rois_index_small], bbox_targets[1][rois_index_small], \
                        bbox_targets[2][rois_index_small], bbox_targets[3][rois_index_small]
-        print("bbox_targets_small:", bbox_targets[2])
         loss_bbox = self.bbox_head.loss(bbox_results['cls_score'],
                                         bbox_results['bbox_pred'], rois[rois_index_small],
                                         *bbox_targets)
