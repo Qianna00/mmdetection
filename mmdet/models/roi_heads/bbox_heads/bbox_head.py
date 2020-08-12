@@ -143,6 +143,7 @@ class BBoxHead(nn.Module):
             label_weights = torch.cat(label_weights, 0)
             bbox_targets = torch.cat(bbox_targets, 0)
             bbox_weights = torch.cat(bbox_weights, 0)
+        print("bbox_targets:", bbox_targets)
         return labels, label_weights, bbox_targets, bbox_weights
 
     @force_fp32(apply_to=('cls_score', 'bbox_pred'))
