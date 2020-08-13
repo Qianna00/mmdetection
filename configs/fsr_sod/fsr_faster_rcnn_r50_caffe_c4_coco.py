@@ -1,6 +1,4 @@
 _base_ = [
-    '../_base_/models/faster_rcnn_r50_caffe_c4.py',
-    '../_base_/datasets/coco_detection.py',
     '../_base_/schedules/schedule_1x.py', '../_base_/default_runtime.py'
 ]
 norm_cfg = dict(type='BN', requires_grad=False)
@@ -167,11 +165,11 @@ test_pipeline = [
             dict(type='Collect', keys=['img']),
         ])
 ]
-data = dict(
+"""data = dict(
     train=dict(pipeline=train_pipeline),
     val=dict(pipeline=test_pipeline),
     test=dict(pipeline=test_pipeline))
-evaluation = dict(interval=1, metric='bbox')
+evaluation = dict(interval=1, metric='bbox')"""
 
 # optimizer
 optimizer_b = dict(type='SGD', lr=0.001, momentum=0.9, weight_decay=0.0001)
