@@ -87,13 +87,13 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             self.bbox_head.init_weights(pretrained)
             self.bbox_head_large.init_weights(pretrained)
             if self.with_fsr_generator:
-                self.fsr_generator.init_weights(pretrained)
+                self.fsr_generator.init_weights()
         if self.with_mask:
             self.mask_head.init_weights()
             if not self.share_roi_extractor:
                 self.mask_roi_extractor.init_weights()
         if self.with_dis_head:
-            self.dis_head.init_weights(pretrained)
+            self.dis_head.init_weights()
 
 
     def forward_dummy(self, x, proposals):

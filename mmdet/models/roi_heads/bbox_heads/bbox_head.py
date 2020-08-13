@@ -170,6 +170,7 @@ class BBoxHead(nn.Module):
             bg_class_ind = self.num_classes
             # 0~self.num_classes-1 are FG, self.num_classes is BG
             pos_inds = (labels >= 0) & (labels < bg_class_ind)
+            print("pos_inds:", pos_inds)
             # do not perform bounding box regression for BG anymore.
             if pos_inds.any():
                 if self.reg_decoded_bbox:
@@ -182,6 +183,8 @@ class BBoxHead(nn.Module):
                         bbox_pred.size(0), -1,
                         4)[pos_inds.type(torch.bool),
                            labels[pos_inds.type(torch.bool)]]
+                print("pos_bbox_pred:", pos_bbox_pred)
+                print("pos_bbox_targets:", bbox_targets[pos_inds.type(torch.bool)])
                 losses['loss_bbox'] = self.loss_bbox(
                     pos_bbox_pred,
                     bbox_targets[pos_inds.type(torch.bool)],
