@@ -19,6 +19,7 @@ def smooth_l1_loss(pred, target, beta=1.0):
 def l1_loss(pred, target):
     assert pred.size() == target.size() and target.numel() > 0
     loss = torch.abs(pred - target)
+    print("loss_bbox:", loss)
     return loss
 
 
