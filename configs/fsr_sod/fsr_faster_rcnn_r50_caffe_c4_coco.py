@@ -67,7 +67,7 @@ model = dict(
             reg_class_agnostic=False,
             loss_cls=dict(
                 type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
-            loss_bbox=dict(type='SmoothL1Loss', loss_weight=2.0)),
+            loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
         bbox_head_large = dict(
             type='BBoxHead',
             with_avg_pool=True,
