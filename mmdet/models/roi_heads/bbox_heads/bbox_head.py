@@ -182,8 +182,8 @@ class BBoxHead(nn.Module):
                         bbox_pred.size(0), -1,
                         4)[pos_inds.type(torch.bool),
                            labels[pos_inds.type(torch.bool)]]
-                print("pos_bbox_pred:", pos_bbox_pred)
-                print("pos_bbox_targets:", bbox_targets[pos_inds.type(torch.bool)])
+                # print("pos_bbox_pred:", pos_bbox_pred)
+                # print("pos_bbox_targets:", bbox_targets[pos_inds.type(torch.bool)])
                 losses['loss_bbox'] = self.loss_bbox(
                     pos_bbox_pred,
                     bbox_targets[pos_inds.type(torch.bool)],
