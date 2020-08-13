@@ -199,7 +199,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         # bbox_feats = self.bbox_roi_extractor(x, rois)
         if self.with_fsr_generator:
             bbox_feats_sub_hr, bbox_feats_hr = self.bbox_roi_extractor(x, rois)
-            bbox_feats_sr = self.fsr_generator((bbox_feats_sub_hr[rois_index_small], bbox_feats_hr[rois_index_small]))
+            # bbox_feats_sr = self.fsr_generator((bbox_feats_sub_hr[rois_index_small], bbox_feats_hr[rois_index_small]))
             if x_lr is not None:
                 bbox_feats_sub_lr, bbox_feats_lr = self.bbox_roi_extractor(x_lr, rois[rois_index_sr], for_lr=True)
                 bbox_feats_lr = self.fsr_generator((bbox_feats_sub_lr, bbox_feats_lr))
@@ -210,7 +210,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         # bbox_results = dict(bbox_feats=bbox_feats)
         bbox_results = {}
         if self.with_shared_head:
-            bbox_feats = self.shared_head(bbox_feats_sr)
+            bbox_feats = self.shared_head(bbox_feats_hr)
             # if x_lr is not None:
                 # bbox_feats_lr = self.shared_head(bbox_feats_sr[rois_index_small])
         # if x_lr is not None:
