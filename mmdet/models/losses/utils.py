@@ -92,6 +92,7 @@ def weighted_loss(loss_func):
                 **kwargs):
         # get element-wise loss
         loss = loss_func(pred, target, **kwargs)
+        print("loss_bbox:", loss)
         loss = weight_reduce_loss(loss, weight, reduction, avg_factor)
         return loss
 
