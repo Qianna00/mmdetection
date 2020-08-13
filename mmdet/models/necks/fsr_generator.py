@@ -20,10 +20,9 @@ class ResidualBlock(nn.Module):
             nn.Conv2d(in_features, in_features, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(in_features, eps=0.8)
         )
-        self.relu = nn.ReLU()
 
     def forward(self, inputs):
-        return self.relu(inputs + self.conv_block(inputs))
+        return inputs + self.conv_block(inputs)
 
 
 @NECKS.register_module()
@@ -37,13 +36,14 @@ class FSRGenerator(nn.Module):
             res_blocks.append(ResidualBlock(in_channels))
 
         self.res_blocks = nn.Sequential(*res_blocks)
+        self.relu = nn.ReLU()
 
     def forward(self, inputs):
         pooled_regions_sub, pooled_regions = inputs
         feat = torch.cat((pooled_regions, pooled_regions_sub), dim=1)  # 将channel所在维度concat
 
         feat_sr = self.res_blocks(feat)
-        feat_sr = feat_sr[:, :1024, :, :]
+        feat_sr = self.relu(feat_sr[:, :1024, :, :])
 
         return feat_sr
 
