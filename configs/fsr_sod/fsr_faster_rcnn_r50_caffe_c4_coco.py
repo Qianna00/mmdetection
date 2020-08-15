@@ -147,8 +147,10 @@ test_cfg = dict(
 
 dataset_type = 'CocoDataset'
 data_root = '/root/data/zq/data/coco/'
+"""img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)"""
 img_norm_cfg = dict(
-    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+    mean=[103.530, 116.280, 123.675], std=[1.0, 1.0, 1.0], to_rgb=False)
 train_pipeline = [
     dict(type='LoadImagePairFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
