@@ -149,6 +149,7 @@ class StandardRoIHead(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         bbox_targets = self.bbox_head.get_targets(sampling_results, gt_bboxes,
                                                   gt_labels, self.train_cfg)
+        print("labels:", bbox_targets[0])
         loss_bbox = self.bbox_head.loss(bbox_results['cls_score'],
                                         bbox_results['bbox_pred'], rois,
                                         *bbox_targets)
