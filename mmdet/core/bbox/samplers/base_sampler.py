@@ -83,6 +83,7 @@ class BaseSampler(metaclass=ABCMeta):
         # (may be a bug of PyTorch)
         pos_inds = pos_inds.unique()
         num_sampled_pos = pos_inds.numel()
+        print("num_sampled_pos:", num_sampled_pos)
         num_expected_neg = self.num - num_sampled_pos
         if self.neg_pos_ub >= 0:
             _pos = max(1, num_sampled_pos)
