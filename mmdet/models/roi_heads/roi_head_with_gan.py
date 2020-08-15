@@ -161,7 +161,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
                     proposal_list[i],
                     gt_bboxes[i],
                     gt_labels[i],
-                    feats=[lvl_feat[i][None] for lvl_feat in x])
+                    feats=[lvl_feat[i][None] for lvl_feat in tuple([x[1]])])
                 sampling_results.append(sampling_result)
 
         losses = dict()
