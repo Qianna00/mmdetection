@@ -33,21 +33,11 @@ class BaseSubRoIExtractor(SingleRoIExtractor):
 
     @force_fp32(apply_to=('feats', ), out_fp16=True)
     def forward(self, feats, rois, roi_scale_factor=None, for_lr=False):
-        num_levels = len(feats)
-        print(num_levels)
+        # num_levels = len(feats)
         if not for_lr:
-            out_size = self.roi_layers[2].out_size
-            if num_levels == 1:
-                roi_feats = feats[0].new_zeros(
-                    rois.size(0), self.out_channels, *out_size)
-                if len(rois) == 0:
-                    return roi_feats
-                roi_feats = self.roi_layers[2](feats[0], rois)
-                return roi_feats
-            else:
-                roi_feats_sub = self.roi_layers[0](feats[0], rois)
-                roi_feats = self.roi_layers[2](feats[1], rois)
-                return roi_feats_sub, roi_feats
+            roi_feats_sub = self.roi_layers[0](feats[0], rois)
+            roi_feats = self.roi_layers[2](feats[1], rois)
+            return roi_feats_sub, roi_feats
         roi_feats_lr_sub = self.roi_layers[1](feats[0], rois)
         roi_feats_lr = self.roi_layers[3](feats[1], rois)
         return roi_feats_lr_sub, roi_feats_lr
