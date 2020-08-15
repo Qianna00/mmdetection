@@ -437,8 +437,8 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             scale_factor,
             rescale=rescale,
             cfg=rcnn_test_cfg)
-        print("det_bboxes:", det_bboxes)
-        print("det_labels:", det_labels)
+        # print("det_bboxes:", det_bboxes)
+        # print("det_labels:", det_labels)
         return det_bboxes, det_labels
 
     def aug_test_bboxes(self, feats, img_metas, proposal_list, rcnn_test_cfg):
