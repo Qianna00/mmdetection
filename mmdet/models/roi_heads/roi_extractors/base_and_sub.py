@@ -34,6 +34,7 @@ class BaseSubRoIExtractor(SingleRoIExtractor):
     @force_fp32(apply_to=('feats', ), out_fp16=True)
     def forward(self, feats, rois, roi_scale_factor=None, for_lr=False):
         num_levels = len(feats)
+        print(num_levels)
         if not for_lr:
             out_size = self.roi_layers[2].out_size
             if num_levels == 1:
