@@ -19,6 +19,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
                  mask_roi_extractor=None,
                  mask_head=None,
                  shared_head=None,
+                 shared_head_large=None,
                  dis_head=None,
                  train_cfg=None,
                  test_cfg=None
@@ -28,6 +29,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         self.test_cfg = test_cfg
         if shared_head is not None:
             self.shared_head = build_shared_head(shared_head)
+            self.shared_head_large = build_shared_head(shared_head_large)
 
         if bbox_head is not None:
             self.init_bbox_head(bbox_roi_extractor, bbox_head, bbox_head_large)
@@ -82,6 +84,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
     def init_weights(self, pretrained):
         if self.with_shared_head:
             self.shared_head.init_weights(pretrained=pretrained)
+            self.shared_head_large.init_weights(pretrained=pretrained)
         if self.with_bbox:
             self.bbox_roi_extractor.init_weights()
             self.bbox_head.init_weights(pretrained)
@@ -249,10 +252,8 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         bbox_targets = self.bbox_head.get_targets(sampling_results,
                                                   gt_bboxes, gt_labels, self.train_cfg)
-        print("labels:", bbox_targets[0])
         bbox_targets = bbox_targets[0][rois_index_small], bbox_targets[1][rois_index_small], \
                        bbox_targets[2][rois_index_small], bbox_targets[3][rois_index_small]
-        print("labels_small:", bbox_targets[0])
         loss_bbox = self.bbox_head.loss(bbox_results['cls_score'],
                                         bbox_results['bbox_pred'], rois[rois_index_small],
                                         *bbox_targets)
@@ -484,7 +485,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             rois_small_index = torch.where(areas < 96*96)
             # bbox_feats[rois_small_index] = bbox_feats_sr[rois_small_index]
         if self.with_shared_head:
-            bbox_feats = self.shared_head(bbox_feats)
+            bbox_feats = self.shared_head_large(bbox_feats)
             bbox_feats_sr = self.shared_head(bbox_feats_sr[rois_small_index])
 
         cls_score_s, bbox_pred_s = self.bbox_head(bbox_feats_sr)

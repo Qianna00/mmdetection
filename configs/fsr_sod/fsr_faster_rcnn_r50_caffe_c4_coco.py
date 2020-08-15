@@ -43,6 +43,15 @@ model = dict(
             style='caffe',
             norm_cfg=norm_cfg,
             norm_eval=True),
+        shared_head_large = dict(
+            type='ResLayer',
+            depth=50,
+            stage=3,
+            stride=2,
+            dilation=1,
+            style="caffe",
+            norm_cfg=norm_cfg,
+            norm_eval=True),
         bbox_roi_extractor=dict(
             type='BaseSubRoIExtractor',
             roi_layer=dict(type='RoIPool', out_size=14, use_torchvision=True),
