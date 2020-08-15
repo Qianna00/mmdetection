@@ -183,7 +183,7 @@ test_pipeline = [
 evaluation = dict(interval=1, metric='bbox')"""
 
 # optimizer
-optimizer_b = dict(type='SGD', lr=0.0001, momentum=0.9)
+optimizer_b = dict(type='SGD', lr=0.001, momentum=0.9)
 optimizer_g = dict(type='SGD', lr=0.0005, momentum=0.9, weight_decay=0.0001)
 optimizer_d = dict(type='SGD', lr=0.001, momentum=0.9, weight_decay=0.0001)
 optimizer_config_b = dict(grad_clip=None)
