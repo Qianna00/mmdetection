@@ -254,14 +254,17 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         rois_index_small = torch.where(areas <= 96 * 96)
 
         bbox_results = self._bbox_forward(x, rois, rois_index_hr, rois_index_sr, rois_index_small, x_lr)
+        if rois_index_small[0].shape[0] == 0:
+            bbox_targets = torch.Tensor(np.zeros(1, dtype=np.int64)), \
+                           torch.Tensor(np.ones(1, dtype=np.float32)), \
+                           torch.Tensor(np.zeros((1, 4), dtype=np.float32)), \
+                           torch.Tensor(np.ones((1, 4), dtype=np.float32))
+        else:
 
-        bbox_targets = self.bbox_head.get_targets(sampling_results,
-                                                  gt_bboxes, gt_labels, self.train_cfg)
-        print(bbox_targets[0].dtype, bbox_targets[1].shape, bbox_targets[2].shape, bbox_targets[3].shape)
-        print("label_weights:", bbox_targets[1])
-        print("bbox_weights:", bbox_targets[3])
-        bbox_targets = bbox_targets[0][rois_index_small], bbox_targets[1][rois_index_small], \
-                       bbox_targets[2][rois_index_small], bbox_targets[3][rois_index_small]
+            bbox_targets = self.bbox_head.get_targets(sampling_results,
+                                                      gt_bboxes, gt_labels, self.train_cfg)
+            bbox_targets = bbox_targets[0][rois_index_small], bbox_targets[1][rois_index_small], \
+                           bbox_targets[2][rois_index_small], bbox_targets[3][rois_index_small]
         loss_bbox = self.bbox_head.loss(bbox_results['cls_score'],
                                         bbox_results['bbox_pred'], rois[rois_index_small],
                                         *bbox_targets)
