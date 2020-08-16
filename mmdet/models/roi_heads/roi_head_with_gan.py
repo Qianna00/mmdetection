@@ -214,7 +214,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         # bbox_results = dict(bbox_feats=bbox_feats)
         bbox_results = {}
         if rois_index_small[0].shape[0] == 0:
-            cls_score = torch.Tensor(np.zeros((1, 81))).cuda().long()
+            cls_score = torch.Tensor(np.zeros((1, 81))).cuda()
             bbox_pred = torch.Tensor(np.zeros((1, 320), dtype=np.float32)).cuda()
         else:
             if self.with_shared_head:
