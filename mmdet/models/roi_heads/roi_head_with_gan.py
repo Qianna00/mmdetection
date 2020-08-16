@@ -247,6 +247,9 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         rois_index_hr = torch.where(areas > 96 * 96)
         rois_index_sr = torch.where(areas <= 96 * 96 * 4)
         rois_index_small = torch.where(areas <= 96 * 96)
+        if rois_index_small[0].shape[0] == 0:
+            print("areas:", areas)
+            print("rois_index_small:", rois_index_small)
 
         bbox_results = self._bbox_forward(x, rois, rois_index_hr, rois_index_sr, rois_index_small, x_lr)
 
