@@ -214,8 +214,8 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         # bbox_results = dict(bbox_feats=bbox_feats)
         bbox_results = {}
         if rois_index_small[0].shape[0] == 0:
-            cls_score = torch.Tensor(np.zeros((1, 81), dtype=np.long))
-            bbox_pred = torch.Tensor(np.zeros((1, 320), dtype=np.float32))
+            cls_score = torch.Tensor(np.zeros((1, 81))).cuda().long()
+            bbox_pred = torch.Tensor(np.zeros((1, 320), dtype=np.float32)).cuda()
         else:
             if self.with_shared_head:
                 bbox_feats = self.shared_head(bbox_feats_sr)
@@ -223,7 +223,6 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
                     # bbox_feats_lr = self.shared_head(bbox_feats_sr[rois_index_small])
             # if x_lr is not None:
             cls_score, bbox_pred = self.bbox_head(bbox_feats)
-            print(cls_score.dtype, bbox_pred.dtype)
         bbox_results.update(cls_score=cls_score)
         bbox_results.update(bbox_pred=bbox_pred)
 
@@ -256,10 +255,10 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         bbox_results = self._bbox_forward(x, rois, rois_index_hr, rois_index_sr, rois_index_small, x_lr)
         if rois_index_small[0].shape[0] == 0:
-            bbox_targets = torch.Tensor(np.zeros(1, dtype=np.int64)), \
-                           torch.Tensor(np.ones(1, dtype=np.float32)), \
-                           torch.Tensor(np.zeros((1, 4), dtype=np.float32)), \
-                           torch.Tensor(np.ones((1, 4), dtype=np.float32))
+            bbox_targets = torch.Tensor(np.zeros(1)).cuda().long(), \
+                           torch.Tensor(np.ones(1, dtype=np.float32)).cuda(), \
+                           torch.Tensor(np.zeros((1, 4), dtype=np.float32)).cuda(), \
+                           torch.Tensor(np.ones((1, 4), dtype=np.float32)).cuda()
         else:
 
             bbox_targets = self.bbox_head.get_targets(sampling_results,
