@@ -214,7 +214,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         # bbox_results = dict(bbox_feats=bbox_feats)
         bbox_results = {}
         if rois_index_small[0].shape[0] == 0:
-            cls_score = torch.Tensor(np.zeros((1, 81), dtype=np.float32))
+            cls_score = torch.Tensor(np.zeros((1, 81), dtype=np.long))
             bbox_pred = torch.Tensor(np.zeros((1, 320), dtype=np.float32))
         else:
             if self.with_shared_head:
@@ -264,7 +264,6 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
             bbox_targets = self.bbox_head.get_targets(sampling_results,
                                                       gt_bboxes, gt_labels, self.train_cfg)
-            print(bbox_targets[0].dtype, bbox_targets[1].dtype, bbox_targets[2].dtype, bbox_targets[3].dtype)
             bbox_targets = bbox_targets[0][rois_index_small], bbox_targets[1][rois_index_small], \
                            bbox_targets[2][rois_index_small], bbox_targets[3][rois_index_small]
         loss_bbox = self.bbox_head.loss(bbox_results['cls_score'],
