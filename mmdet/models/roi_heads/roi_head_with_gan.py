@@ -223,6 +223,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
                     # bbox_feats_lr = self.shared_head(bbox_feats_sr[rois_index_small])
             # if x_lr is not None:
             cls_score, bbox_pred = self.bbox_head(bbox_feats)
+            print(cls_score.dtype, bbox_pred.dtype)
         bbox_results.update(cls_score=cls_score)
         bbox_results.update(bbox_pred=bbox_pred)
 
@@ -263,6 +264,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
             bbox_targets = self.bbox_head.get_targets(sampling_results,
                                                       gt_bboxes, gt_labels, self.train_cfg)
+            print(bbox_targets[0].dtype, bbox_targets[1].dtype, bbox_targets[2].dtype, bbox_targets[3].dtype)
             bbox_targets = bbox_targets[0][rois_index_small], bbox_targets[1][rois_index_small], \
                            bbox_targets[2][rois_index_small], bbox_targets[3][rois_index_small]
         loss_bbox = self.bbox_head.loss(bbox_results['cls_score'],
