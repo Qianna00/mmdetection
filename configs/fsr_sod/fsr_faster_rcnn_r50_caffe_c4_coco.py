@@ -53,10 +53,10 @@ model = dict(
             norm_cfg=norm_cfg,
             norm_eval=True),
         bbox_roi_extractor=dict(
-            type='BaseSubRoIExtractor',
+            type='SingleRoIExtractor',
             roi_layer=dict(type='RoIPool', out_size=14, use_torchvision=True),
             out_channels=1024,
-            featmap_strides=[2, 4, 16, 32]),
+            featmap_strides=[16]),
         fsr_generator=dict(
             type='FSRGenerator',
             in_channels=1536,
