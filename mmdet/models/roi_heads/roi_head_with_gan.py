@@ -294,15 +294,20 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         if rois_index_hr[0].shape[0] == 0:
             target_ones_d = torch.Tensor(np.ones((1, 1))).cuda().long()
+            loss_d_hr = torch.Tensor([0.]).cuda()
+        else:
+            loss_d_hr = self.dis_head.loss(bbox_results['dis_score_hr'], target_ones_d)
         if rois_index_sr[0].shape[0] == 0:
             target_ones_g = torch.Tensor(np.ones((1, 1))).cuda().long()
             target_zeros_d = torch.Tensor(np.zeros((1, 1))).cuda().long()
-
-        loss_g_dis = self.dis_head.loss(bbox_results['gen_score_sr'], target_ones_g)
+            loss_g_dis = torch.Tensor([0.]).cuda()
+            loss_d_sr = torch.Tensor([0.]).cuda()
+        else:
+            loss_g_dis = self.dis_head.loss(bbox_results['gen_score_sr'], target_ones_g)
+            loss_d_sr = self.dis_head.loss(bbox_results['dis_score_sr'], target_zeros_d)
         loss_det = loss_bbox['loss_cls'] + loss_bbox['loss_bbox']
         loss_gen = loss_det + loss_g_dis
-        loss_dis = (self.dis_head.loss(bbox_results['dis_score_sr'], target_zeros_d) +
-                    self.dis_head.loss(bbox_results['dis_score_hr'], target_ones_d)) / 2
+        loss_dis = (loss_d_hr + loss_d_sr) / 2
         bbox_results.update(loss_gen=loss_gen)
         bbox_results.update(loss_dis=loss_dis)
         bbox_results.update(loss_det=loss_det)
