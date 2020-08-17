@@ -295,8 +295,8 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         if rois_index_hr[0].shape[0] == 0:
             target_ones_d = torch.Tensor(np.ones((1, 1))).cuda().long()
         if rois_index_sr[0].shape[0] == 0:
-            target_ones_g = torch.Tensor(np.ones((1, 1))).cuda().long()
-            target_zeros_d = torch.Tensor(np.zeros((1, 1))).cuda().long()
+            target_ones_g = torch.Tensor(np.ones((1, 1))).cuda()
+            target_zeros_d = torch.Tensor(np.zeros((1, 1))).cuda()
 
         loss_g_dis = self.dis_head.loss(bbox_results['gen_score_sr'], target_ones_g)
         loss_det = loss_bbox['loss_cls'] + loss_bbox['loss_bbox']
