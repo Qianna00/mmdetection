@@ -260,6 +260,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         bbox_results = self._bbox_forward(x, rois, rois_index_hr, rois_index_sr, rois_index_small, x_lr)
         if rois_index_small[0].shape[0] == 0:
+            print("rois_index_small:", rois_index_small)
             bbox_targets = torch.Tensor(np.zeros(1)).cuda().long(), \
                            torch.Tensor(np.ones(1, dtype=np.float32)).cuda(), \
                            torch.Tensor(np.zeros((1, 4), dtype=np.float32)).cuda(), \
@@ -293,11 +294,13 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         # dis_score_hr = bbox_results['dis_score_hr'][rois_index_hr]
 
         if rois_index_hr[0].shape[0] == 0:
+            print("rois_index_hr:", rois_index_hr)
             target_ones_d = torch.Tensor(np.ones((1, 1))).cuda().long()
             loss_d_hr = torch.Tensor([0.]).cuda()
         else:
             loss_d_hr = self.dis_head.loss(bbox_results['dis_score_hr'], target_ones_d)
         if rois_index_sr[0].shape[0] == 0:
+            print("rois_index_sr:", rois_index_sr)
             target_ones_g = torch.Tensor(np.ones((1, 1))).cuda().long()
             target_zeros_d = torch.Tensor(np.zeros((1, 1))).cuda().long()
             loss_g_dis = torch.Tensor([0.]).cuda()
