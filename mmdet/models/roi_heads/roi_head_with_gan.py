@@ -199,18 +199,15 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
     def _bbox_forward(self, x, rois, rois_index_hr, rois_index_sr, rois_index_small, x_lr=None):
         # TODO: a more flexible way to decide which feature maps to use
 
-        print("rois_index_hr:", rois_index_hr)
-        print("rois_index_sr:", rois_index_sr)
-        print("rois_index_small:", rois_index_small)
-
         # bbox_feats = self.bbox_roi_extractor(x, rois)
         if self.with_fsr_generator:
             bbox_feats_sub_hr, bbox_feats_hr = self.bbox_roi_extractor(x, rois)
             if rois_index_small[0].shape[0] != 0:
                 bbox_feats_sr = self.fsr_generator((bbox_feats_sub_hr[rois_index_small], bbox_feats_hr[rois_index_small]))
             if x_lr is not None:
-                bbox_feats_sub_lr, bbox_feats_lr = self.bbox_roi_extractor(x_lr, rois[rois_index_sr], for_lr=True)
-                bbox_feats_lr = self.fsr_generator((bbox_feats_sub_lr, bbox_feats_lr))
+                if rois_index_sr[0].shape[0] != 0:
+                    bbox_feats_sub_lr, bbox_feats_lr = self.bbox_roi_extractor(x_lr, rois[rois_index_sr], for_lr=True)
+                    bbox_feats_lr = self.fsr_generator((bbox_feats_sub_lr, bbox_feats_lr))
         """cls_score, bbox_pred = self.bbox_head(bbox_feats)
 
         bbox_results = dict(
@@ -239,8 +236,12 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             bbox_results.update(dis_score_hr=dis_score_hr)
             # bbox_results.update(bbox_feats_hr=bbox_feats_hr)
             if x_lr is not None:
-                dis_score_sr = self.dis_head(bbox_feats_lr.detach())
-                gen_score_sr = self.dis_head(bbox_feats_lr)
+                if rois_index_sr[0].shape[0] == 0:
+                    dis_score_sr = torch.Tensor(np.zeros((1, 1))).cuda().long()
+                    gen_score_sr = torch.Tensor(np.ones((1, 1))).cuda().long()
+                else:
+                    dis_score_sr = self.dis_head(bbox_feats_lr.detach())
+                    gen_score_sr = self.dis_head(bbox_feats_lr)
                 bbox_results.update(dis_score_sr=dis_score_sr)
                 bbox_results.update(gen_score_sr=gen_score_sr)
                 # bbox_results.update(bbox_feats_lr=bbox_feats_lr)
@@ -293,6 +294,9 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         if rois_index_hr[0].shape[0] == 0:
             target_ones_d = torch.Tensor(np.ones((1, 1))).cuda().long()
+        if rois_index_sr[0].shape[0] == 0:
+            target_ones_g = torch.Tensor(np.ones((1, 1))).cuda().long()
+            target_zeros_d = torch.Tensor(np.zeros((1, 1))).cuda().long()
 
         loss_g_dis = self.dis_head.loss(bbox_results['gen_score_sr'], target_ones_g)
         loss_det = loss_bbox['loss_cls'] + loss_bbox['loss_bbox']
