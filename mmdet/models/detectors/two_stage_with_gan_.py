@@ -159,14 +159,14 @@ class TwoStageGanDetector2(BaseDetector):
                 # proposal_list = self.rpn_head.simple_test_rpn(tuple([x[1]]), img_metas)
                 proposal_cfg = self.train_cfg.get('rpn_proposal',
                                                       self.test_cfg.rpn)
-                proposal_list = self.rpn_head.simple_test_rpn(tuple([x[1]]), img_metas)
-                """rpn_losses, proposal_list = self.rpn_head.forward_train(
+                # proposal_list = self.rpn_head.simple_test_rpn(tuple([x[1]]), img_metas)
+                rpn_losses, proposal_list = self.rpn_head.forward_train(
                         tuple([x[1]]),
                         img_metas,
                         gt_bboxes,
                         gt_labels=None,
                         gt_bboxes_ignore=gt_bboxes_ignore,
-                        proposal_cfg=proposal_cfg)"""
+                        proposal_cfg=proposal_cfg)
                 # losses.update(rpn_losses)
                 # rpn_outs = self.rpn_head(tuple([x[1]]))
                 # proposal_list = self.rpn_head.get_bboxes(*rpn_outs, img_metas, cfg=proposal_cfg)
