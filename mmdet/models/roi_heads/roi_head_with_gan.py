@@ -199,6 +199,10 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
     def _bbox_forward(self, x, rois, rois_index_hr, rois_index_sr, rois_index_small, x_lr=None):
         # TODO: a more flexible way to decide which feature maps to use
 
+        print("rois_index_hr:", rois_index_hr)
+        print("rois_index_sr:", rois_index_sr)
+        print("rois_index_small:", rois_index_small)
+
         # bbox_feats = self.bbox_roi_extractor(x, rois)
         if self.with_fsr_generator:
             bbox_feats_sub_hr, bbox_feats_hr = self.bbox_roi_extractor(x, rois)
