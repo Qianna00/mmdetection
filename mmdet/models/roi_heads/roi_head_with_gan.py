@@ -301,6 +301,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             loss_d_hr = self.dis_head.loss(bbox_results['dis_score_hr'], target_ones_d)
         if rois_index_sr[0].shape[0] == 0:
             print("rois_index_sr:", rois_index_sr)
+            print("areas:", areas)
             target_ones_g = torch.Tensor(np.ones((1, 1))).cuda().long()
             target_zeros_d = torch.Tensor(np.zeros((1, 1))).cuda().long()
             loss_g_dis = torch.Tensor([0.]).cuda()
