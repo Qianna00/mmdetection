@@ -12,11 +12,13 @@ from .pisa_roi_head import PISARoIHead
 from .roi_head_with_gan import RoIHeadGan
 from .roi_extractors import SingleRoIExtractor
 from .shared_heads import ResLayer
+from .roi_head_with_gan_e2e import RoIHeadGane2e
 
 __all__ = [
     'BaseRoIHead', 'CascadeRoIHead', 'DoubleHeadRoIHead', 'MaskScoringRoIHead',
     'HybridTaskCascadeRoIHead', 'GridRoIHead', 'ResLayer', 'BBoxHead',
     'ConvFCBBoxHead', 'Shared2FCBBoxHead', 'Shared4Conv1FCBBoxHead',
     'DoubleConvFCBBoxHead', 'FCNMaskHead', 'HTCMaskHead', 'FusedSemanticHead',
-    'GridHead', 'MaskIoUHead', 'SingleRoIExtractor', 'PISARoIHead', 'RoIHeadGan'
+    'GridHead', 'MaskIoUHead', 'SingleRoIExtractor', 'PISARoIHead', 'RoIHeadGan',
+    'RoIHeadGane2e'
 ]

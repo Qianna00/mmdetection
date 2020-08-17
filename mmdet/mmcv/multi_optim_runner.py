@@ -131,12 +131,14 @@ class MultiOptimRunner(EpochBasedRunner):
                                 optimizer_d_config=None,
                                 checkpoint_config=None,
                                 log_config=None,
-                                momentum_config=None):
+                                momentum_config=None,
+                                e2e_training=False):
         self.register_lr_hook(lr_config_b, type='B')
         self.register_lr_hook(lr_config_g, type='G')
         self.register_lr_hook(lr_config_d, type='D')
         self.register_momentum_hook(momentum_config)
-        # self.register_optimizer_hook(optimizer_b_config, priority="HIGH", optim_type="OptimHookB")
+        if e2e_training:
+            self.register_optimizer_hook(optimizer_b_config, priority="HIGH", optim_type="OptimHookB")
         self.register_optimizer_hook(optimizer_g_config, priority="NORMAL", optim_type="OptimHookG")
         self.register_optimizer_hook(optimizer_d_config, priority="LOW", optim_type="OptimHookD")
         # self.register_optimizer_hook(optimizer_b_config, priority="NORMAL", optim_type="MultiOptimHook")

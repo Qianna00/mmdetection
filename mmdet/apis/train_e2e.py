@@ -53,9 +53,9 @@ def train_detector_e2e(model,
     ]
 
     params_b = []
-    for key, value in dict(model.backbone.named_parameters()).items():
+    """for key, value in dict(model.backbone.named_parameters()).items():
         if value.requires_grad:
-            params_b += [{'params': [value]}]
+            params_b += [{'params': [value]}]"""
     for key, value in dict(model.rpn_head.named_parameters()).items():
         if value.requires_grad:
             params_b += [{'params': [value]}]
@@ -133,7 +133,7 @@ def train_detector_e2e(model,
     runner.register_training_hooks(cfg.lr_config_b, cfg.lr_config_g, cfg.lr_config_d, optimizer_config_b,
                                    optimizer_config_g, optimizer_config_d,
                                    cfg.checkpoint_config, cfg.log_config,
-                                   cfg.get('momentum_config', None))
+                                   cfg.get('momentum_config', None), e2e_training=True)
     if distributed:
         runner.register_hook(DistSamplerSeedHook())
     # register eval hooks

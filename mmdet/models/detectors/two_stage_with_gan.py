@@ -146,30 +146,30 @@ class TwoStageGanDetector(BaseDetector):
         Returns:
             dict[str, Tensor]: a dictionary of loss components
         """
-        x = self.extract_feat(img)
-        x_lr = None
-        if self.with_dis_head:
-            x_lr = self.extract_feat(img_lr)
-
+        with torch.no_grad():
+            x = self.backbone(img)
+            # x_lr = None
+            if self.with_dis_head:
+                x_lr = self.backbone(img_lr)
         losses = dict()
 
-        # RPN forward and loss
+        # RPN forward and loss(inference)
         if self.with_rpn:
             proposal_cfg = self.train_cfg.get('rpn_proposal',
-                                              self.test_cfg.rpn)
+                                                      self.test_cfg.rpn)
             rpn_losses, proposal_list = self.rpn_head.forward_train(
-                x,
-                img_metas,
-                gt_bboxes,
-                gt_labels=None,
-                gt_bboxes_ignore=gt_bboxes_ignore,
-                proposal_cfg=proposal_cfg)
+                    tuple([x[1]]),
+                    img_metas,
+                    gt_bboxes,
+                    gt_labels=None,
+                    gt_bboxes_ignore=gt_bboxes_ignore,
+                    proposal_cfg=proposal_cfg)
             losses.update(rpn_losses)
         else:
             proposal_list = proposals
 
         roi_losses = self.roi_head.forward_train(x, img_metas, proposal_list, gt_bboxes, gt_labels,
-                                                 gt_bboxes_ignore, gt_masks, x_lr, **kwargs)
+                                                     gt_bboxes_ignore, gt_masks, x_lr, **kwargs)
 
         losses.update(roi_losses)
 
@@ -200,7 +200,7 @@ class TwoStageGanDetector(BaseDetector):
         x = self.extract_feat(img)
 
         if proposals is None:
-            proposal_list = self.rpn_head.simple_test_rpn(x, img_metas)
+            proposal_list = self.rpn_head.simple_test_rpn(tuple([x[1]]), img_metas)
         else:
             proposal_list = proposals
 
@@ -222,24 +222,18 @@ class TwoStageGanDetector(BaseDetector):
     def _parse_losses(self, losses):
         log_vars = OrderedDict()
         for loss_name, loss_value in losses.items():
-            print(loss_name)
             if isinstance(loss_value, torch.Tensor):
-                print(loss_value.shape)
                 log_vars[loss_name] = loss_value.mean()
             elif isinstance(loss_value, list):
-                print(len(loss_value), loss_value[0].shape)
                 log_vars[loss_name] = sum(_loss.mean() for _loss in loss_value)
             else:
                 raise TypeError(f'{loss_name} is not a tensor or list of tensors')
 
         # loss = sum(_value for _key, _value in log_vars.items() if 'loss' in _key)
-        loss_b = log_vars['loss_bbox_lr']
-        loss_g = log_vars['loss_bbox_lr'] + log_vars['loss_gen']
-        loss_d = log_vars['loss_dis']
-
-        log_vars['loss_b'] = loss_b
-        log_vars['loss_g'] = loss_g
-        log_vars['loss_d'] = loss_d
+        # loss_b = log_vars['loss_cls'] + log_vars['loss_bbox']
+        loss_b = log_vars['loss_b'] + log_vars['loss_rpn_cls'] + log_vars['loss_rpn_bbox']
+        loss_g = log_vars['loss_g']
+        loss_d = log_vars['loss_d']
 
         for loss_name, loss_value in log_vars.items():
             # reduce loss when distributed training
@@ -249,6 +243,7 @@ class TwoStageGanDetector(BaseDetector):
             log_vars[loss_name] = loss_value.item()
 
         return loss_b, loss_g, loss_d, log_vars
+        # return loss_b, log_vars
 
     def train_step(self, data, optimizer):
         """The iteration step during training.
@@ -279,9 +274,9 @@ class TwoStageGanDetector(BaseDetector):
         """
         losses = self(**data)
         loss_b, loss_g, loss_d, log_vars = self._parse_losses(losses)
-
         outputs = dict(
             loss_b=loss_b, loss_g=loss_g, loss_d=loss_d, log_vars=log_vars, num_samples=len(data['img'].data))
+        # outputs.update(feats)
 
         return outputs
 

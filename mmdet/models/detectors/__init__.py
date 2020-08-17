@@ -18,10 +18,11 @@ from .single_stage import SingleStageDetector
 from .two_stage import TwoStageDetector
 from .two_stage_with_gan import TwoStageGanDetector
 from .faster_rcnn_with_gan import FasterRCNNGan
+from .faster_rcnn_with_gan_e2e import FasterRCNNGane2e
 
 __all__ = [
     'ATSS', 'BaseDetector', 'SingleStageDetector', 'TwoStageDetector', 'RPN',
     'FastRCNN', 'FasterRCNN', 'MaskRCNN', 'CascadeRCNN', 'HybridTaskCascade',
     'RetinaNet', 'FCOS', 'GridRCNN', 'MaskScoringRCNN', 'RepPointsDetector',
-    'FOVEA', 'FSAF', 'NASFCOS', 'TwoStageGanDetector', 'FasterRCNNGan'
+    'FOVEA', 'FSAF', 'NASFCOS', 'TwoStageGanDetector', 'FasterRCNNGan', 'FasterRCNNGane2e'
 ]
