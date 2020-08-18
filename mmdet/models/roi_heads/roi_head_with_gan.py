@@ -291,9 +291,9 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             bbox_results.update(bbox_feats=bbox_results['bbox_feats'][rois_index_hr])
             bbox_results.update(bbox_feats_lr=bbox_results['bbox_feats_lr'][rois_index_sr])"""
 
-        target_ones_g = torch.Tensor(np.ones(rois[0].shape[0])).cuda().long()
-        target_ones_d = torch.Tensor(np.ones(rois[0].shape[0])).cuda().long()
-        target_zeros_d = torch.Tensor(np.zeros(rois[0].shape[0])).cuda().long()
+        target_ones_g = torch.Tensor(np.ones(rois.shape[0])).cuda().long()
+        target_ones_d = torch.Tensor(np.ones(rois.shape[0])).cuda().long()
+        target_zeros_d = torch.Tensor(np.zeros(rois.shape[0])).cuda().long()
         # dis_score_sr = bbox_results['dis_score_sr'][rois_index_sr]
         # dis_score_hr = bbox_results['dis_score_hr'][rois_index_hr]
 
