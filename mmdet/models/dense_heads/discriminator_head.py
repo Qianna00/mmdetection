@@ -44,8 +44,8 @@ class DisHead(nn.Module):
         else:
             raise TypeError('pretrained must be a str or None')
 
-    def loss(self, dis_score, targets):
+    def loss(self, dis_score, targets, weights=None):
 
-        loss = self.loss_dis(dis_score, targets)
+        loss = self.loss_dis(dis_score, targets, weights)
 
         return loss

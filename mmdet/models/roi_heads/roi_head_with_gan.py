@@ -196,30 +196,28 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         return losses
 
-    def _bbox_forward(self, x, rois, rois_index_hr, rois_index_sr, rois_index_small, x_lr=None):
+    def _bbox_forward(self, x, rois, x_lr=None):
         # TODO: a more flexible way to decide which feature maps to use
 
         # bbox_feats = self.bbox_roi_extractor(x, rois)
         if self.with_fsr_generator:
             bbox_feats_sub_hr, bbox_feats_hr = self.bbox_roi_extractor(x, rois)
-            if rois_index_small[0].shape[0] != 0:
-                bbox_feats_sr = self.fsr_generator((bbox_feats_sub_hr[rois_index_small], bbox_feats_hr[rois_index_small]))
+            bbox_feats_sr = self.fsr_generator((bbox_feats_sub_hr, bbox_feats_hr))
             if x_lr is not None:
-                if rois_index_sr[0].shape[0] != 0:
-                    bbox_feats_sub_lr, bbox_feats_lr = self.bbox_roi_extractor(x_lr, rois[rois_index_sr], for_lr=True)
-                    bbox_feats_lr = self.fsr_generator((bbox_feats_sub_lr, bbox_feats_lr))
+                bbox_feats_sub_lr, bbox_feats_lr = self.bbox_roi_extractor(x_lr, rois, for_lr=True)
+                bbox_feats_lr = self.fsr_generator((bbox_feats_sub_lr, bbox_feats_lr))
         """cls_score, bbox_pred = self.bbox_head(bbox_feats)
 
         bbox_results = dict(
             cls_score=cls_score, bbox_pred=bbox_pred, bbox_feats=bbox_feats)"""
         # bbox_results = dict(bbox_feats=bbox_feats)
         bbox_results = {}
-        if rois_index_small[0].shape[0] == 0:
+        """if rois_index_small[0].shape[0] == 0:
             cls_score = torch.Tensor(np.zeros((1, 81))).cuda()
             bbox_pred = torch.Tensor(np.zeros((1, 320), dtype=np.float32)).cuda()
-        else:
-            if self.with_shared_head:
-                bbox_feats = self.shared_head(bbox_feats_sr)
+        else:"""
+        if self.with_shared_head:
+            bbox_feats = self.shared_head(bbox_feats_sr)
                 # if x_lr is not None:
                     # bbox_feats_lr = self.shared_head(bbox_feats_sr[rois_index_small])
             # if x_lr is not None:
@@ -228,20 +226,20 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         bbox_results.update(bbox_pred=bbox_pred)
 
         if self.with_dis_head:
-            if rois_index_hr[0].shape[0] == 0:
+            """if rois_index_hr[0].shape[0] == 0:
                 # print("There is no roi larger than 96*96")
                 dis_score_hr = torch.Tensor(np.ones((1, 1))).cuda().long()
-            else:
-                dis_score_hr = self.dis_head(bbox_feats_hr[rois_index_hr])
+            else:"""
+            dis_score_hr = self.dis_head(bbox_feats_hr)
             bbox_results.update(dis_score_hr=dis_score_hr)
             # bbox_results.update(bbox_feats_hr=bbox_feats_hr)
             if x_lr is not None:
-                if rois_index_sr[0].shape[0] == 0:
+                """if rois_index_sr[0].shape[0] == 0:
                     dis_score_sr = torch.Tensor(np.zeros((1, 1))).cuda()
                     gen_score_sr = torch.Tensor(np.ones((1, 1))).cuda()
-                else:
-                    dis_score_sr = self.dis_head(bbox_feats_lr.detach())
-                    gen_score_sr = self.dis_head(bbox_feats_lr)
+                else:"""
+                dis_score_sr = self.dis_head(bbox_feats_lr.detach())
+                gen_score_sr = self.dis_head(bbox_feats_lr)
                 bbox_results.update(dis_score_sr=dis_score_sr)
                 bbox_results.update(gen_score_sr=gen_score_sr)
                 # bbox_results.update(bbox_feats_lr=bbox_feats_lr)
@@ -254,25 +252,32 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
                             img_metas, x_lr):
         rois = bbox2roi([res.bboxes for res in sampling_results])
         areas = torch.mul((rois[:, 3] - rois[:, 1]), rois[:, 4] - rois[:, 2])
-        rois_index_hr = torch.where(areas > 96 * 96)
+        """rois_index_hr = torch.where(areas > 96 * 96)
         rois_index_sr = torch.where(areas <= 96 * 96 * 4)
-        rois_index_small = torch.where(areas <= 96 * 96)
+        rois_index_small = torch.where(areas <= 96 * 96)"""
+        one_weights = torch.Tensor(np.ones(rois.shape[0])).cuda()
+        zero_weights = torch.Tensor(np.zeros(rois.shape[0])).cuda()
+        zero_weights_4 = torch.Tensor(np.zeros((rois.shape[0], 4))).cuda()
+        loss_weights_adv_real = torch.where(areas > 96*96, one_weights, zero_weights)
+        loss_weights_adv_fake = torch.where(areas <= 96*96*4, one_weights, zero_weights)
 
-        bbox_results = self._bbox_forward(x, rois, rois_index_hr, rois_index_sr, rois_index_small, x_lr)
-        if rois_index_small[0].shape[0] == 0:
+        bbox_results = self._bbox_forward(x, rois, x_lr)
+        """if rois_index_small[0].shape[0] == 0:
             bbox_targets = torch.Tensor(np.zeros(1)).cuda().long(), \
                            torch.Tensor(np.ones(1, dtype=np.float32)).cuda(), \
                            torch.Tensor(np.zeros((1, 4), dtype=np.float32)).cuda(), \
                            torch.Tensor(np.ones((1, 4), dtype=np.float32)).cuda()
-        else:
+        else:"""
 
-            bbox_targets = self.bbox_head.get_targets(sampling_results,
-                                                      gt_bboxes, gt_labels, self.train_cfg)
-            bbox_targets = bbox_targets[0][rois_index_small], bbox_targets[1][rois_index_small], \
-                           bbox_targets[2][rois_index_small], bbox_targets[3][rois_index_small]
+        labels, label_weights, bbox_targets, bbox_weights = \
+            self.bbox_head.get_targets(sampling_results, gt_bboxes, gt_labels, self.train_cfg)
+        """bbox_targets = bbox_targets[0][rois_index_small], bbox_targets[1][rois_index_small], \
+                           bbox_targets[2][rois_index_small], bbox_targets[3][rois_index_small]"""
+        label_weights = torch.where(areas <= 96*96, label_weights, zero_weights)
+        bbox_weights = torch.where(areas <= 96*96, bbox_weights, zero_weights_4)
         loss_bbox = self.bbox_head.loss(bbox_results['cls_score'],
-                                        bbox_results['bbox_pred'], rois[rois_index_small],
-                                        *bbox_targets)
+                                        bbox_results['bbox_pred'], rois,
+                                        labels, label_weights, bbox_targets, bbox_weights)
         bbox_results.update(loss_bbox=loss_bbox)
         # if x_lr is not None:
 
@@ -286,14 +291,14 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             bbox_results.update(bbox_feats=bbox_results['bbox_feats'][rois_index_hr])
             bbox_results.update(bbox_feats_lr=bbox_results['bbox_feats_lr'][rois_index_sr])"""
 
-        target_ones_g = torch.Tensor(np.ones((rois_index_sr[0].shape[0], 1))).cuda().long()
-        target_ones_d = torch.Tensor(np.ones((rois_index_hr[0].shape[0], 1))).cuda().long()
-        target_zeros_d = torch.Tensor(np.zeros((rois_index_sr[0].shape[0], 1))).cuda().long()
+        target_ones_g = torch.Tensor(np.ones(rois[0].shape[0])).cuda().long()
+        target_ones_d = torch.Tensor(np.ones(rois[0].shape[0])).cuda().long()
+        target_zeros_d = torch.Tensor(np.zeros(rois[0].shape[0])).cuda().long()
         # dis_score_sr = bbox_results['dis_score_sr'][rois_index_sr]
         # dis_score_hr = bbox_results['dis_score_hr'][rois_index_hr]
 
         loss_det = loss_bbox['loss_cls'] + loss_bbox['loss_bbox']
-        if rois_index_hr[0].shape[0] == 0:
+        """if rois_index_hr[0].shape[0] == 0:
             target_ones_d = torch.Tensor(np.ones((1, 1))).cuda().long()
             # loss_d_hr = torch.Tensor([0.]).cuda()
         loss_d_hr = self.dis_head.loss(bbox_results['dis_score_hr'], target_ones_d)
@@ -304,11 +309,12 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             # loss_d_sr = torch.Tensor([0.]).cuda()
             loss_gen = loss_det
             loss_dis = loss_d_hr
-        else:
-            loss_g_dis = self.dis_head.loss(bbox_results['gen_score_sr'], target_ones_g)
-            loss_d_sr = self.dis_head.loss(bbox_results['dis_score_sr'], target_zeros_d)
-            loss_gen = loss_det + loss_g_dis
-            loss_dis = loss_d_hr + loss_d_sr
+        else:"""
+        loss_g_dis = self.dis_head.loss(bbox_results['gen_score_sr'], target_ones_g, loss_weights_adv_fake)
+        loss_d_sr = self.dis_head.loss(bbox_results['dis_score_sr'], target_zeros_d, loss_weights_adv_fake)
+        loss_d_hr = self.dis_head.loss(bbox_results['dis_score_hr'], target_ones_d, loss_weights_adv_real)
+        loss_gen = loss_det + loss_g_dis
+        loss_dis = loss_d_hr + loss_d_sr
         bbox_results.update(loss_gen=loss_gen)
         bbox_results.update(loss_dis=loss_dis)
         bbox_results.update(loss_det=loss_det)
