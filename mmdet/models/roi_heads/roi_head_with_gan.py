@@ -271,11 +271,10 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
         labels, label_weights, bbox_targets, bbox_weights = \
             self.bbox_head.get_targets(sampling_results, gt_bboxes, gt_labels, self.train_cfg)
-        print(bbox_weights.shape)
         """bbox_targets = bbox_targets[0][rois_index_small], bbox_targets[1][rois_index_small], \
                            bbox_targets[2][rois_index_small], bbox_targets[3][rois_index_small]"""
         label_weights = torch.where(areas <= 96*96, label_weights, zero_weights)
-        bbox_weights = torch.where(areas <= 96*96, bbox_weights, zero_weights_4)
+        bbox_weights[torch.where(areas <= 96*96)] = zero_weights_4[torch.where(areas <= 96*96)]
         loss_bbox = self.bbox_head.loss(bbox_results['cls_score'],
                                         bbox_results['bbox_pred'], rois,
                                         labels, label_weights, bbox_targets, bbox_weights)
