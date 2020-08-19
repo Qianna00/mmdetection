@@ -184,6 +184,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
                 losses.update(loss_b=bbox_results['loss_det'])
                 losses.update(loss_g=bbox_results['loss_gen'])
                 losses.update(loss_d=bbox_results['loss_dis'])
+                losses.update(bbox_results['loss_g_dis'])
 
         # mask head forward and loss
         if self.with_mask:
@@ -318,6 +319,7 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         bbox_results.update(loss_gen=loss_gen)
         bbox_results.update(loss_dis=loss_dis)
         bbox_results.update(loss_det=loss_det)
+        bbox_results.update(loss_g_dis=loss_g_dis)
         bbox_results.update(loss_bbox=loss_bbox)
 
         return bbox_results
@@ -517,13 +519,13 @@ class RoIHeadGan(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             # bbox_feats[rois_small_index] = bbox_feats_sr[rois_small_index]
         if self.with_shared_head:
             bbox_feats = self.shared_head_large(bbox_feats)
-            bbox_feats_sr = self.shared_head(bbox_feats_sr[rois_small_index])
-            # bbox_feats_sr = self.shared_head(bbox_feats_sr)
+            # bbox_feats_sr = self.shared_head(bbox_feats_sr[rois_small_index])
+            bbox_feats_sr = self.shared_head(bbox_feats_sr)
 
         cls_score_s, bbox_pred_s = self.bbox_head(bbox_feats_sr)
         cls_score, bbox_pred = self.bbox_head_large(bbox_feats)
-        cls_score[rois_small_index] = cls_score_s
-        bbox_pred[rois_small_index] = bbox_pred_s
+        cls_score[rois_small_index] = cls_score_s[rois_small_index]
+        bbox_pred[rois_small_index] = bbox_pred_s[rois_small_index]
 
         bbox_results = dict(
             cls_score=cls_score, bbox_pred=bbox_pred)
