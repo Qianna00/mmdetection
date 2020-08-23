@@ -31,9 +31,28 @@ test_pipeline = [
             dict(type='Collect', keys=['img']),
         ])
 ]
+
+dataset_type = 'CocoDataset'
+data_root = '/root/data/zq/data/SMD/'
+
 data = dict(
-    train=dict(pipeline=train_pipeline),
-    val=dict(pipeline=test_pipeline),
-    test=dict(pipeline=test_pipeline))
+    samples_per_gpu=1,
+    workers_per_gpu=1,
+    train=dict(
+        type=dataset_type,
+        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_2_train.json',
+        img_prefix=data_root + 'train/',
+        pipeline=train_pipeline),
+    val=dict(
+        type=dataset_type,
+        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_2_val.json',
+        img_prefix=data_root + 'train/',
+        pipeline=test_pipeline),
+    test=dict(
+        type=dataset_type,
+        ann_file=data_root + 'annotations/Test/SMD_VIS_skip_2.json',
+        img_prefix=data_root + 'test/',
+        pipeline=test_pipeline))
+evaluation = dict(interval=1, metric='bbox')
 # optimizer
 optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
