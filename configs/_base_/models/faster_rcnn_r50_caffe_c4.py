@@ -2,7 +2,7 @@
 norm_cfg = dict(type='BN', requires_grad=False)
 model = dict(
     type='FasterRCNN',
-    pretrained='open-mmlab://detectron2/resnet50_caffe',
+    pretrained='/root/data/zq/mmdetection/checkpoints/resnet50_msra.pth',
     backbone=dict(
         type='ResNet',
         depth=50,
