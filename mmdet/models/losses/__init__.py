@@ -12,6 +12,7 @@ from .mse_loss import MSELoss, mse_loss
 from .pisa_loss import carl_loss, isr_p
 from .smooth_l1_loss import L1Loss, SmoothL1Loss, l1_loss, smooth_l1_loss
 from .utils import reduce_loss, weight_reduce_loss, weighted_loss
+from .DiscCentroidsLoss import DiscCentroidsLoss
 
 __all__ = [
     'accuracy', 'Accuracy', 'cross_entropy', 'binary_cross_entropy',
@@ -20,5 +21,5 @@ __all__ = [
     'BalancedL1Loss', 'mse_loss', 'MSELoss', 'iou_loss', 'bounded_iou_loss',
     'IoULoss', 'BoundedIoULoss', 'GIoULoss', 'GHMC', 'GHMR', 'reduce_loss',
     'weight_reduce_loss', 'weighted_loss', 'L1Loss', 'l1_loss', 'isr_p',
-    'carl_loss', 'AssociativeEmbeddingLoss', 'GaussianFocalLoss'
+    'carl_loss', 'AssociativeEmbeddingLoss', 'GaussianFocalLoss', 'DiscCentroidsLoss'
 ]
