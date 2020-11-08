@@ -107,7 +107,7 @@ model = dict(
             norm_eval=True),
         bbox_roi_extractor=dict(
             type='SingleRoIExtractor',
-            roi_layer=dict(type='RoIAlign', output_size=14, sampling_ratio=0),
+            roi_layer=dict(type='RoIPool', out_size=14, use_torchvision=True),
             out_channels=1024,
             featmap_strides=[16]),
         bbox_head=dict(
