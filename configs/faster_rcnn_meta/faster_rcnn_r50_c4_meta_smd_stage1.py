@@ -94,7 +94,7 @@ model = dict(
         loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
     roi_head=dict(
         type='MetaEmbedding_RoIHead',
-        num_classes=7,
+        num_classes=10,
         feat_dim=1024,
         shared_head=dict(
             type='ResLayer',
@@ -115,7 +115,7 @@ model = dict(
             with_avg_pool=True,
             roi_feat_size=7,
             in_channels=2048,
-            num_classes=1,
+            num_classes=10,
             bbox_coder=dict(
                 type='DeltaXYWHBBoxCoder',
                 target_means=[0., 0., 0., 0.],
@@ -126,7 +126,7 @@ model = dict(
             loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
         loss_feat=dict(
             type="DiscCentroidsLoss",
-            num_classes=7,
+            num_classes=10,
             feat_dim=1024,
             size_average=True)),
     init_centroids=False)
