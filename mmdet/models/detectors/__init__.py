@@ -20,10 +20,12 @@ from .two_stage_with_gan import TwoStageGanDetector
 from .faster_rcnn_with_gan import FasterRCNNGan
 from .faster_rcnn_with_gan_e2e import FasterRCNNGane2e
 from .two_stage_with_MetaEmbedding import TwoStageDetectorMetaEmbedding
+from .faster_rcnn_with_meta_embedding import FasterRCNNMetaEmbedding
 
 __all__ = [
     'ATSS', 'BaseDetector', 'SingleStageDetector', 'TwoStageDetector', 'RPN',
     'FastRCNN', 'FasterRCNN', 'MaskRCNN', 'CascadeRCNN', 'HybridTaskCascade',
     'RetinaNet', 'FCOS', 'GridRCNN', 'MaskScoringRCNN', 'RepPointsDetector',
-    'FOVEA', 'FSAF', 'NASFCOS', 'TwoStageGanDetector', 'FasterRCNNGan', 'FasterRCNNGane2e'
+    'FOVEA', 'FSAF', 'NASFCOS', 'TwoStageGanDetector', 'FasterRCNNGan', 'FasterRCNNGane2e',
+    'FasterRCNNMetaEmbedding'
 ]

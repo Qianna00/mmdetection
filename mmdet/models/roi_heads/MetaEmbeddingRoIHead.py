@@ -34,7 +34,8 @@ class MetaEmbedding_RoIHead(nn.Module):
                                             shared_head=shared_head,
                                             train_cfg=train_cfg,
                                             test_cfg=test_cfg)
-        self.loss_feat = build_loss(loss_feat)
+        if loss_feat is not None:
+            self.loss_feat = build_loss(loss_feat)
 
     def forward(self,
                 x,
