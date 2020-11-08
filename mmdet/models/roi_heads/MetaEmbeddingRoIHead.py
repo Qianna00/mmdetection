@@ -17,7 +17,6 @@ class MetaEmbedding_RoIHead(nn.Module):
                  shared_head=None,
                  train_cfg=None,
                  test_cfg=None,
-                 memory_cfg=None,
                  loss_feat=dict(
                      type="DiscCentroidsLoss",
                      num_classes=7,
@@ -36,21 +35,20 @@ class MetaEmbedding_RoIHead(nn.Module):
                                             train_cfg=train_cfg,
                                             test_cfg=test_cfg)
         self.loss_feat = build_loss(loss_feat)
-        self.memory = memory_cfg
 
     def forward(self,
                 x,
-                centroids,
-                img_metas,
-                proposal_list,
-                gt_bboxes,
-                gt_labels,
+                centroids=None,
+                img_metas=None,
+                proposal_list=None,
+                gt_bboxes=None,
+                gt_labels=None,
                 gt_bboxes_ignore=None,
                 gt_masks=None,
                 test=False,
                 *args):
 
-        if self.memory["centroids"]:
+        if centroids is not None:
 
             # storing direct feature
             direct_feature = x.clone()
@@ -74,7 +72,7 @@ class MetaEmbedding_RoIHead(nn.Module):
             x = direct_feature + concept_selector * memory_feature
 
             # storing infused feature
-            infused_feature = concept_selector * memory_feature
+            # infused_feature = concept_selector * memory_feature
 
         if not test:
             roi_losses = self.std_roi_head.forward_train(x,
@@ -84,11 +82,11 @@ class MetaEmbedding_RoIHead(nn.Module):
                                                          gt_labels,
                                                          gt_bboxes_ignore,
                                                          gt_masks)
-            if self.memory["centroids"]:
+            if centroids is not None:
                 feat_loss = self.loss_feat(x, gt_labels)
-                return roi_losses, feat_loss, [direct_feature, infused_feature]
-            else:
-                return roi_losses
+                roi_losses.update(loss_feat=feat_loss)
+                # roi_losses.update(features=[direct_feature, infused_feature])
+            return roi_losses
         else:
             bbox_results = self.std_roi_head.simple_test(x,
                                                          proposal_list,

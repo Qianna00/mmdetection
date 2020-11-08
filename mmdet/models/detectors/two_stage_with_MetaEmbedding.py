@@ -26,10 +26,12 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                  roi_head=None,
                  train_cfg=None,
                  test_cfg=None,
+                 init_centroids=False,
                  pretrained=None):
         super(TwoStageDetectorMetaEmbedding, self).__init__()
         self.backbone = build_backbone(backbone)
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self.init_centroids = init_centroids
 
         if neck is not None:
             self.neck = build_neck(neck)
@@ -54,7 +56,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         self.init_weights(pretrained=pretrained)
         if roi_head["type"] == "MetaEmbedding_RoIHead":
             # calculate init_centroids using training dataset
-            if self.roi_head.memory['init_centroids']:
+            if init_centroids:
                 cfg = Config.fromfile("/root/data/zq/smd_det/config.yaml")
                 dataset = [build_dataset(cfg.data.train)][0]
                 data = build_dataloader(dataset=dataset, samples_per_gpu=2,
@@ -165,31 +167,28 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         else:
             proposal_list = proposals
 
-        roi_losses = self.roi_head.forward_train(x, img_metas, proposal_list,
+        """roi_losses = self.roi_head.forward_train(x, img_metas, proposal_list,
                                                  gt_bboxes, gt_labels,
                                                  gt_bboxes_ignore, gt_masks,
-                                                 **kwargs)
+                                                 **kwargs)"""
+
+        if self.init_centroids:
+            centroids = self.self.roi_head.loss_feat.centroids.data
+        else:
+            centroids = None
+        roi_losses = self.roi_head(x,
+                                   centroids=centroids,
+                                   img_metas=img_metas,
+                                   proposal_list=proposal_list,
+                                   gt_bboxes=gt_bboxes,
+                                   gt_labels=gt_labels,
+                                   gt_bboxes_ignore=gt_bboxes_ignore,
+                                   gt_masks=gt_masks,
+                                   test=False,
+                                   **kwargs)
         losses.update(roi_losses)
 
         return losses
-
-    async def async_simple_test(self,
-                                img,
-                                img_meta,
-                                proposals=None,
-                                rescale=False):
-        """Async test without augmentation."""
-        assert self.with_bbox, 'Bbox head must be implemented.'
-        x = self.extract_feat(img)
-
-        if proposals is None:
-            proposal_list = await self.rpn_head.async_simple_test_rpn(
-                x, img_meta)
-        else:
-            proposal_list = proposals
-
-        return await self.roi_head.async_simple_test(
-            x, proposal_list, img_meta, rescale=rescale)
 
     def simple_test(self, img, img_metas, proposals=None, rescale=False):
         """Test without augmentation."""
@@ -202,20 +201,16 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         else:
             proposal_list = proposals
 
-        return self.roi_head.simple_test(
-            x, proposal_list, img_metas, rescale=rescale)
+        if self.init_centroids:
+            centroids = self.self.roi_head.loss_feat.centroids.data
+        else:
+            centroids = None
 
-    def aug_test(self, imgs, img_metas, rescale=False):
-        """Test with augmentations.
-
-        If rescale is False, then returned bboxes and masks will fit the scale
-        of imgs[0].
-        """
-        # recompute feats to save memory
-        x = self.extract_feats(imgs)
-        proposal_list = self.rpn_head.aug_test_rpn(x, img_metas)
-        return self.roi_head.aug_test(
-            x, proposal_list, img_metas, rescale=rescale)
+        return self.roi_head(x,
+                             centroids=centroids,
+                             proposal_list=proposal_list,
+                             img_metas=img_metas,
+                             test=True)
 
     def centroids_cal(self, data):
 
