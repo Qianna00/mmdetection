@@ -19,6 +19,7 @@ from .two_stage import TwoStageDetector
 from .two_stage_with_gan import TwoStageGanDetector
 from .faster_rcnn_with_gan import FasterRCNNGan
 from .faster_rcnn_with_gan_e2e import FasterRCNNGane2e
+from .two_stage_with_MetaEmbedding import TwoStageDetectorMetaEmbedding
 
 __all__ = [
     'ATSS', 'BaseDetector', 'SingleStageDetector', 'TwoStageDetector', 'RPN',
