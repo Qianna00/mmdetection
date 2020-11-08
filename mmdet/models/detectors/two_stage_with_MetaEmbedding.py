@@ -57,7 +57,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         if roi_head["type"] == "MetaEmbedding_RoIHead":
             # calculate init_centroids using training dataset
             if init_centroids:
-                cfg = Config.fromfile("/root/data/zq/smd_det/config.yaml")
+                cfg = Config.fromfile("/root/data/zq/smd_det/faster_rcnn_r50_c4_meta_smd_stage1.py")
                 dataset = [build_dataset(cfg.data.train)][0]
                 data = build_dataloader(dataset=dataset, samples_per_gpu=2,
                                         workers_per_gpu=2, num_gpus=2, dist=True, shuffle=False)
