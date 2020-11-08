@@ -1,4 +1,4 @@
-dataset_type = 'CocoDataset'
+dataset_type = 'SmdDataset'
 data_root = '/root/data/zq/data/SMD/'
 # use caffe img_norm
 img_norm_cfg = dict(
