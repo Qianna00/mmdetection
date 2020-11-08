@@ -190,6 +190,24 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
 
         return losses
 
+    async def async_simple_test(self,
+                                img,
+                                img_meta,
+                                proposals=None,
+                                rescale=False):
+        """Async test without augmentation."""
+        assert self.with_bbox, 'Bbox head must be implemented.'
+        x = self.extract_feat(img)
+
+        if proposals is None:
+            proposal_list = await self.rpn_head.async_simple_test_rpn(
+                x, img_meta)
+        else:
+            proposal_list = proposals
+
+        return await self.roi_head.async_simple_test(
+            x, proposal_list, img_meta, rescale=rescale)
+
     def simple_test(self, img, img_metas, proposals=None, rescale=False):
         """Test without augmentation."""
         assert self.with_bbox, 'Bbox head must be implemented.'
@@ -211,6 +229,18 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                              proposal_list=proposal_list,
                              img_metas=img_metas,
                              test=True)
+
+    def aug_test(self, imgs, img_metas, rescale=False):
+        """Test with augmentations.
+
+        If rescale is False, then returned bboxes and masks will fit the scale
+        of imgs[0].
+        """
+        # recompute feats to save memory
+        x = self.extract_feats(imgs)
+        proposal_list = self.rpn_head.aug_test_rpn(x, img_metas)
+        return self.roi_head.aug_test(
+            x, proposal_list, img_metas, rescale=rescale)
 
     def centroids_cal(self, data):
 
