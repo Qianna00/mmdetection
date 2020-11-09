@@ -258,7 +258,6 @@ class LoadAnnotations(object):
 
     def __call__(self, results):
         if self.with_bbox:
-            print("results before loading annotations:", results)
             results = self._load_bboxes(results)
             if results is None:
                 return None
