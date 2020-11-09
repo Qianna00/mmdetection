@@ -155,7 +155,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         x = self.extract_feat(img)
 
         losses = dict()
-        print("x:",x.size())
+        print("x:",x[0].size())
         print("img_metas:", img_metas)
         print("gt_bboxes:", gt_bboxes)
         print("gt_labels:", gt_labels)
