@@ -4,6 +4,8 @@ import numpy as np
 from tqdm import tqdm
 from .standard_roi_head import StandardRoIHead
 from ..builder import HEADS, build_head, build_loss
+from mmcv.runner import load_checkpoint
+from mmdet.utils import get_root_logger
 
 
 
@@ -95,3 +97,17 @@ class MetaEmbedding_RoIHead(nn.Module):
                                                          proposals=None,
                                                          rescale=False)
             return bbox_results
+
+    def init_weights(self, pretrained=None):
+        if isinstance(pretrained, str):
+            logger = get_root_logger()
+            load_checkpoint(self, pretrained, strict=False, logger=logger)
+        elif pretrained is None:
+            nn.init.normal_(self.fc_hallucinator.weight, 0, 0.01)
+            nn.init.constant_(self.fc_hallucinator.bias, 0)
+            nn.init.normal_(self.fc_selector.weight, 0, 0.001)
+            nn.init.constant_(self.fc_selector.bias, 0)
+            self.std_roi_head.init_weights(pretrained)
+        else:
+            raise TypeError('pretrained must be a str or None')
+
