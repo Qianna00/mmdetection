@@ -155,11 +155,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         x = self.extract_feat(img)
 
         losses = dict()
-        print("x:",x[0].size())
-        print("img_metas:", img_metas)
-        print("gt_bboxes:", gt_bboxes)
-        print("gt_labels:", gt_labels)
-        print("gt_bboxes_ignore:", gt_bboxes_ignore)
+
         # RPN forward and loss
         if self.with_rpn:
             proposal_cfg = self.train_cfg.get('rpn_proposal',
