@@ -33,7 +33,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.init_centroids = init_centroids
         if self.init_centroids:
-            self.centroids = self.self.roi_head.loss_feat.centroids.data
+            self.centroids = self.roi_head.loss_feat.centroids.data
         else:
             self.centroids = None
 
@@ -220,13 +220,8 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         else:
             proposal_list = proposals
 
-        if self.init_centroids:
-            centroids = self.self.roi_head.loss_feat.centroids.data
-        else:
-            centroids = None
-
         return self.roi_head(x,
-                             centroids=centroids,
+                             centroids=self.centroids,
                              proposal_list=proposal_list,
                              img_metas=img_metas,
                              test=True)
