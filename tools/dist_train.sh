@@ -6,4 +6,4 @@ PORT=${PORT:-29500}
 
 PYTHONPATH="$(dirname $0)/..":$PYTHONPATH \
 python -m torch.distributed.launch --nproc_per_node=$GPUS --master_port 2000 \
-    $(dirname "$0")/train.py $CONFIG --launcher pytorch --work_dir /root/data/zq/smd_det/meta_embedding/10c/stage1 ${@:3}
+    $(dirname "$0")/train.py $CONFIG --launcher pytorch --work_dir /root/data/zq/smd_det/meta_embedding/10c/stage2 ${@:3}

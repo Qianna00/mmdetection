@@ -1,4 +1,4 @@
-dataset_type = 'CocoDataset'
+dataset_type = 'SmdDataset'
 data_root = '/root/data/zq/data/SMD/'
 # use caffe img_norm
 img_norm_cfg = dict(
@@ -29,21 +29,21 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=4,
+    samples_per_gpu=2,
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_2_train.json',
+        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_10_train.json',
         img_prefix=data_root + 'train/',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_2_val.json',
+        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_10_val.json',
         img_prefix=data_root + 'train/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/Test/SMD_VIS_skip_2.json',
+        ann_file=data_root + 'annotations/Test/SMD_VIS_skip_10.json',
         img_prefix=data_root + 'test/',
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric='bbox')
@@ -64,7 +64,7 @@ total_epochs = 12
 norm_cfg = dict(type='BN', requires_grad=False)
 model = dict(
     type='FasterRCNNMetaEmbedding',
-    pretrained='/root/data/zq/mmdetection/checkpoints/resnet50_msra.pth',
+    pretrained='/root/data/zq/pretrained_models/resnet50_msra.pth',
     backbone=dict(
         type='ResNet',
         depth=50,
@@ -94,7 +94,7 @@ model = dict(
         loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
     roi_head=dict(
         type='MetaEmbedding_RoIHead',
-        num_classes=7,
+        num_classes=10,
         feat_dim=1024,
         shared_head=dict(
             type='ResLayer',
@@ -107,7 +107,7 @@ model = dict(
             norm_eval=True),
         bbox_roi_extractor=dict(
             type='SingleRoIExtractor',
-            roi_layer=dict(type='RoIAlign', output_size=14, sampling_ratio=0),
+            roi_layer=dict(type='RoIPool', out_size=14, use_torchvision=True),
             out_channels=1024,
             featmap_strides=[16]),
         bbox_head=dict(
@@ -115,7 +115,7 @@ model = dict(
             with_avg_pool=True,
             roi_feat_size=7,
             in_channels=2048,
-            num_classes=1,
+            num_classes=10,
             bbox_coder=dict(
                 type='DeltaXYWHBBoxCoder',
                 target_means=[0., 0., 0., 0.],
@@ -126,7 +126,7 @@ model = dict(
             loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
         loss_feat=dict(
             type="DiscCentroidsLoss",
-            num_classes=7,
+            num_classes=10,
             feat_dim=1024,
             size_average=True)),
     init_centroids=True)
@@ -182,13 +182,13 @@ test_cfg = dict(
         min_bbox_size=0),
     rcnn=dict(
         score_thr=0.05,
-        nms=dict(type='nms', iou_threshold=0.5),
+        nms=dict(type='nms', iou_thr=0.5),
         max_per_img=100))
 
 checkpoint_config = dict(interval=1)
 # yapf:disable
 log_config = dict(
-    interval=1,
+    interval=20,
     hooks=[
         dict(type='TextLoggerHook'),
         # dict(type='TensorboardLoggerHook')
