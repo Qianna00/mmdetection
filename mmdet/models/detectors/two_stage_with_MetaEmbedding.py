@@ -251,6 +251,8 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         with torch.set_grad_enabled(False):
 
             for inputs in tqdm(data):
+                print(type(inputs))
+                print(inputs)
                 imgs, gt_labels, gt_bboxes, img_metas = inputs["imgs"].to(self.device), \
                                                         inputs["gt_labels"].to(self.device), \
                                                         inputs["gt_bboxes"].to(self.device),\
