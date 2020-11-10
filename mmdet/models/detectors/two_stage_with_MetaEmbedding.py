@@ -250,7 +250,9 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         # Calculate initial centroids only on training data.
         with torch.set_grad_enabled(False):
 
-            for inputs in tqdm(data):
+            for i, inputs in enumerate(data):
+                print(type(inputs))
+                print(inputs)
                 imgs, gt_labels, gt_bboxes, img_metas = inputs["img"], \
                                                         inputs["gt_labels"], \
                                                         inputs["gt_bboxes"],\
