@@ -253,7 +253,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
             for inputs in tqdm(data):
                 print(type(inputs))
                 print(inputs)
-                imgs, gt_labels, gt_bboxes, img_metas = inputs["imgs"].to(self.device), \
+                imgs, gt_labels, gt_bboxes, img_metas = inputs["img"].to(self.device), \
                                                         inputs["gt_labels"].to(self.device), \
                                                         inputs["gt_bboxes"].to(self.device),\
                                                         inputs["img_metas"].to(self.device)
