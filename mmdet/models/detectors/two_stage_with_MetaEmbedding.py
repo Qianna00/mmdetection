@@ -251,12 +251,10 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         with torch.set_grad_enabled(False):
 
             for inputs in tqdm(data):
-                print(type(inputs['img']))
-                print(inputs)
-                imgs, gt_labels, gt_bboxes, img_metas = inputs["img"].to(self.device), \
-                                                        inputs["gt_labels"].to(self.device), \
-                                                        inputs["gt_bboxes"].to(self.device),\
-                                                        inputs["img_metas"].to(self.device)
+                imgs, gt_labels, gt_bboxes, img_metas = inputs["img"], \
+                                                        inputs["gt_labels"], \
+                                                        inputs["gt_bboxes"],\
+                                                        inputs["img_metas"]
                 # Calculate Features of each training data
                 feats = self.backbone(imgs)
                 proposal_list = self.rpn_head.simple_test_rpn(feats, img_metas)
