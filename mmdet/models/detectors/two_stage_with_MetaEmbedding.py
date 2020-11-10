@@ -32,10 +32,6 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         self.backbone = build_backbone(backbone)
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.init_centroids = init_centroids
-        if self.init_centroids:
-            self.centroids = self.roi_head.loss_feat.centroids.data
-        else:
-            self.centroids = None
 
         if neck is not None:
             self.neck = build_neck(neck)
@@ -53,6 +49,11 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
             roi_head.update(train_cfg=rcnn_train_cfg)
             roi_head.update(test_cfg=test_cfg.rcnn)
             self.roi_head = build_head(roi_head)
+
+        if self.init_centroids:
+            self.centroids = self.roi_head.loss_feat.centroids.data
+        else:
+            self.centroids = None
 
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
