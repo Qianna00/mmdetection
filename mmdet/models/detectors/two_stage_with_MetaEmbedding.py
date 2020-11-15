@@ -10,6 +10,7 @@ from mmdet.datasets import build_dataloader, build_dataset
 from mmcv import Config
 from mmdet.core import bbox2roi
 from functools import partial
+from torch.utils.data.dataloader import DataLoader
 
 
 @DETECTORS.register_module()
@@ -67,8 +68,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                     "/root/data/zq/smd_det/meta_embedding/10c/stage2/faster_rcnn_r50_c4_meta_smd_stage2.py")
                 dataset = [build_dataset(cfg.data.train)][0]
                 print("dataset:",dataset[0])
-                data = build_dataloader(dataset=dataset, samples_per_gpu=2,
-                                        workers_per_gpu=2, num_gpus=2, dist=True, shuffle=False)
+                data = DataLoader(dataset=dataset, batch_size=2)
                 self.roi_head.loss_feat.centroids.data = self.centroids_cal(data)
 
     @property
