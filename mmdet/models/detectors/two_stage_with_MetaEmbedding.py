@@ -67,7 +67,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                 cfg = Config.fromfile(
                     "/root/data/zq/smd_det/meta_embedding/10c/stage2/faster_rcnn_r50_c4_meta_smd_stage2.py")
                 dataset = build_dataset(cfg.data.centroids_cal)
-                data = build_dataloader(dataset, samples_per_gpu=1, workers_per_gpu=1, num_gpus=1, dist=False, shuffle=False)
+                data = build_dataloader(dataset, samples_per_gpu=1, workers_per_gpu=0, num_gpus=1, dist=False, shuffle=False)
                 # print(data[0])
                 self.roi_head.loss_feat.centroids.data = self.centroids_cal(data)
 
