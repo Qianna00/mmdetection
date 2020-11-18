@@ -252,11 +252,12 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         # Calculate initial centroids only on training data.
         with torch.set_grad_enabled(False):
 
-            for _, inputs in enumerate(data):
+            for i, inputs in enumerate(data):
                 imgs, gt_labels, gt_bboxes, img_metas = inputs["img"], \
                                                         inputs["gt_labels"], \
                                                         inputs["gt_bboxes"],\
                                                         inputs["img_metas"]
+                print(i)
                 # Calculate Features of each training data
                 feats = self.backbone(imgs)
                 proposal_list = self.rpn_head.simple_test_rpn(feats, img_metas)
