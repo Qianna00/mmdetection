@@ -144,6 +144,51 @@ class DefaultFormatBundle(object):
 
 
 @PIPELINES.register_module()
+class DefaultFormatBundleTensor(object):
+    """Default formatting bundle.
+
+    It simplifies the pipeline of formatting common fields, including "img",
+    "proposals", "gt_bboxes", "gt_labels", "gt_masks" and "gt_semantic_seg".
+    These fields are formatted as follows.
+
+    - img: (1)transpose, (2)to tensor, (3)to DataContainer (stack=True)
+    - proposals: (1)to tensor, (2)to DataContainer
+    - gt_bboxes: (1)to tensor, (2)to DataContainer
+    - gt_bboxes_ignore: (1)to tensor, (2)to DataContainer
+    - gt_labels: (1)to tensor, (2)to DataContainer
+    - gt_masks: (1)to tensor, (2)to DataContainer (cpu_only=True)
+    - gt_semantic_seg: (1)unsqueeze dim-0 (2)to tensor,
+                       (3)to DataContainer (stack=True)
+    """
+
+    def __call__(self, results):
+        if 'img' in results:
+            img = results['img']
+            if len(img.shape) < 3:
+                img = np.expand_dims(img, -1)
+            img = np.ascontiguousarray(img.transpose(2, 0, 1))
+            results['img'] = to_tensor(img)
+        if 'img_lr' in results:
+            img_lr = results['img_lr']
+            if len(img_lr.shape) < 3:
+                img_lr = np.expand_dims(img_lr, -1)
+            img_lr = np.ascontiguousarray(img_lr.transpose(2, 0, 1))
+            results['img_lr'] = to_tensor(img_lr)
+        for key in ['proposals', 'gt_bboxes', 'gt_bboxes_ignore', 'gt_labels']:
+            if key not in results:
+                continue
+            results[key] = to_tensor(results[key])
+        if 'gt_masks' in results:
+            results['gt_masks'] = results['gt_masks']
+        if 'gt_semantic_seg' in results:
+            results['gt_semantic_seg'] = to_tensor(results['gt_semantic_seg'][None, ...])
+        return results
+
+    def __repr__(self):
+        return self.__class__.__name__
+
+
+@PIPELINES.register_module()
 class Collect(object):
     """
     Collect data from the loader relevant to the specific task.
