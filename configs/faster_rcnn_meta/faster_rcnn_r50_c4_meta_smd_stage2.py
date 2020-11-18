@@ -55,12 +55,12 @@ data = dict(
         type=dataset_type,
         ann_file=data_root + 'annotations/Test/SMD_VIS_skip_10.json',
         img_prefix=data_root + 'test/',
-        pipeline=test_pipeline),
-    centroids_cal=dict(
+        pipeline=test_pipeline))
+centroids_cal=dict(
         type=dataset_type,
         ann_file=data_root + 'annotations/Training/SMD_VIS_skip_10_train.json',
         img_prefix=data_root + 'train/',
-        pipeline=pipeline_for_init_centroids))
+        pipeline=pipeline_for_init_centroids)
 evaluation = dict(interval=1, metric='bbox')
 
 # optimizer
