@@ -263,6 +263,9 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                                                         [data[i]['gt_labels'].to(self.device)], \
                                                         [data[i]['gt_bboxes'].to(self.device)], \
                                                         [data[i]['img_metas']]
+                self.backbone.cuda()
+                self.rpn_head.cuda()
+                self.roi_head.cuda()
                 # Calculate Features of each training data
                 feats = self.backbone(imgs)
                 proposal_list = self.rpn_head.simple_test_rpn(feats, img_metas)
