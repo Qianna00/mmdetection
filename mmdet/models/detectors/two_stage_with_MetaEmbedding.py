@@ -285,7 +285,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                     feats[:self.roi_head.std_roi_head.bbox_roi_extractor.num_inputs], rois)
 
                 labels = self.roi_head.std_roi_head.bbox_head.get_targets(sampling_results, gt_bboxes,
-                                                                                gt_labels, self.train_cfg)[0]
+                                                                                gt_labels, self.train_cfg.rcnn)[0]
 
                 # Add all calculated features to center tensor
                 for i in range(len(labels)):
