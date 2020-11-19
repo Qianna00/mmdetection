@@ -259,9 +259,9 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                                                         inputs["gt_labels"], \
                                                         inputs["gt_bboxes"],\
                                                         inputs["img_metas"]"""
-                imgs, gt_labels, gt_bboxes, img_metas = torch.unsqueeze(data[i]['img'], 0), \
-                                                        [data[i]['gt_labels']], \
-                                                        [data[i]['gt_bboxes']], \
+                imgs, gt_labels, gt_bboxes, img_metas = torch.unsqueeze(data[i]['img'], 0).to(self.device), \
+                                                        [data[i]['gt_labels'].to(self.device)], \
+                                                        [data[i]['gt_bboxes'].to(self.device)], \
                                                         [data[i]['img_metas']]
                 # Calculate Features of each training data
                 feats = self.backbone(imgs)
