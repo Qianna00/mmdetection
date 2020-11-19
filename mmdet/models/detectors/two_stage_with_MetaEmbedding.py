@@ -245,7 +245,9 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
     def centroids_cal(self, data):
 
         centroids = torch.zeros(self.roi_head.num_classes,
-                                self.roi_head.feat_dim).cuda()
+                                self.roi_head.feat_dim,
+                                14,
+                                14).cuda()
 
         print('Calculating centroids.')
 
@@ -290,8 +292,6 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                 # Add all calculated features to center tensor
                 for i in range(len(labels)):
                     label = labels[i]
-                    print(bbox_feats[i].size())
-                    print(centroids[label].size())
                     centroids[label] += bbox_feats[i]
 
         # Average summed features with class count
