@@ -291,11 +291,11 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
 
                 labels = self.roi_head.std_roi_head.bbox_head.get_targets(sampling_results, gt_bboxes,
                                                                                 gt_labels, self.train_cfg.rcnn)[0]
-                print(labels.unique())
                 # Add all calculated features to center tensor
                 for i in range(len(labels)):
                     label = labels[i]
-                    centroids[label] += bbox_feats[i]
+                    if label < self.roi_head.num_classes:
+                        centroids[label] += bbox_feats[i]
 
         # Average summed features with class count
         centroids /= torch.tensor(class_count(data)).float().unsqueeze(1).cuda()
