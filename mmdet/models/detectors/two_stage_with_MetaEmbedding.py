@@ -67,11 +67,9 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                 cfg = Config.fromfile(
                     "/root/data/zq/smd_det/meta_embedding/10c/stage2/faster_rcnn_r50_c4_meta_smd_stage2.py")
                 dataset = build_dataset(cfg.centroids_cal)
-                data = build_dataloader(dataset, samples_per_gpu=1, workers_per_gpu=0, num_gpus=1, shuffle=False)
-                for i in range(len(dataset)):
-                    print(dataset[i])
+                # data = build_dataloader(dataset, samples_per_gpu=1, workers_per_gpu=0, num_gpus=1, shuffle=False)
                 # print(data[0])
-                self.roi_head.loss_feat.centroids.data = self.centroids_cal(data)
+                self.roi_head.loss_feat.centroids.data = self.centroids_cal(dataset)
 
     @property
     def with_rpn(self):
@@ -254,11 +252,15 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         # Calculate initial centroids only on training data.
         with torch.set_grad_enabled(False):
 
-            for inputs in tqdm(data):
-                imgs, gt_labels, gt_bboxes, img_metas = inputs["img"], \
+            for i in tqdm(range(len(data))):
+                """imgs, gt_labels, gt_bboxes, img_metas = inputs["img"], \
                                                         inputs["gt_labels"], \
                                                         inputs["gt_bboxes"],\
-                                                        inputs["img_metas"]
+                                                        inputs["img_metas"]"""
+                imgs, gt_labels, gt_bboxes, img_metas = torch.unsqueeze(data[i]['img'], 0), \
+                                                        [data[i]['gt_labels']], \
+                                                        [data[i]['gt_bboxes']], \
+                                                        [data[i]['img_metas']]
                 # Calculate Features of each training data
                 feats = self.backbone(imgs)
                 proposal_list = self.rpn_head.simple_test_rpn(feats, img_metas)
