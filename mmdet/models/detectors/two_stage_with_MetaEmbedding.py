@@ -253,19 +253,19 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
 
         # Calculate initial centroids only on training data.
         with torch.set_grad_enabled(False):
-
+            self.backbone.cuda()
+            self.rpn_head.cuda()
+            self.roi_head.cuda()
             for i in tqdm(range(len(data))):
                 """imgs, gt_labels, gt_bboxes, img_metas = inputs["img"], \
                                                         inputs["gt_labels"], \
                                                         inputs["gt_bboxes"],\
                                                         inputs["img_metas"]"""
-                imgs, gt_labels, gt_bboxes, img_metas = torch.unsqueeze(data[i]['img'], 0).to(self.device), \
-                                                        [data[i]['gt_labels'].to(self.device)], \
-                                                        [data[i]['gt_bboxes'].to(self.device)], \
-                                                        [data[i]['img_metas']]
-                self.backbone.cuda()
-                self.rpn_head.cuda()
-                self.roi_head.cuda()
+                imgs, gt_labels, gt_bboxes, img_metas = \
+                    torch.unsqueeze(data[i]['img'], 0).to(next(self.backbone.parameters()).device), \
+                    [data[i]['gt_labels'].to(next(self.backbone.parameters()).device)], \
+                    [data[i]['gt_bboxes'].to(next(self.backbone.parameters()).device)], \
+                    [data[i]['img_metas']]
                 # Calculate Features of each training data
                 feats = self.backbone(imgs)
                 proposal_list = self.rpn_head.simple_test_rpn(feats, img_metas)
