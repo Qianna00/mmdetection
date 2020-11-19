@@ -303,7 +303,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                         class_data_num[i] = 1
 
         # Average summed features with class count
-        centroids /= torch.tensor(class_data_num).float().unsqueeze(1).cuda()
+        centroids /= torch.tensor(class_data_num).float().unsqueeze(1).unsqueeze(2).repeat(1, 14, 14).cuda()
 
         return centroids
 
