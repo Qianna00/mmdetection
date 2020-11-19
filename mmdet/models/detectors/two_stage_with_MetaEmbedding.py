@@ -290,6 +290,8 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                 # Add all calculated features to center tensor
                 for i in range(len(labels)):
                     label = labels[i]
+                    print(bbox_feats[i].size())
+                    print(centroids[label.size()])
                     centroids[label] += bbox_feats[i]
 
         # Average summed features with class count
