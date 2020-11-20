@@ -6,6 +6,7 @@ from .standard_roi_head import StandardRoIHead
 from ..builder import HEADS, build_head, build_loss
 from mmcv.runner import load_checkpoint
 from mmdet.utils import get_root_logger
+from mmdet.core import bbox2result, bbox2roi
 
 
 
@@ -29,6 +30,7 @@ class MetaEmbedding_RoIHead(nn.Module):
         super(MetaEmbedding_RoIHead, self).__init__()
         self.num_classes = num_classes
         self.feat_dim = feat_dim
+        self.pool_meta_embedding = nn.AvgPool2d((14, 14))
         self.fc_hallucinator = nn.Linear(feat_dim, num_classes)
         self.fc_selector = nn.Linear(feat_dim, feat_dim)
         self.std_roi_head = StandardRoIHead(bbox_roi_extractor=bbox_roi_extractor,
@@ -50,11 +52,33 @@ class MetaEmbedding_RoIHead(nn.Module):
                 gt_masks=None,
                 test=False,
                 *args):
+        if not test:
+            num_imgs = len(img_metas)
+            if gt_bboxes_ignore is None:
+                gt_bboxes_ignore = [None for _ in range(num_imgs)]
+            sampling_results = []
+            for i in range(num_imgs):
+                assign_result = self.std_roi_head.bbox_assigner.assign(
+                    proposal_list[i], gt_bboxes[i], gt_bboxes_ignore[i],
+                    gt_labels[i])
+                sampling_result = self.std_roi_head.bbox_sampler.sample(
+                    assign_result,
+                    proposal_list[i],
+                    gt_bboxes[i],
+                    gt_labels[i],
+                    feats=[lvl_feat[i][None] for lvl_feat in x])
+                sampling_results.append(sampling_result)
+
+            rois = bbox2roi([res.bboxes for res in sampling_results])
+        else:
+            rois = bbox2roi(proposal_list)
+        bbox_feats = self.std_roi_head.bbox_roi_extractor(
+            x[:self.bbox_roi_extractor.num_inputs], rois)
 
         if centroids is not None:
 
             # storing direct feature
-            direct_feature = x.clone()
+            direct_feature = bbox_feats.clone()
 
             # batch_size = x.size(0)
             # feat_size = x.size(1)
@@ -65,26 +89,30 @@ class MetaEmbedding_RoIHead(nn.Module):
             keys_memory = centroids.clone()
 
             # computing memory feature by querying and associating visual memory
-            values_memory = self.fc_hallucinator(x.clone())
+            values_memory = self.fc_hallucinator(self.pool_meta_embedding(bbox_feats.clone()))
             values_memory = values_memory.softmax(dim=1)
             memory_feature = torch.matmul(values_memory, keys_memory)
 
             # computing concept selector
-            concept_selector = self.fc_selector(x.clone())
+            concept_selector = self.fc_selector(self.pool_meta_embedding(bbox_feats.clone()))
             concept_selector = concept_selector.tanh()
-            x = direct_feature + concept_selector * memory_feature
+            bbox_feats = direct_feature + concept_selector * memory_feature
 
             # storing infused feature
             # infused_feature = concept_selector * memory_feature
+        if self.std_roi_head.with_shared_head:
+            bbox_feats = self.std_roi_head.shared_head(bbox_feats)
 
         if not test:
-            roi_losses = self.std_roi_head.forward_train(x,
-                                                         img_metas,
-                                                         proposal_list,
-                                                         gt_bboxes,
-                                                         gt_labels,
-                                                         gt_bboxes_ignore,
-                                                         gt_masks)
+            roi_losses = dict()
+            cls_score, bbox_pred = self.std_roi_head.bbox_head(bbox_feats)
+            bbox_targets = self.std_roi_head.bbox_head.get_targets(sampling_results, gt_bboxes,
+                                                      gt_labels, self.train_cfg)
+            loss_bbox = self.std_roi_head.bbox_head.loss(cls_score,
+                                            bbox_pred, rois,
+                                            *bbox_targets)
+            roi_losses.update(loss_bbox=loss_bbox)
+
             if centroids is not None:
                 feat_loss = self.loss_feat(x, gt_labels)
                 roi_losses.update(loss_feat=feat_loss)
