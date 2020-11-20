@@ -73,7 +73,7 @@ class MetaEmbedding_RoIHead(nn.Module):
         else:
             rois = bbox2roi(proposal_list)
         bbox_feats = self.std_roi_head.bbox_roi_extractor(
-            x[:self.bbox_roi_extractor.num_inputs], rois)
+            x[:self.std_roi_head.bbox_roi_extractor.num_inputs], rois)
 
         if centroids is not None:
 
