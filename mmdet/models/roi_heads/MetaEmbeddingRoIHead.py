@@ -139,13 +139,12 @@ class MetaEmbedding_RoIHead(nn.Module):
         # computing memory feature by querying and associating visual memory
         values_memory = self.fc_hallucinator(self.pool_meta_embedding(feats.clone()).squeeze())
         values_memory = values_memory.softmax(dim=1)
-        print(values_memory)
-        memory_feature = torch.matmul(keys_memory.view(batch_size, self.num_classes, -1), values_memory.t())
-        print(memory_feature.size())
+        memory_feature = torch.matmul(keys_memory.view(self.num_classes, -1), values_memory)
 
         # computing concept selector
         concept_selector = self.fc_selector(self.pool_meta_embedding(feats.clone()).squeeze())
         concept_selector = concept_selector.tanh()
+        print(concept_selector.size())
         feats = direct_feature + concept_selector * memory_feature
 
         # storing infused feature
