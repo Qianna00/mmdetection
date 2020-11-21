@@ -83,7 +83,7 @@ class MetaEmbedding_RoIHead(nn.Module):
                 bbox_feats_pos = bbox_feats[pos_index]
                 bbox_feats_pos = self.get_meta_embedding_feature(bbox_feats_pos, centroids)
                 bbox_feats[pos_index] = bbox_feats_pos
-                feat_loss = self.loss_feat(bbox_feats, bbox_targets[0][pos_index])
+                feat_loss = self.loss_feat(bbox_feats_pos, bbox_targets[0][pos_index])
             else:
                 bbox_feats = self.get_meta_embedding_feature(bbox_feats, centroids)
 
