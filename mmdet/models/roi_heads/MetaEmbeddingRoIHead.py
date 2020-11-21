@@ -31,8 +31,8 @@ class MetaEmbedding_RoIHead(nn.Module):
         self.num_classes = num_classes
         self.feat_dim = feat_dim
         self.pool_meta_embedding = nn.AvgPool2d((14, 14))
-        self.fc_hallucinator = nn.Linear(feat_dim, num_classes)
-        self.fc_selector = nn.Linear(feat_dim, feat_dim)
+        self.fc_hallucinator = nn.Linear(self.feat_dim, self.num_classes)
+        self.fc_selector = nn.Linear(self.feat_dim, self.feat_dim)
         self.std_roi_head = StandardRoIHead(bbox_roi_extractor=bbox_roi_extractor,
                                             bbox_head=bbox_head,
                                             shared_head=shared_head,
@@ -137,11 +137,9 @@ class MetaEmbedding_RoIHead(nn.Module):
         # x_expand = x.clone().unsqueeze(1).expand(-1, self.num_classes, -1)
         # centroids_expand = centroids.clone().unsqueeze(0).expand(batch_size, -1, -1)
         keys_memory = centroids.clone()
-        print(feats.size())
-        print(self.pool_meta_embedding(feats).size())
 
         # computing memory feature by querying and associating visual memory
-        values_memory = self.fc_hallucinator(self.pool_meta_embedding(feats.clone()))
+        values_memory = self.fc_hallucinator(self.pool_meta_embedding(feats.clone()).squeeze())
         values_memory = values_memory.softmax(dim=1)
         memory_feature = torch.matmul(values_memory, keys_memory)
 
