@@ -70,56 +70,41 @@ class MetaEmbedding_RoIHead(nn.Module):
                 sampling_results.append(sampling_result)
 
             rois = bbox2roi([res.bboxes for res in sampling_results])
+            bbox_targets = self.std_roi_head.bbox_head.get_targets(sampling_results, gt_bboxes,
+                                                                   gt_labels, self.train_cfg)
         else:
             rois = bbox2roi(proposal_list)
         bbox_feats = self.std_roi_head.bbox_roi_extractor(
             x[:self.std_roi_head.bbox_roi_extractor.num_inputs], rois)
 
         if centroids is not None:
+            if not test:
+                pos_index = torch.nonzero(bbox_targets[3])
+                bbox_feats_pos = bbox_feats[pos_index]
+                bbox_feats_pos = self.get_meta_embedding_feature(bbox_feats_pos, centroids)
+                bbox_feats[pos_index] = bbox_feats_pos
+                feat_loss = self.loss_feat(bbox_feats, bbox_targets[0][pos_index])
+            else:
+                bbox_feats = self.get_meta_embedding_feature(bbox_feats, centroids)
 
-            # storing direct feature
-            direct_feature = bbox_feats.clone()
-
-            # batch_size = x.size(0)
-            # feat_size = x.size(1)
-
-            # set up visual memory
-            # x_expand = x.clone().unsqueeze(1).expand(-1, self.num_classes, -1)
-            # centroids_expand = centroids.clone().unsqueeze(0).expand(batch_size, -1, -1)
-            keys_memory = centroids.clone()
-
-            # computing memory feature by querying and associating visual memory
-            values_memory = self.fc_hallucinator(self.pool_meta_embedding(bbox_feats.clone()))
-            values_memory = values_memory.softmax(dim=1)
-            memory_feature = torch.matmul(values_memory, keys_memory)
-
-            # computing concept selector
-            concept_selector = self.fc_selector(self.pool_meta_embedding(bbox_feats.clone()))
-            concept_selector = concept_selector.tanh()
-            bbox_feats = direct_feature + concept_selector * memory_feature
-
-            # storing infused feature
-            # infused_feature = concept_selector * memory_feature
         if self.std_roi_head.with_shared_head:
             bbox_feats = self.std_roi_head.shared_head(bbox_feats)
 
         if not test:
             roi_losses = dict()
             cls_score, bbox_pred = self.std_roi_head.bbox_head(bbox_feats)
-            bbox_targets = self.std_roi_head.bbox_head.get_targets(sampling_results, gt_bboxes,
-                                                      gt_labels, self.train_cfg)
+
             loss_bbox = self.std_roi_head.bbox_head.loss(cls_score,
                                             bbox_pred, rois,
                                             *bbox_targets)
             roi_losses.update(loss_bbox=loss_bbox)
 
             if centroids is not None:
-                feat_loss = self.loss_feat(x, gt_labels)
                 roi_losses.update(loss_feat=feat_loss)
                 # roi_losses.update(features=[direct_feature, infused_feature])
             return roi_losses
         else:
-            bbox_results = self.std_roi_head.simple_test(x,
+            bbox_results = self.std_roi_head.simple_test(bbox_feats,
                                                          proposal_list,
                                                          img_metas,
                                                          proposals=None,
@@ -139,3 +124,28 @@ class MetaEmbedding_RoIHead(nn.Module):
         else:
             raise TypeError('pretrained must be a str or None')
 
+    def get_meta_embedding_feature(self, feats, centroids):
+        # storing direct feature
+        direct_feature = feats.clone()
+
+        # batch_size = x.size(0)
+        # feat_size = x.size(1)
+
+        # set up visual memory
+        # x_expand = x.clone().unsqueeze(1).expand(-1, self.num_classes, -1)
+        # centroids_expand = centroids.clone().unsqueeze(0).expand(batch_size, -1, -1)
+        keys_memory = centroids.clone()
+
+        # computing memory feature by querying and associating visual memory
+        values_memory = self.fc_hallucinator(self.pool_meta_embedding(feats.clone()))
+        values_memory = values_memory.softmax(dim=1)
+        memory_feature = torch.matmul(values_memory, keys_memory)
+
+        # computing concept selector
+        concept_selector = self.fc_selector(self.pool_meta_embedding(feats.clone()))
+        concept_selector = concept_selector.tanh()
+        feats = direct_feature + concept_selector * memory_feature
+
+        # storing infused feature
+        # infused_feature = concept_selector * memory_feature
+        return feats
