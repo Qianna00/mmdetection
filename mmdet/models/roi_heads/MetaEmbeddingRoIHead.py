@@ -140,10 +140,10 @@ class MetaEmbedding_RoIHead(nn.Module):
         values_memory = self.fc_hallucinator(self.pool_meta_embedding(feats.clone()).squeeze())
         values_memory = values_memory.softmax(dim=1)
         print(values_memory)
-        memory_feature = torch.matmul(values_memory, keys_memory)
+        memory_feature = torch.matmul(values_memory.t(), keys_memory)
 
         # computing concept selector
-        concept_selector = self.fc_selector(self.pool_meta_embedding(feats.clone()))
+        concept_selector = self.fc_selector(self.pool_meta_embedding(feats.clone()).squeeze())
         concept_selector = concept_selector.tanh()
         feats = direct_feature + concept_selector * memory_feature
 
