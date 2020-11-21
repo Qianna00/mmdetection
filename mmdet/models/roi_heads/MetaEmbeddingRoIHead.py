@@ -81,7 +81,9 @@ class MetaEmbedding_RoIHead(nn.Module):
             if not test:
                 pos_index = torch.nonzero(bbox_targets[3])
                 bbox_feats_pos = bbox_feats[pos_index]
-                print("pos_index:", pos_index)
+                print("label:", bbox_targets[0].size(), bbox_targets[0])
+                print("bbox_weights:", bbox_targets[3].size(), bbox_targets[3])
+                print("pos_index:", pos_index.size())
                 print("bbox_feat:", bbox_feats.size())
                 print("inputs:", bbox_feats_pos.size())
                 bbox_feats_pos = self.get_meta_embedding_feature(bbox_feats_pos, centroids)
