@@ -65,6 +65,7 @@ class DiscCentroidsLossFunc(Function):
     def forward(ctx, feature, label, centroids, batch_size):
         ctx.save_for_backward(feature, label, centroids, batch_size)
         centroids_batch = centroids.index_select(0, label.long())
+        print(feature.size(), centroids_batch.size(), centroids.size())
         return (feature - centroids_batch).pow(2).sum() / 2.0 / batch_size
 
     @staticmethod
