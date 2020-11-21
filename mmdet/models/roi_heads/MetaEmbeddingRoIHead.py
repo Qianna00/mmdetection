@@ -144,7 +144,8 @@ class MetaEmbedding_RoIHead(nn.Module):
         # computing concept selector
         concept_selector = self.fc_selector(self.pool_meta_embedding(feats.clone()).squeeze())
         concept_selector = concept_selector.tanh()
-        feats = direct_feature + torch.matmul(concept_selector, memory_feature.view(feats.size(0), feats.size(1), -1)).view(feats.size(0), feats.size(1), feats.size(2), feats.size(3))
+        feats = direct_feature + concept_selector.unsqueeze(2).unsqueeze(3).expand(-1, -1, feats.size(2), feats.size(3))\
+                * memory_feature.view(feats.size(0), feats.size(1), feats.size(2), feats.size(3))
 
         # storing infused feature
         # infused_feature = concept_selector * memory_feature
