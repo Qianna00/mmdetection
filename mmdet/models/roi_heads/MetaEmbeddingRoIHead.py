@@ -136,12 +136,11 @@ class MetaEmbedding_RoIHead(nn.Module):
         # set up visual memory
         # x_expand = x.clone().unsqueeze(1).expand(-1, self.num_classes, -1)
         # centroids_expand = centroids.clone().unsqueeze(0).expand(batch_size, -1, -1)
-        keys_memory = centroids.clone()
+        keys_memory = centroids.clone().cuda()
 
         # computing memory feature by querying and associating visual memory
         values_memory = self.fc_hallucinator(self.pool_meta_embedding(feats.clone()).squeeze())
         values_memory = values_memory.softmax(dim=1)
-        print(keys_memory.device, values_memory.device)
         memory_feature = torch.matmul(values_memory, keys_memory)
 
         # computing concept selector
