@@ -128,7 +128,7 @@ class MetaEmbedding_RoIHead(nn.Module):
         # storing direct feature
         direct_feature = feats.clone()
 
-        # batch_size = x.size(0)
+        batch_size = feats.size(0)
         # feat_size = x.size(1)
 
         # set up visual memory
@@ -140,7 +140,8 @@ class MetaEmbedding_RoIHead(nn.Module):
         values_memory = self.fc_hallucinator(self.pool_meta_embedding(feats.clone()).squeeze())
         values_memory = values_memory.softmax(dim=1)
         print(values_memory)
-        memory_feature = torch.matmul(keys_memory, values_memory.t())
+        memory_feature = torch.matmul(keys_memory.view(batch_size, self.num_classes, -1), values_memory.t())
+        print(memory_feature.size())
 
         # computing concept selector
         concept_selector = self.fc_selector(self.pool_meta_embedding(feats.clone()).squeeze())
