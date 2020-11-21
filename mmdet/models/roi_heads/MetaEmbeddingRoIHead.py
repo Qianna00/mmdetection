@@ -79,7 +79,7 @@ class MetaEmbedding_RoIHead(nn.Module):
 
         if centroids is not None:
             if not test:
-                pos_index = torch.nonzero(bbox_targets[0]-10)
+                pos_index = torch.nonzero(bbox_targets[0]-10).squeeze()
                 bbox_feats_pos = bbox_feats[pos_index]
                 # print("label:", bbox_targets[0].size(), bbox_targets[0])
                 # print("bbox_weights:", bbox_targets[3].size(), bbox_targets[3])
