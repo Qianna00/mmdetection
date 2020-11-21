@@ -83,9 +83,6 @@ class MetaEmbedding_RoIHead(nn.Module):
                 bbox_feats_pos = bbox_feats[pos_index]
                 # print("label:", bbox_targets[0].size(), bbox_targets[0])
                 # print("bbox_weights:", bbox_targets[3].size(), bbox_targets[3])
-                print("pos_index:", pos_index.size(), pos_index)
-                print("bbox_feat:", bbox_feats.size())
-                print("inputs:", bbox_feats_pos.size())
                 bbox_feats_pos = self.get_meta_embedding_feature(bbox_feats_pos, centroids)
                 bbox_feats[pos_index] = bbox_feats_pos
                 feat_loss = self.loss_feat(bbox_feats, bbox_targets[0][pos_index])
@@ -140,6 +137,8 @@ class MetaEmbedding_RoIHead(nn.Module):
         # x_expand = x.clone().unsqueeze(1).expand(-1, self.num_classes, -1)
         # centroids_expand = centroids.clone().unsqueeze(0).expand(batch_size, -1, -1)
         keys_memory = centroids.clone()
+        print(feats.size())
+        print(self.pool_meta_embedding(feats).size())
 
         # computing memory feature by querying and associating visual memory
         values_memory = self.fc_hallucinator(self.pool_meta_embedding(feats.clone()))
