@@ -97,7 +97,7 @@ class MetaEmbedding_RoIHead(nn.Module):
             loss_bbox = self.std_roi_head.bbox_head.loss(cls_score,
                                             bbox_pred, rois,
                                             *bbox_targets)
-            roi_losses.update(loss_bbox=loss_bbox)
+            roi_losses.update(loss_bbox)
 
             if centroids is not None:
                 roi_losses.update(loss_feat=feat_loss)
