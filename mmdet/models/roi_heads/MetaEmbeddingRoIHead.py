@@ -143,7 +143,7 @@ class MetaEmbedding_RoIHead(nn.Module):
 
         # computing memory feature by querying and associating visual memory
         values_memory = self.fc_hallucinator(pooled_feats)
-        # print(values_memory.size())
+        print(pooled_feats.size(), values_memory.size())
 
         values_memory = values_memory.softmax(dim=1)
         memory_feature = torch.mm(values_memory, keys_memory.view(self.num_classes, -1))
