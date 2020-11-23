@@ -126,8 +126,6 @@ class MetaEmbedding_RoIHead(nn.Module):
 
     def get_meta_embedding_feature(self, feats, centroids):
 
-        if len(feats.size()) != 4:
-            feats = feats.unsqueeze(0)
         # storing direct feature
         direct_feature = feats.clone()
 
@@ -139,9 +137,14 @@ class MetaEmbedding_RoIHead(nn.Module):
         # centroids_expand = centroids.clone().unsqueeze(0).expand(batch_size, -1, -1)
         keys_memory = centroids.clone().cuda()
 
+        pooled_feats = self.pool_meta_embedding(feats.clone()).squeeze()
+        if len(pooled_feats.size()) != 2:
+            pooled_feats.unsqueeze(0)
+
         # computing memory feature by querying and associating visual memory
-        values_memory = self.fc_hallucinator(self.pool_meta_embedding(feats.clone()).squeeze())
+        values_memory = self.fc_hallucinator(pooled_feats)
         # print(values_memory.size())
+
         values_memory = values_memory.softmax(dim=1)
         memory_feature = torch.mm(values_memory, keys_memory.view(self.num_classes, -1))
 
