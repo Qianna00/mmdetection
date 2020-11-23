@@ -18,6 +18,7 @@ class DiscCentroidsLoss(nn.Module):
 
     def forward(self, feat, label):
         print(feat.size(), label.size())
+        print(label)
         batch_size = feat.size(0)
 
         #############################
