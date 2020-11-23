@@ -125,6 +125,9 @@ class MetaEmbedding_RoIHead(nn.Module):
             raise TypeError('pretrained must be a str or None')
 
     def get_meta_embedding_feature(self, feats, centroids):
+
+        if len(feats.size()) != 4:
+            feats = feats.unsqueeze(0)
         # storing direct feature
         direct_feature = feats.clone()
 
@@ -135,8 +138,6 @@ class MetaEmbedding_RoIHead(nn.Module):
         # x_expand = x.clone().unsqueeze(1).expand(-1, self.num_classes, -1)
         # centroids_expand = centroids.clone().unsqueeze(0).expand(batch_size, -1, -1)
         keys_memory = centroids.clone().cuda()
-        print(self.pool_meta_embedding(feats.clone()).size())
-        print(self.pool_meta_embedding(feats.clone()).squeeze().size())
 
         # computing memory feature by querying and associating visual memory
         values_memory = self.fc_hallucinator(self.pool_meta_embedding(feats.clone()).squeeze())
