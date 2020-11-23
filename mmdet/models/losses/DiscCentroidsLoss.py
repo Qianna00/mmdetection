@@ -78,9 +78,14 @@ class DiscCentroidsLossFunc(Function):
         grad_centroids = centroids.new_zeros(centroids.size())
 
         print("disccentroidsloss success1")
+        print(counts.size(), label.size(), ones.size())
 
         counts = counts.scatter_add_(0, label.long(), ones)
-        grad_centroids.scatter_add_(0, label.unsqueeze(1).expand(feature.size()).long(), diff)
-        grad_centroids = grad_centroids / counts.view(-1, 1)
         print("disccentroidsloss success2")
+        print(grad_centroids.size(), label.unsqueeze(1).expand(feature.size()).size(), diff.size())
+        grad_centroids.scatter_add_(0, label.unsqueeze(1).expand(feature.size()).long(), diff)
+        print("disccentroidsloss success3")
+        print(grad_centroids.size(), counts.view(-1,1).size())
+        grad_centroids = grad_centroids / counts.view(-1, 1)
+        print("disccentroidsloss success4")
         return - grad_output * diff / batch_size, None, grad_centroids / batch_size, None
