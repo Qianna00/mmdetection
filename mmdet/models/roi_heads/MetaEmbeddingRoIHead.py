@@ -127,9 +127,6 @@ class MetaEmbedding_RoIHead(nn.Module):
 
     def get_meta_embedding_feature(self, feats, centroids):
 
-        if len(feats.size()) != 4:
-            feats = feats.unsqueeze(0)
-
         # storing direct feature
         direct_feature = feats.clone()
 
