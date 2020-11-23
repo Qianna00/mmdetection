@@ -136,6 +136,7 @@ class MetaEmbedding_RoIHead(nn.Module):
         # centroids_expand = centroids.clone().unsqueeze(0).expand(batch_size, -1, -1)
         keys_memory = centroids.clone().cuda()
         print(self.pool_meta_embedding(feats.clone()).size())
+        print(self.pool_meta_embedding(feats.clone()).squeeze().size())
 
         # computing memory feature by querying and associating visual memory
         values_memory = self.fc_hallucinator(self.pool_meta_embedding(feats.clone()).squeeze())
