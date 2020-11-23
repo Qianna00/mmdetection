@@ -69,7 +69,6 @@ class DiscCentroidsLossFunc(Function):
 
     @staticmethod
     def backward(ctx, grad_output):
-        print("grad_output:", grad_output.size())
         feature, label, centroids, batch_size = ctx.saved_tensors
         centroids_batch = centroids.index_select(0, label.long())
         diff = centroids_batch - feature
@@ -81,4 +80,5 @@ class DiscCentroidsLossFunc(Function):
         counts = counts.scatter_add_(0, label.long(), ones)
         grad_centroids.scatter_add_(0, label.unsqueeze(1).expand(feature.size()).long(), diff)
         grad_centroids = grad_centroids / counts.view(-1, 1)
+        print("disccentroidsloss success")
         return - grad_output * diff / batch_size, None, grad_centroids / batch_size, None
