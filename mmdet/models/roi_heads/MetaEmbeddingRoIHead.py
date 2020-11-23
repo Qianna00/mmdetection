@@ -139,7 +139,7 @@ class MetaEmbedding_RoIHead(nn.Module):
 
         pooled_feats = self.pool_meta_embedding(feats.clone()).squeeze()
         if len(pooled_feats.size()) != 2:
-            pooled_feats.unsqueeze(0)
+            pooled_feats = pooled_feats.unsqueeze(0)
 
         # computing memory feature by querying and associating visual memory
         values_memory = self.fc_hallucinator(pooled_feats)
