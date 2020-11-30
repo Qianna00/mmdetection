@@ -75,6 +75,7 @@ class MetaEmbedding_RoIHead(nn.Module):
         else:
             rois = bbox2roi(proposal_list)
         print(x.size())
+        print(rois.size())
         bbox_feats = self.std_roi_head.bbox_roi_extractor(
             x[:self.std_roi_head.bbox_roi_extractor.num_inputs], rois)
 
