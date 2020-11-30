@@ -189,7 +189,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                                    gt_labels=gt_labels,
                                    gt_bboxes_ignore=gt_bboxes_ignore,
                                    gt_masks=gt_masks,
-                                   test=False,
+                                   test=True,
                                    **kwargs)
         losses.update(roi_losses)
 
