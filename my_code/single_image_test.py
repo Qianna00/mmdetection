@@ -8,6 +8,6 @@ checkpoint_file = "/root/data/zq/smd_det/frcnn_res50_mmdet/10c/epoch_8.pth"
 
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 
-img = "/root/data/zq/smd_det/test_imgs/1.png"
+img = "/root/data/zq/smd_det/test_imgs/2.png"
 result = inference_detector(model, img)
 show_result_pyplot(model, img, result)
