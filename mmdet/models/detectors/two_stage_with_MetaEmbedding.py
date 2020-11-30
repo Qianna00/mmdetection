@@ -164,14 +164,15 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         if self.with_rpn:
             proposal_cfg = self.train_cfg.get('rpn_proposal',
                                               self.test_cfg.rpn)
-            rpn_losses, proposal_list = self.rpn_head.forward_train(
+            """rpn_losses, proposal_list = self.rpn_head.forward_train(
                     x,
                     img_metas,
                     gt_bboxes,
                     gt_labels=None,
                     gt_bboxes_ignore=gt_bboxes_ignore,
                     proposal_cfg=proposal_cfg)
-            losses.update(rpn_losses)
+            losses.update(rpn_losses)"""
+            proposal_list = self.rpn_head.simple_test_rpn(x, img_metas)
         else:
             proposal_list = proposals
 
@@ -181,7 +182,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                                                  **kwargs)"""
 
 
-        roi_losses = self.roi_head(x,
+        """roi_losses = self.roi_head(x,
                                    centroids=self.centroids,
                                    img_metas=img_metas,
                                    proposal_list=proposal_list,
@@ -191,7 +192,8 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                                    gt_masks=gt_masks,
                                    test=True,
                                    **kwargs)
-        losses.update(roi_losses)
+        losses.update(roi_losses)"""
+        self.roi_head(x,centroids=self.centroids,proposal_list=proposal_list,img_metas=img_metas,test=True)
 
         return losses
 
