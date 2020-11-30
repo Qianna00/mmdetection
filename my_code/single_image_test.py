@@ -2,7 +2,7 @@ from mmdet.apis import inference_detector
 from mmdet.apis import init_detector
 from mmdet.apis import show_result_pyplot
 
-config_file = "../configs/faster_rcnn/faster_rcnn_r50_caffe_c4_1x_smd.py"
+config_file = "/mmdetection/configs/faster_rcnn/faster_rcnn_r50_caffe_c4_1x_smd.py"
 
 checkpoint_file = "/root/data/zq/smd_det/frcnn_res50_mmdet/10c/epoch_8.pth"
 
