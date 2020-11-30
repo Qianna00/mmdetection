@@ -74,7 +74,7 @@ class MetaEmbedding_RoIHead(nn.Module):
                                                                    gt_labels, self.std_roi_head.train_cfg)
         else:
             rois = bbox2roi(proposal_list)
-        # print(len(x))
+        print(x[0].shape)
         print(rois.size())
         bbox_feats = self.std_roi_head.bbox_roi_extractor(
             x[:self.std_roi_head.bbox_roi_extractor.num_inputs], rois)
