@@ -1,4 +1,4 @@
-dataset_type = 'CocoDataset'
+dataset_type = 'SmdDataset'
 data_root = '/root/data/zq/data/SMD/'
 # use caffe img_norm
 img_norm_cfg = dict(
@@ -11,7 +11,7 @@ train_pipeline = [
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size_divisor=32),
     dict(type='DefaultFormatBundle'),
-    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels']),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
 ]
 test_pipeline = [
     dict(type='LoadImageFromFile'),
@@ -30,22 +30,27 @@ test_pipeline = [
 ]
 data = dict(
     samples_per_gpu=1,
-    workers_per_gpu=1,
+    workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_2_train.json',
+        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_10_train.json',
         img_prefix=data_root + 'train/',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_2_val.json',
+        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_10_val.json',
         img_prefix=data_root + 'train/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/Test/SMD_VIS_skip_2.json',
+        ann_file=data_root + 'annotations/Test/SMD_VIS_skip_10.json',
         img_prefix=data_root + 'test/',
         pipeline=test_pipeline))
+centroids_cal=dict(
+        type=dataset_type,
+        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_10_train.json',
+        img_prefix=data_root + 'train/',
+        pipeline=pipeline_for_init_centroids)
 evaluation = dict(interval=1, metric='bbox')
 
 # optimizer
