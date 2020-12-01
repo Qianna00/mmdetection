@@ -91,10 +91,10 @@ class MetaEmbedding_RoIHead(nn.Module):
         if self.std_roi_head.with_shared_head:
             bbox_feats = self.std_roi_head.shared_head(bbox_feats)
 
+        cls_score, bbox_pred = self.std_roi_head.bbox_head(bbox_feats)
+
         if not test:
             roi_losses = dict()
-            cls_score, bbox_pred = self.std_roi_head.bbox_head(bbox_feats)
-
             loss_bbox = self.std_roi_head.bbox_head.loss(cls_score,
                                             bbox_pred, rois,
                                             *bbox_targets)
@@ -105,11 +105,22 @@ class MetaEmbedding_RoIHead(nn.Module):
                 # roi_losses.update(features=[direct_feature, infused_feature])
             return roi_losses
         else:
-            bbox_results = self.std_roi_head.simple_test(bbox_feats,
-                                                         proposal_list,
-                                                         img_metas,
-                                                         proposals=None,
-                                                         rescale=False)
+            bbox_results = dict(
+                cls_score=cls_score,
+                bbox_pred=bbox_pred,
+                bbox_feats=bbox_feats
+            )
+            img_shape = img_metas[0]['img_shape']
+            scale_factor = img_metas[0]['scale_factor']
+            det_bboxes, det_labels = self.std_roi_head.bbox_head.get_bboxes(
+                rois,
+                bbox_results['cls_score'],
+                bbox_results['bbox_pred'],
+                img_shape,
+                scale_factor,
+                rescale=False,
+                cfg=self.std_roi_head.test_cfg)
+            bbox_results = bbox2result(det_bboxes, det_labels, self.std_roi_head.bbox_head.num_classes)
             return bbox_results
 
     def init_weights(self, pretrained=None):
