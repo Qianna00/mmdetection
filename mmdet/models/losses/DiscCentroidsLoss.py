@@ -54,6 +54,8 @@ class DiscCentroidsLoss(nn.Module):
         margin = 10.0
         loss_repel = torch.clamp(margin - distmat_neg.sum() / (batch_size * self.num_classes * 14 * 14), 0.0, 1e6)
 
+        print(loss_repel, loss_attract)
+
         loss = loss_attract + 0.01 * loss_repel
         # loss = loss_attract + 0.01 * loss_repel
 
