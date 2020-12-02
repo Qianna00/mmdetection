@@ -34,6 +34,8 @@ class DiscCentroidsLoss(nn.Module):
         loss_attract = self.disccentroidslossfunc(feat.clone(), label, self.centroids.clone(),
                                                   batch_size_tensor).squeeze()
 
+        print("feat:", feat)
+
         ############################
         # calculate repelling loss #
         #############################
@@ -42,7 +44,8 @@ class DiscCentroidsLoss(nn.Module):
                   torch.pow(self.centroids.clone(), 2).sum(dim=1, keepdim=True).expand(self.num_classes, batch_size).permute(1,0,2,3)
         distmat.addmm_(1, -2, feat.clone(), self.centroids.clone().t())"""
         distmat = torch.pow(feat.clone().sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14)-
-                            self.centroids.clone().sum(dim=1, keepdim=True).expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3), 2)
+                            self.centroids.clone().sum(dim=1, keepdim=True)
+                            .expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3), 2)
 
         classes = torch.arange(self.num_classes).long().cuda()
         labels_expand = label.unsqueeze(1).expand(batch_size, self.num_classes)
