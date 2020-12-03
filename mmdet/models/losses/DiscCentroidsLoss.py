@@ -45,7 +45,7 @@ class DiscCentroidsLoss(nn.Module):
         distmat.addmm_(1, -2, feat.clone(), self.centroids.clone().t())"""
         distmat = torch.pow(feat.clone().sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14), 2) + \
                             torch.pow(self.centroids.clone().sum(dim=1, keepdim=True).expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3), 2)
-        distmat.addmm_(feat.clone(), self.centroids.clone().t(), beta=1, alpha=-2)
+        distmat = distmat - 2 * torch.matmul(feat.clone().permute(2 ,3 ,0 ,1), self.centroids.clone().permute(2, 3, 1, 0)).permute(2, 3, 0, 1)
 
         classes = torch.arange(self.num_classes).long().cuda()
         labels_expand = label.unsqueeze(1).expand(batch_size, self.num_classes)
