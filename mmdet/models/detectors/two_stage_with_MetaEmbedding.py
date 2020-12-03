@@ -256,6 +256,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
             self.backbone.cuda()
             self.rpn_head.cuda()
             self.roi_head.cuda()
+            class_data_num = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             for i in tqdm(range(len(data))):
                 """imgs, gt_labels, gt_bboxes, img_metas = inputs["img"], \
                                                         inputs["gt_labels"], \
@@ -291,16 +292,15 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
 
                 labels = self.roi_head.std_roi_head.bbox_head.get_targets(sampling_results, gt_bboxes,
                                                                                 gt_labels, self.train_cfg.rcnn)[0]
-                class_data_num = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 # Add all calculated features to center tensor
                 for i in range(len(labels)):
                     label = labels[i]
                     if label < 10:
                         centroids[label] += bbox_feats[i]
                         class_data_num[label] += 1
-                for i in range(len(class_data_num)):
-                    if class_data_num[i] == 0:
-                        class_data_num[i] = 1
+            for i in range(len(class_data_num)):
+                if class_data_num[i] == 0:
+                    class_data_num[i] = 1
 
         # Average summed features with class count
         centroids /= torch.tensor(class_data_num).float().unsqueeze(1).unsqueeze(2).\
