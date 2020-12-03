@@ -79,8 +79,18 @@ def train_detector(model,
         model = MMDataParallel(
             model.cuda(cfg.gpu_ids[0]), device_ids=cfg.gpu_ids)
 
+    param_group = []
+    param_group += [{'params': model.backbone.parameters(), 'lr': cfg.optimizer.lr[0]}]
+    param_group += [{'params': model.rpn_head.parameters(), 'lr': cfg.optimizer.lr[0]}]
+    param_group += [{'params': model.roi_head.shared_head.parameters(), 'lr': cfg.optimizer.lr[0]}]
+    param_group += [{'params': model.roi_head.bbox_head.parameters(), 'lr': cfg.optimizer.lr[0]}]
+    param_group += [{'params': model.roi_head.loss_feat.parameters(), 'lr': cfg.optimizer.lr[1]*10}]
+
+    if isinstance(cfg.optimizer.lr, list):
+        optimizer = torch.optim.SGD(param_group, cfg.optimizer.lr[0], momentum=0.9, weight_decay=0.0001)
+    else:
+        optimizer = build_optimizer(model, cfg.optimizer)
     # build runner
-    optimizer = build_optimizer(model, cfg.optimizer)
     runner = EpochBasedRunner(
         model,
         optimizer=optimizer,

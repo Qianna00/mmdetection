@@ -84,7 +84,7 @@ class MetaEmbedding_RoIHead(nn.Module):
                 bbox_feats_pos = bbox_feats[pos_index]
                 bbox_feats_pos = self.get_meta_embedding_feature(bbox_feats_pos, centroids)
                 bbox_feats[pos_index] = bbox_feats_pos
-                feat_loss = self.loss_feat(bbox_feats_pos, bbox_targets[0][pos_index])
+                loss_attract, loss_repel = self.loss_feat(bbox_feats_pos, bbox_targets[0][pos_index])
             else:
                 bbox_feats = self.get_meta_embedding_feature(bbox_feats, centroids)
 
@@ -101,7 +101,8 @@ class MetaEmbedding_RoIHead(nn.Module):
             roi_losses.update(loss_bbox)
 
             if centroids is not None:
-                roi_losses.update(loss_feat=feat_loss)
+                roi_losses.update(loss_attract=loss_attract)
+                roi_losses.update(loss_repel=loss_repel)
                 # roi_losses.update(features=[direct_feature, infused_feature])
             return roi_losses
         else:
