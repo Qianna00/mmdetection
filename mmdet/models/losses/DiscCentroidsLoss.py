@@ -60,7 +60,7 @@ class DiscCentroidsLoss(nn.Module):
 
         # print(loss_repel, loss_attract)
 
-        loss = loss_attract + 0.01 * loss_repel
+        loss = 0.1 * loss_attract + 0.01 * loss_repel
         # loss = loss_attract + 0.01 * loss_repel
 
         return loss
