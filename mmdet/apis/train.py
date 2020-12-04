@@ -68,9 +68,10 @@ def train_detector(model,
     param_group = []
     param_group += [{'params': model.backbone.parameters(), 'lr': cfg.optimizer.lr[0]}]
     param_group += [{'params': model.rpn_head.parameters(), 'lr': cfg.optimizer.lr[0]}]
-    param_group += [{'params': model.roi_head.shared_head.parameters(), 'lr': cfg.optimizer.lr[0]}]
-    param_group += [{'params': model.roi_head.bbox_head.parameters(), 'lr': cfg.optimizer.lr[0]}]
+    param_group += [{'params': model.roi_head.std_roi_head.parameters(), 'lr': cfg.optimizer.lr[0]}]
     param_group += [{'params': model.roi_head.loss_feat.parameters(), 'lr': cfg.optimizer.lr[1] * 10}]
+    param_group += [{'params': model.roi_head.fc_selector.parameters(), 'lr': cfg.optimizer.lr[1] * 10}]
+    param_group += [{'params': model.roi_head.fc_hallucinator.parameters(), 'lr': cfg.optimizer.lr[1] * 10}]
 
     if isinstance(cfg.optimizer.lr, list):
         optimizer = torch.optim.SGD(param_group, cfg.optimizer.lr[0], momentum=0.9, weight_decay=0.0001)
