@@ -43,21 +43,21 @@ class DiscCentroidsLoss(nn.Module):
         """distmat = torch.pow(feat.clone(), 2).sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) + \
                   torch.pow(self.centroids.clone(), 2).sum(dim=1, keepdim=True).expand(self.num_classes, batch_size).permute(1,0,2,3)
         distmat.addmm_(1, -2, feat.clone(), self.centroids.clone().t())"""
-        distmat = torch.pow(feat.clone().sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14), 2) + \
+        """distmat = torch.pow(feat.clone().sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14), 2) + \
                             torch.pow(self.centroids.clone().sum(dim=1, keepdim=True).expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3), 2)
-        distmat = distmat - 2 * torch.matmul(feat.clone().permute(2 ,3 ,0 ,1), self.centroids.clone().permute(2, 3, 1, 0)).permute(2, 3, 0, 1)
+        distmat = distmat - 2 * torch.matmul(feat.clone().permute(2 ,3 ,0 ,1), self.centroids.clone().permute(2, 3, 1, 0)).permute(2, 3, 0, 1)"""
+        distmat = (feat.clone().sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14)-
+                   self.centroids.clone().sum(dim=1, keepdim=True).expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).pow(2)
 
         classes = torch.arange(self.num_classes).long().cuda()
         labels_expand = label.unsqueeze(1).expand(batch_size, self.num_classes)
         mask = labels_expand.eq(classes.expand(batch_size, self.num_classes))
-        print(mask.size())
-        print(distmat.size())
 
         distmat_neg = distmat
         distmat_neg[mask, :, :] = 0.0
-        # print("distmat_neg:", distmat_neg.sum())
+        print("distmat_neg:", distmat_neg.sum())
         # margin = 50.0
-        margin = 2000.0
+        margin = 5.0
         loss_repel = torch.clamp(margin - distmat_neg.sum() / (batch_size * self.num_classes * 14 * 14), 0.0, 1e6)
 
         # print(loss_repel, loss_attract)
