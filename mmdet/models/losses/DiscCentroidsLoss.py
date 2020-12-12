@@ -15,8 +15,7 @@ class DiscCentroidsLoss(nn.Module):
         self.disccentroidslossfunc = DiscCentroidsLossFunc.apply
         self.feat_dim = feat_dim
         self.size_average = size_average
-        print(self.centroids.data)
-        print(self.centroids.grad)
+        print(self.centroids.requires_grad)
 
     def forward(self, feat, label):
         batch_size = feat.size(0)
