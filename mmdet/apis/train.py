@@ -70,7 +70,7 @@ def train_detector(model,
         param_group += [{'params': model.backbone.parameters(), 'lr': cfg.optimizer.lr[0]}]
         param_group += [{'params': model.rpn_head.parameters(), 'lr': cfg.optimizer.lr[0]}]
         param_group += [{'params': model.roi_head.std_roi_head.parameters(), 'lr': cfg.optimizer.lr[0]}]
-        param_group += [{'params': model.roi_head.loss_feat.centroids, 'lr': cfg.optimizer.lr[1] * 10}]
+        param_group += [{'params': model.roi_head.loss_feat.centroids, 'lr': cfg.optimizer.lr[1] * 100}]
         param_group += [{'params': model.roi_head.fc_selector.parameters(), 'lr': cfg.optimizer.lr[1] * 10}]
         param_group += [{'params': model.roi_head.fc_hallucinator.parameters(), 'lr': cfg.optimizer.lr[1] * 10}]
 
