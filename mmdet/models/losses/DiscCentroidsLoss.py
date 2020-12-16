@@ -23,7 +23,6 @@ class DiscCentroidsLoss(nn.Module):
         #############################
         # calculate attracting loss #
         #############################
-        print(self.centroids.requires_grad)
 
         # feat = feat.view(batch_size, -1)
         # feat = feat.view()
@@ -33,9 +32,9 @@ class DiscCentroidsLoss(nn.Module):
             raise ValueError("Center's dim: {0} should be equal to input feature's \
                             dim: {1}".format(self.centroids.size()[1:], feat.size()[1:]))
         batch_size_tensor = feat.new_empty(1).fill_(batch_size if self.size_average else 1)
-        loss_attract = self.disccentroidslossfunc(feat.clone(), label, self.centroids.clone(),
-                                                  batch_size_tensor).squeeze()
-        # loss_attract = self.loss_attract(feat.clone(), label, batch_size)
+        """loss_attract = self.disccentroidslossfunc(feat.clone(), label, self.centroids.clone(),
+                                                  batch_size_tensor).squeeze()"""
+        loss_attract = self.loss_attract(feat.clone(), label, batch_size)
 
         # print("feat:", feat)
 
