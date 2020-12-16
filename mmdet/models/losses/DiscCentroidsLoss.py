@@ -15,7 +15,7 @@ class DiscCentroidsLoss(nn.Module):
         self.disccentroidslossfunc = DiscCentroidsLossFunc.apply
         self.feat_dim = feat_dim
         self.size_average = size_average
-        print(self.centroids.requires_grad)
+        # print(self.centroids.requires_grad)
 
     def forward(self, feat, label):
         batch_size = feat.size(0)
@@ -53,6 +53,7 @@ class DiscCentroidsLoss(nn.Module):
         distmat = torch.matmul(feat.clone().permute(2, 3, 0, 1), self.centroids.clone().permute(2, 3, 1, 0)).abs()
         norm_feat = torch.norm(feat.clone().permute(2, 3, 0, 1), p=2, dim=(2, 3), keepdim=True)
         norm_centroids = torch.norm(self.centroids.clone().permute(2, 3, 1, 0), p=2, dim=(2, 3), keepdim=True)
+        print(norm_centroids.requires_grad)
         distmat = (distmat / torch.matmul(norm_feat, norm_centroids)).permute(2, 3, 0, 1)
 
         classes = torch.arange(self.num_classes).long().cuda()
