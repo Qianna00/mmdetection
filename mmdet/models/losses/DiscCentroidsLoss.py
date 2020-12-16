@@ -12,6 +12,7 @@ class DiscCentroidsLoss(nn.Module):
         super(DiscCentroidsLoss, self).__init__()
         self.num_classes = num_classes
         self.centroids = nn.Parameter(torch.randn(num_classes, feat_dim, 14, 14))
+        print(self.centroids.data)
         self.disccentroidslossfunc = DiscCentroidsLossFunc.apply
         self.feat_dim = feat_dim
         self.size_average = size_average
@@ -23,7 +24,7 @@ class DiscCentroidsLoss(nn.Module):
         #############################
         # calculate attracting loss #
         #############################
-        print(self.centroids.data)
+        # print(self.centroids.data)
 
         # feat = feat.view(batch_size, -1)
         # feat = feat.view()
@@ -68,7 +69,7 @@ class DiscCentroidsLoss(nn.Module):
         loss_repel = torch.clamp(margin - distmat_neg.sum(), 0.0, 1e6)
 
         # print(loss_repel, loss_attract)
-        loss_attract = loss_attract
+        loss_attract = 0.01 * loss_attract
         loss_repel = 0.1 * loss_repel
         # loss = loss_attract + 0.01 * loss_repel
 
