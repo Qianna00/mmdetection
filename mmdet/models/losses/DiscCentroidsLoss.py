@@ -32,9 +32,9 @@ class DiscCentroidsLoss(nn.Module):
             raise ValueError("Center's dim: {0} should be equal to input feature's \
                             dim: {1}".format(self.centroids.size()[1:], feat.size()[1:]))
         batch_size_tensor = feat.new_empty(1).fill_(batch_size if self.size_average else 1)
-        """loss_attract = self.disccentroidslossfunc(feat.clone(), label, self.centroids.clone(),
-                                                  batch_size_tensor).squeeze()"""
-        loss_attract = self.loss_attract(feat.clone(), label, batch_size)
+        loss_attract = self.disccentroidslossfunc(feat.clone(), label, self.centroids.clone(),
+                                                  batch_size_tensor).squeeze()
+        # loss_attract = self.loss_attract(feat.clone(), label, batch_size)
 
         # print("feat:", feat)
 
@@ -53,7 +53,6 @@ class DiscCentroidsLoss(nn.Module):
         distmat = torch.matmul(feat.clone().permute(2, 3, 0, 1), self.centroids.clone().permute(2, 3, 1, 0)).abs()
         norm_feat = torch.norm(feat.clone().permute(2, 3, 0, 1), p=2, dim=(2, 3), keepdim=True)
         norm_centroids = torch.norm(self.centroids.clone().permute(2, 3, 1, 0), p=2, dim=(2, 3), keepdim=True)
-        print(norm_centroids.requires_grad)
         distmat = (distmat / torch.matmul(norm_feat, norm_centroids)).permute(2, 3, 0, 1)
 
         classes = torch.arange(self.num_classes).long().cuda()
@@ -87,7 +86,7 @@ class DiscCentroidsLossFunc(Function):
         centroids_batch = centroids.index_select(0, label.long())
         return (feature - centroids_batch).pow(2).sum() / 2.0 / (batch_size * 14 * 14)
 
-    """"@staticmethod
+    @staticmethod
     def backward(ctx, grad_output):
         feature, label, centroids, batch_size = ctx.saved_tensors
         centroids_batch = centroids.index_select(0, label.long())
@@ -99,5 +98,6 @@ class DiscCentroidsLossFunc(Function):
         counts = counts.scatter_add_(0, label.long(), ones)
         grad_centroids.scatter_add_(0, label.unsqueeze(1).unsqueeze(2).unsqueeze(3).expand(feature.size()).long(), diff)
         grad_centroids = grad_centroids / counts.unsqueeze(1).unsqueeze(2).unsqueeze(3).expand(grad_centroids.size())
-        return - grad_output * diff / (batch_size * 14 * 14), None, grad_centroids / (batch_size * 14 * 14), None"""
+        print(grad_centroids)
+        return - grad_output * diff / (batch_size * 14 * 14), None, grad_centroids / (batch_size * 14 * 14), None
 
