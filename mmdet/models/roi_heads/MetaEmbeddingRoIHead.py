@@ -52,7 +52,7 @@ class MetaEmbedding_RoIHead(nn.Module):
                 gt_masks=None,
                 test=False,
                 *args):
-        print(centroids.required_grad, centroids.grad)
+        print(centroids)
         if not test:
             num_imgs = len(img_metas)
             if gt_bboxes_ignore is None:
