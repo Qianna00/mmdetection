@@ -24,7 +24,7 @@ class DiscCentroidsLoss(nn.Module):
         #############################
         # calculate attracting loss #
         #############################
-        # print(self.centroids.data)
+        print(self.centroids.data)
 
         # feat = feat.view(batch_size, -1)
         # feat = feat.view()
