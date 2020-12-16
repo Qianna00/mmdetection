@@ -79,7 +79,8 @@ total_epochs = 12
 norm_cfg = dict(type='BN', requires_grad=False)
 model = dict(
     type='FasterRCNNMetaEmbedding',
-    pretrained='/root/data/zq/smd_det/meta_embedding/10c/stage1/epoch_5_modified.pth',
+    # pretrained='/root/data/zq/smd_det/meta_embedding/10c/stage1/epoch_5_modified.pth',
+    pretrained='/root/data/zq/pretrained_models/resnet50_msra.pth',
     backbone=dict(
         type='ResNet',
         depth=50,
