@@ -26,7 +26,7 @@ class DiscCentroidsLoss(nn.Module):
 
         # feat = feat.view(batch_size, -1)
         # feat = feat.view()
-        print(self.centroids.data)
+        print(self.centroids.grad)
 
         # To check the dim of centroids and features
         if feat.size()[1:] != self.centroids.size()[1:]:
