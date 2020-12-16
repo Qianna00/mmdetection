@@ -26,6 +26,7 @@ class DiscCentroidsLoss(nn.Module):
 
         # feat = feat.view(batch_size, -1)
         # feat = feat.view()
+        print(self.centroids.data)
 
         # To check the dim of centroids and features
         if feat.size()[1:] != self.centroids.size()[1:]:
@@ -98,6 +99,5 @@ class DiscCentroidsLossFunc(Function):
         counts = counts.scatter_add_(0, label.long(), ones)
         grad_centroids.scatter_add_(0, label.unsqueeze(1).unsqueeze(2).unsqueeze(3).expand(feature.size()).long(), diff)
         grad_centroids = grad_centroids / counts.unsqueeze(1).unsqueeze(2).unsqueeze(3).expand(grad_centroids.size())
-        print(grad_centroids/(batch_size*14*14))
         return - grad_output * diff / (batch_size * 14 * 14), None, grad_centroids / (batch_size * 14 * 14), None
 
