@@ -7,3 +7,10 @@ class SmdDataset(CocoDataset):
                'Speed boat', 'Boat', 'Kayak',
                'Sail boat', 'Swimming person',
                'Flying bird/plane', 'Other')
+
+
+@DATASETS.register_module()
+class SmdDataset6(CocoDataset):
+    CLASSES = ('Ferry', 'Vessel/ship',
+               'Speed boat', 'Boat', 'Kayak',
+               'Sail boat')
