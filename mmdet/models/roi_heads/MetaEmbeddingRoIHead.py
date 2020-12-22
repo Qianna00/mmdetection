@@ -84,7 +84,7 @@ class MetaEmbedding_RoIHead(nn.Module):
                 bbox_feats_pos = bbox_feats[pos_index]
                 bbox_feats_pos = self.get_meta_embedding_feature(bbox_feats_pos, centroids)
                 bbox_feats[pos_index] = bbox_feats_pos
-                print("labels:", bbox_targets[0][pos_index])
+                # print("labels:", bbox_targets[0][pos_index])
                 loss_attract, loss_repel = self.loss_feat(bbox_feats_pos, bbox_targets[0][pos_index])
             else:
                 bbox_feats = self.get_meta_embedding_feature(bbox_feats, centroids)
@@ -158,10 +158,9 @@ class MetaEmbedding_RoIHead(nn.Module):
         # computing memory feature by querying and associating visual memory
         values_memory = self.fc_hallucinator(pooled_feats)
         # print(pooled_feats.size(), values_memory.size())
-        print("values_memory:", values_memory)
 
         values_memory = values_memory.softmax(dim=1)
-        print("values_memory_softmax:", values_memory)
+        # print("values_memory_softmax:", values_memory)
         memory_feature = torch.mm(values_memory, keys_memory.view(self.num_classes, -1))
 
         # computing concept selector
