@@ -58,7 +58,7 @@ data = dict(
         pipeline=test_pipeline))
 centroids_cal=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_10_train.json',
+        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_train.json',
         img_prefix=data_root + 'train/',
         pipeline=pipeline_for_init_centroids)
 evaluation = dict(interval=1, metric='bbox')
@@ -79,7 +79,7 @@ total_epochs = 12
 norm_cfg = dict(type='BN', requires_grad=False)
 model = dict(
     type='FasterRCNNMetaEmbedding',
-    pretrained='/root/data/zq/smd_det/meta_embedding/10c/stage1/epoch_5_modified.pth',
+    pretrained='/root/data/zq/smd_det/meta_embedding/6c/stage1/epoch_10_modified.pth',
     # pretrained='/root/data/zq/pretrained_models/resnet50_msra.pth',
     backbone=dict(
         type='ResNet',
