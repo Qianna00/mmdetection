@@ -295,7 +295,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                 # Add all calculated features to center tensor
                 for i in range(len(labels)):
                     label = labels[i]
-                    if label < 6:
+                    if label < self.roi_head.num_classes:
                         centroids[label] += bbox_feats[i]
                         class_data_num[label] += 1
             for i in range(len(class_data_num)):
