@@ -256,7 +256,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
             self.backbone.cuda()
             self.rpn_head.cuda()
             self.roi_head.cuda()
-            class_data_num = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            class_data_num = [0, 0, 0, 0, 0, 0]
             for i in tqdm(range(len(data))):
                 """imgs, gt_labels, gt_bboxes, img_metas = inputs["img"], \
                                                         inputs["gt_labels"], \
