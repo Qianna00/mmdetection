@@ -10,7 +10,6 @@ from mmdet.utils import get_root_logger
 from mmdet.core import bbox2result, bbox2roi
 
 
-
 @HEADS.register_module()
 class MetaEmbedding_RoIHead(nn.Module):
     def __init__(self,
