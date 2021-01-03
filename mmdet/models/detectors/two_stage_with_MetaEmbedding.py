@@ -65,7 +65,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
             # calculate init_centroids using training dataset
             if init_centroids:
                 cfg = Config.fromfile(
-                    "/root/data/zq/smd_det/meta_embedding/6c/stage2/faster_rcnn_r50_c4_meta_smd_stage2.py")
+                    "/mmdetection/configs/faster_rcnn_meta/faster_rcnn_r50_c4_meta_smd_stage2.py")
                 dataset = build_dataset(cfg.centroids_cal)
                 # data = build_dataloader(dataset, samples_per_gpu=1, workers_per_gpu=0, num_gpus=1, shuffle=False)
                 # print(data[0])
@@ -256,7 +256,8 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
             self.backbone.cuda()
             self.rpn_head.cuda()
             self.roi_head.cuda()
-            class_data_num = [0, 0, 0, 0, 0, 0]
+            # class_data_num = [0, 0, 0, 0, 0, 0]
+            class_data_num = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             for i in tqdm(range(len(data))):
                 """imgs, gt_labels, gt_bboxes, img_metas = inputs["img"], \
                                                         inputs["gt_labels"], \
