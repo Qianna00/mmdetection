@@ -162,6 +162,7 @@ class MetaEmbedding_RoIHead(nn.Module):
 
         values_memory = values_memory.softmax(dim=1)
         print("values_memory_softmax:", values_memory.size(), values_memory)
+        print("values_memory_softmax_sum:", values_memory.sum(dim=1))
         memory_feature = torch.mm(values_memory, keys_memory.view(self.num_classes, -1))
 
         # computing concept selector
