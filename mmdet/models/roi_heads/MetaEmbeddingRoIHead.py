@@ -5,6 +5,7 @@ from tqdm import tqdm
 from .standard_roi_head import StandardRoIHead
 from ..builder import HEADS, build_head, build_loss
 from mmcv.runner import load_checkpoint
+from mmcv.cnn import kaiming_init
 from mmdet.utils import get_root_logger
 from mmdet.core import bbox2result, bbox2roi
 
@@ -31,8 +32,10 @@ class MetaEmbedding_RoIHead(nn.Module):
         self.num_classes = num_classes
         self.feat_dim = feat_dim
         self.pool_meta_embedding = nn.AvgPool2d((14, 14))
-        self.fc_hallucinator = nn.Linear(self.feat_dim, self.num_classes)
+        # self.fc_hallucinator = nn.Linear(self.feat_dim, self.num_classes)
         self.fc_selector = nn.Linear(self.feat_dim, self.feat_dim)
+        self.conv_hallucinator = nn.Conv2d(self.feat_dim, self.num_classes, (1, 1))
+        # self.conv_selector = nn.Conv2d(self.feat_dim, self.feat_dim, (1, 1))
         self.std_roi_head = StandardRoIHead(bbox_roi_extractor=bbox_roi_extractor,
                                             bbox_head=bbox_head,
                                             shared_head=shared_head,
@@ -130,8 +133,9 @@ class MetaEmbedding_RoIHead(nn.Module):
             logger = get_root_logger()
             load_checkpoint(self, pretrained, strict=False, logger=logger)
         elif pretrained is None:
-            nn.init.normal_(self.fc_hallucinator.weight, 0, 0.01)
-            nn.init.constant_(self.fc_hallucinator.bias, 0)
+            # nn.init.normal_(self.fc_hallucinator.weight, 0, 0.01)
+            # nn.init.constant_(self.fc_hallucinator.bias, 0)
+            kaiming_init(self.conv_hallucinator)
             nn.init.normal_(self.fc_selector.weight, 0, 0.001)
             nn.init.constant_(self.fc_selector.bias, 0)
             self.std_roi_head.init_weights(pretrained)
@@ -143,7 +147,7 @@ class MetaEmbedding_RoIHead(nn.Module):
         # storing direct feature
         direct_feature = feats.clone()
 
-        # batch_size = feats.size(0)
+        batch_size = feats.size(0)
         # feat_size = x.size(1)
 
         # set up visual memory
@@ -156,20 +160,28 @@ class MetaEmbedding_RoIHead(nn.Module):
             pooled_feats = pooled_feats.unsqueeze(0)
 
         # computing memory feature by querying and associating visual memory
-        values_memory = self.fc_hallucinator(pooled_feats)
+        # values_memory = self.fc_hallucinator(pooled_feats)
         # print(pooled_feats.size(), values_memory.size())
-        print(values_memory.size(), values_memory)
+        # print(values_memory.size(), values_memory)
+        # values_memory = values_memory.softmax(dim=1)
+        # print("values_memory_softmax:", values_memory.size(), values_memory)
+        # print("values_memory_softmax_sum:", values_memory.sum(dim=1))
+        values_memory = self.conv_hallucinator(direct_feature)
+        values_memory = values_memory.softmax(dim=1)  # B*C*W*H
+        # memory_feature = torch.zeros((batch_size, self.feat_dim, 14, 14))  # B*D*W*H
+        memory_feature = torch.mul(values_memory.unsqueeze(1).expand(batch_size, self.num_classes,
+                                                                     self.feat_dim, 14, 14),
+                                   keys_memory.unsqueeze(0).expand(batch_size, self.num_classes,
+                                                                     self.feat_dim, 14, 14)).sum(dim=1)
 
-        values_memory = values_memory.softmax(dim=1)
-        print("values_memory_softmax:", values_memory.size(), values_memory)
-        print("values_memory_softmax_sum:", values_memory.sum(dim=1))
-        memory_feature = torch.mm(values_memory, keys_memory.view(self.num_classes, -1))
+        # memory_feature = torch.mm(values_memory, keys_memory.view(self.num_classes, -1))
 
         # computing concept selector
         concept_selector = self.fc_selector(pooled_feats)
+        # concept_selector = self.conv_selector(direct_feature)
         concept_selector = concept_selector.tanh()
         feats = direct_feature + concept_selector.unsqueeze(2).unsqueeze(3).expand(-1, -1, feats.size(2), feats.size(3))\
-                * memory_feature.view(feats.size(0), feats.size(1), feats.size(2), feats.size(3))
+                * memory_feature
 
         # storing infused feature
         # infused_feature = concept_selector * memory_feature
