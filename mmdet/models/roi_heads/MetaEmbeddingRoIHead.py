@@ -169,6 +169,10 @@ class MetaEmbedding_RoIHead(nn.Module):
         values_memory = self.conv_hallucinator(direct_feature)
         values_memory = values_memory.softmax(dim=1)  # B*C*W*H
         # memory_feature = torch.zeros((batch_size, self.feat_dim, 14, 14))  # B*D*W*H
+        print(values_memory.unsqueeze(1).expand(batch_size, self.num_classes,
+                                                                     self.feat_dim, 14, 14).size())
+        print(keys_memory.unsqueeze(0).expand(batch_size, self.num_classes,
+                                                                     self.feat_dim, 14, 14).size())
         memory_feature = torch.mul(values_memory.unsqueeze(1).expand(batch_size, self.num_classes,
                                                                      self.feat_dim, 14, 14),
                                    keys_memory.unsqueeze(0).expand(batch_size, self.num_classes,
