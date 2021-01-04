@@ -38,12 +38,12 @@ data = dict(
         pipeline=train_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/Test/SMD_VIS_skip_10.json',
+        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_10_val.json',
         img_prefix=data_root + 'train/',
         pipeline=test_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_test.json',
+        ann_file=data_root + 'annotations/Test/SMD_VIS_skip_10.json',
         img_prefix=data_root + 'test/',
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric='bbox')
