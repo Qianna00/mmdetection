@@ -1,4 +1,4 @@
-dataset_type = 'SmdDataset'
+dataset_type = 'SmdDataset6'
 data_root = '/root/data/zq/data/SMD/'
 # use caffe img_norm
 img_norm_cfg = dict(
@@ -58,7 +58,7 @@ data = dict(
         pipeline=test_pipeline))
 centroids_cal=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_train.json',
+        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_10_train.json',
         img_prefix=data_root + 'train/',
         pipeline=pipeline_for_init_centroids)
 evaluation = dict(interval=1, metric='bbox')
@@ -192,7 +192,7 @@ test_cfg = dict(
     rpn=dict(
         nms_across_levels=False,
         nms_pre=6000,
-        nms_post=500,
+        nms_post=1000,
         max_num=1000,
         nms_thr=0.7,
         min_bbox_size=0),
