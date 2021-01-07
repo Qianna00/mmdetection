@@ -9,8 +9,8 @@ from ..builder import LOSSES, build_loss
 class CBLoss(nn.Module):
     def __init__(self, beta=0.9999, gamma=2.0, loss_type="focal"):
         super(CBLoss, self).__init__()
-        self.beta = beta
-        self.gamma = gamma
+        self.beta = torch.tensor(beta).cuda()
+        self.gamma = torch.tensor(gamma).cuda()
         self.loss_type = loss_type
 
     def forward(self, labels, logits, samples_per_cls, no_of_classes):
