@@ -164,7 +164,7 @@ class BBoxHead(nn.Module):
                     # fg_inds = (labels >= 0) & (labels < self.num_classes)
                     # fg_labels = labels[fg_inds]
                     unique_labels, count = torch.unique(labels, return_counts=True)
-                    samples_per_class = torch.ones(self.num_classes + 1, dtype=torch.int64).cuda()
+                    samples_per_class = torch.zeros(self.num_classes + 1, dtype=torch.int64).cuda()
                     samples_per_class[unique_labels] = count
                     losses['loss_cls'] = self.loss_cls(
                         labels,
