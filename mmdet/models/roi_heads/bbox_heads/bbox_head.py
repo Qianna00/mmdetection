@@ -160,15 +160,23 @@ class BBoxHead(nn.Module):
         if cls_score is not None:
             avg_factor = max(torch.sum(label_weights > 0).float().item(), 1.)
             if cls_score.numel() > 0:
-                # if self.loss_cls_type == "CBLoss":
-                unique_labels, count = torch.unique(labels, return_counts=True)
-                print(unique_labels, count)
-                losses['loss_cls'] = self.loss_cls(
-                    cls_score,
-                    labels,
-                    label_weights,
-                    avg_factor=avg_factor,
-                    reduction_override=reduction_override)
+                if self.loss_cls_type == "CBLoss":
+                    unique_labels, count = torch.unique(labels, return_counts=True)
+                    samples_per_class = torch.ones(self.num_classes + 1, dtype=torch.int64).cuda()
+                    samples_per_class[unique_labels] = count
+                    losses['loss_cls'] = self.loss_cls(
+                        labels,
+                        cls_score,
+                        samples_per_class,
+                        self.num_classes + 1
+                    )
+                else:
+                    losses['loss_cls'] = self.loss_cls(
+                        cls_score,
+                        labels,
+                        label_weights,
+                        avg_factor=avg_factor,
+                        reduction_override=reduction_override)
                 losses['acc'] = accuracy(cls_score, labels)
         if bbox_pred is not None:
             bg_class_ind = self.num_classes
