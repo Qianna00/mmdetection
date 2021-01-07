@@ -1,4 +1,4 @@
-dataset_type = 'SmdDataset'
+dataset_type = 'SmdDataset6'
 data_root = '/root/data/zq/data/SMD/'
 # use caffe img_norm
 img_norm_cfg = dict(
@@ -29,22 +29,22 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=1,
+    samples_per_gpu=2,
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_10_train.json',
-        img_prefix=data_root + 'train/',
+        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_train_Qianna.json',
+        img_prefix=data_root + 'new_split/train/',
         pipeline=train_pipeline),
-    val=dict(
+    test=dict(
         type=dataset_type,
         ann_file=data_root + 'annotations/Training/SMD_VIS_skip_10_val.json',
         img_prefix=data_root + 'train/',
         pipeline=test_pipeline),
-    test=dict(
+    val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/Test/SMD_VIS_skip_10.json',
-        img_prefix=data_root + 'test/',
+        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_test_Qianna.json',
+        img_prefix=data_root + 'new_split/test/',
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric='bbox')
 
@@ -113,7 +113,7 @@ model = dict(
             with_avg_pool=True,
             roi_feat_size=7,
             in_channels=2048,
-            num_classes=10,
+            num_classes=6,
             bbox_coder=dict(
                 type='DeltaXYWHBBoxCoder',
                 target_means=[0., 0., 0., 0.],

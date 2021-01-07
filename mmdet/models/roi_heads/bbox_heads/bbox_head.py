@@ -51,6 +51,7 @@ class BBoxHead(nn.Module):
         self.bbox_coder = build_bbox_coder(bbox_coder)
         self.loss_cls = build_loss(loss_cls)
         self.loss_bbox = build_loss(loss_bbox)
+        self.loss_cls_type = loss_cls
 
         in_channels = self.in_channels
         if self.with_avg_pool:
@@ -159,6 +160,8 @@ class BBoxHead(nn.Module):
         if cls_score is not None:
             avg_factor = max(torch.sum(label_weights > 0).float().item(), 1.)
             if cls_score.numel() > 0:
+                # if self.loss_cls_type == "CBLoss":
+                print("labels:", labels.size())
                 losses['loss_cls'] = self.loss_cls(
                     cls_score,
                     labels,
