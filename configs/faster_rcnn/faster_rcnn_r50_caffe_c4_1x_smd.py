@@ -29,7 +29,7 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=1,
+    samples_per_gpu=2,
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
@@ -72,7 +72,7 @@ model = dict(
         strides=(1, 2, 2),
         dilations=(1, 1, 1),
         out_indices=(2, ),
-        frozen_stages=-1,
+        frozen_stages=1,
         norm_cfg=norm_cfg,
         norm_eval=True,
         style='caffe'),
