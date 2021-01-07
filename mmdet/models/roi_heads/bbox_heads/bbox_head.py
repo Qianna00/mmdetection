@@ -51,7 +51,7 @@ class BBoxHead(nn.Module):
         self.bbox_coder = build_bbox_coder(bbox_coder)
         self.loss_cls = build_loss(loss_cls)
         self.loss_bbox = build_loss(loss_bbox)
-        self.loss_cls_type = loss_cls
+        self.loss_cls_type = loss_cls["type"]
 
         in_channels = self.in_channels
         if self.with_avg_pool:
