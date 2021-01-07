@@ -161,7 +161,8 @@ class BBoxHead(nn.Module):
             avg_factor = max(torch.sum(label_weights > 0).float().item(), 1.)
             if cls_score.numel() > 0:
                 # if self.loss_cls_type == "CBLoss":
-                print("labels:", labels.size())
+                unique_labels, count = torch.unique(labels, return_counts=True)
+                print(unique_labels, count)
                 losses['loss_cls'] = self.loss_cls(
                     cls_score,
                     labels,
