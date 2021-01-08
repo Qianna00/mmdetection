@@ -23,6 +23,7 @@ class CBLoss(nn.Module):
         zero_class_index = samples_per_cls == 0
         samples_per_cls[zero_class_index] = 1
         effective_num = 1.0 - torch.pow(beta, samples_per_cls)
+        print(effective_num)
         weights = (1.0 - beta) / effective_num
         # print(weights.size(), weights)
         weights = weights / torch.sum(weights[zero_class_index]) * (no_of_classes - weights[zero_class_index].shape[0])
