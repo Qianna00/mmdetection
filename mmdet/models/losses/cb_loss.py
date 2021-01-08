@@ -17,24 +17,28 @@ class CBLoss(nn.Module):
         # effective_num = 1.0 - np.power(self.beta, samples_per_cls)
         # weights = (1.0 - self.beta) / np.array(effective_num)
         # weights = weights / np.sum(weights) * no_of_classes
-        print(samples_per_cls)
         zero_class_index = samples_per_cls == 0
         samples_per_cls[zero_class_index] = 1
         effective_num = 1.0 - torch.pow(self.beta, samples_per_cls)
         weights = (1.0 - self.beta) / effective_num
         # print(weights.size(), weights)
         weights = weights / torch.sum(weights[zero_class_index]) * (no_of_classes - weights[zero_class_index].shape[0])
-        print(weights)
+        print(weights.size())
         # weights = weights / torch.sum(weights) * no_of_classes
 
         labels_one_hot = F.one_hot(labels, no_of_classes).float()
 
         weights = torch.tensor(weights).float()
         weights = weights.unsqueeze(0)
+        print(weights.size())
         weights = weights.repeat(labels_one_hot.shape[0], 1) * labels_one_hot
+        print(weights.size())
         weights = weights.sum(1)
+        print(weights.size())
         weights = weights.unsqueeze(1)
+        print(weights.size())
         weights = weights.repeat(1, no_of_classes)
+        print(weights.size())
 
         if self.loss_type == "focal":
             cb_loss = self.focal_loss(labels_one_hot, logits, weights, self.gamma)
