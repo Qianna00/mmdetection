@@ -50,9 +50,9 @@ save_path = '/root/data/zq/data/SMD/lvis/pred_slice_with0.pt'
 torch.save(savebin, save_path)
 
 # for tarining set
-lvis_train = LVIS(train_ann_file)
+# lvis_train = LVIS(train_ann_file)
 # lvis_val = LVIS(val_ann_file)
-train_catsinfo = lvis_train.cats
+# train_catsinfo = lvis_train.cats
 # val_catsinfo = lvis_val.cats
 
 bin1000 = []
@@ -60,6 +60,7 @@ bin10000 = []
 binover = []
 
 for cid, cate in train_catsinfo.items():
+    print(cate)
     ins_count = cate['instance_count']
     if ins_count < 1000:
         bin1000.append(cid)
