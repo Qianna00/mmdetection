@@ -7,8 +7,8 @@ import json
 import torch
 from pycocotools.coco import COCO
 
-train_ann_file = "/root/data/zq/data/SMD/annotations/6c/SMD_VIS_6_class_train.json"
-with open(train_ann_file, 'r') as f:
+train_ann_file = "/root/data/zq/data/SMD/lvis/SMD_VIS_6_class_train_lvis.json"
+"""with open(train_ann_file, 'r') as f:
     gt_new = json.load(f)
 c = [0, 0, 0, 0, 0, 0]
 anns = gt_new["annotations"]
@@ -33,8 +33,8 @@ for i, cate in enumerate(categories):
     categories_new.append(cate)
 gt_new["categories"] = categories_new
 with open("/root/data/zq/data/SMD/lvis/SMD_VIS_6_class_train_lvis.json", 'w') as g:
-    json.dump(gt_new, g)
-"""test_ann_file = "/root/data/zq/data/SMD/annotations/6c/SMD_VIS_6_class_test.json"
+    json.dump(gt_new, g)"""
+# test_ann_file = "/root/data/zq/data/SMD/annotations/6c/SMD_VIS_6_class_test.json"
 
 lvis_train = LVIS(train_ann_file)
 train_catsinfo = lvis_train.cats
@@ -107,4 +107,4 @@ splits['all'] = np.arange(6)
 
 split_file_name = '/root/data/zq/data/SMD/lvis/valsplit.pkl'
 with open(split_file_name, 'wb') as f:
-    pickle.dump(splits, f)"""
+    pickle.dump(splits, f)
