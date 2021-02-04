@@ -32,7 +32,7 @@ for i, cate in enumerate(categories):
     cate["instance_count"] = c[i]
     categories_new.append(cate)
 gt_new["categories"] = categories_new
-with open("/root/data/zq/data/SMD/lvis/SMD_VIS_6_class_train_lvis.json") as g:
+with open("/root/data/zq/data/SMD/lvis/SMD_VIS_6_class_train_lvis.json", 'w') as g:
     json.dump(gt_new, g)
 """test_ann_file = "/root/data/zq/data/SMD/annotations/6c/SMD_VIS_6_class_test.json"
 
