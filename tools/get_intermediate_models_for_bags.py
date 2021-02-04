@@ -20,6 +20,7 @@ label2binlabel[0, 1:] = binlabel_count[0]
 binlabel_count[0] += 1
 
 for cid, cate in train_catsinfo.items():
+    print(cate)
     ins_count = cate['instance_count']
     if ins_count < 1000:
         label2binlabel[1, cid] = binlabel_count[1]
@@ -60,7 +61,6 @@ bin10000 = []
 binover = []
 
 for cid, cate in train_catsinfo.items():
-    print(cate)
     ins_count = cate['instance_count']
     if ins_count < 1000:
         bin1000.append(cid)
