@@ -14,17 +14,17 @@ c = [0, 0, 0, 0, 0, 0]
 anns = gt_new["annotations"]
 for ann in anns:
     if ann['category_id'] == 1:
-        c[1] += 1
+        c[0] += 1
     elif ann['category_id'] == 2:
-        c[2] += 1
+        c[1] += 1
     elif ann['category_id'] == 3:
-        c[3] += 1
+        c[2] += 1
     elif ann['category_id'] == 4:
-        c[4] += 1
+        c[3] += 1
     elif ann['category_id'] == 5:
-        c[5] += 1
+        c[4] += 1
     else:
-        c[6] += 1
+        c[5] += 1
 print(c)
 categories_new = []
 categories = gt_new["categories"]
