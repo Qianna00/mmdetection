@@ -67,19 +67,20 @@ class DiscCentroidsLoss(nn.Module):
         # margin = 50.0
         margin = 0.2
         loss_repel = torch.clamp(margin - distmat_neg.sum(), 0.0, 1e6)"""
-        distmat = (feat.clone().sum(dim=1).expand(batch_size, self.num_classes, 14, 14) -
-                   self.centroids.clone().sum(dim=1).expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).abs()
+        distmat = (feat.clone().sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
+                   self.centroids.clone().sum(dim=1, keepdim=True).expand(self.num_classes, batch_size, 14,
+                                                                          14).permute(1, 0, 2, 3)).abs()
 
         classes = torch.arange(self.num_classes).long().cuda()
         labels_expand = label.unsqueeze(1).expand(batch_size, self.num_classes)
         mask = labels_expand.eq(classes.expand(batch_size, self.num_classes))
         distmat_neg = distmat
         distmat_neg[mask, :, :] = 0.0
-        print("distmat_neg:", distmat_neg.sum() / (batch_size * self.num_classes * 14 * 14))
+        # print("distmat_neg:", distmat_neg.sum() / (batch_size * self.num_classes * 14 * 14))
         margin = 5
         loss_repel = torch.clamp(margin - distmat_neg.sum() / (batch_size * self.num_classes * 14 * 14))
 
-        print(loss_repel, loss_attract)
+        # print(loss_repel, loss_attract)
         loss_attract = 0.01 * loss_attract
         loss_repel = 0.1 * loss_repel
         # loss = loss_attract + 0.01 * loss_repel
