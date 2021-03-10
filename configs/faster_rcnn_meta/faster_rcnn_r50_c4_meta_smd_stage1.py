@@ -34,7 +34,7 @@ data = dict(
     train=dict(
         type=dataset_type,
         ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_train.json',
-        img_prefix=data_root + 'new_split/train/',
+        img_prefix=data_root + 'train/',
         pipeline=train_pipeline),
     test=dict(
         type=dataset_type,
@@ -44,7 +44,7 @@ data = dict(
     val=dict(
         type=dataset_type,
         ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_test.json',
-        img_prefix=data_root + 'new_split/test/',
+        img_prefix=data_root + 'test/',
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric='bbox')
 
