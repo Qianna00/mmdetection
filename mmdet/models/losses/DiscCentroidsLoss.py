@@ -76,8 +76,8 @@ class DiscCentroidsLoss(nn.Module):
         mask = labels_expand.eq(classes.expand(batch_size, self.num_classes))
         distmat_neg = distmat
         distmat_neg[mask, :, :] = 0.0
-        print("distmat_neg:", distmat_neg.sum() / (batch_size * self.num_classes * 14 * 14))
-        margin = 5
+        # print("distmat_neg:", distmat_neg.sum() / (batch_size * self.num_classes * 14 * 14))
+        margin = 100
         loss_repel = torch.clamp(margin - distmat_neg.sum() / (batch_size * self.num_classes * 14 * 14), 0, 1e6)
 
         # print(loss_repel, loss_attract)
