@@ -93,9 +93,7 @@ model = dict(
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
         loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
     roi_head=dict(
-        type='MetaEmbedding_RoIHead',
-        num_classes=1,
-        feat_dim=1024,
+        type='StandardRoIHead',
         shared_head=dict(
             type='ResLayer',
             depth=50,
@@ -115,7 +113,7 @@ model = dict(
             with_avg_pool=True,
             roi_feat_size=7,
             in_channels=2048,
-            num_classes=6,
+            num_classes=1,
             bbox_coder=dict(
                 type='DeltaXYWHBBoxCoder',
                 target_means=[0., 0., 0., 0.],
