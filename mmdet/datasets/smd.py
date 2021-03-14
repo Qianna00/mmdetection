@@ -435,5 +435,6 @@ class SMDParams:
         self.useSegm = None
 
 
+@DATASETS.register_module()
 class SmdDataset2(SmdDataset6):
     CLASSES = ('Object',)
