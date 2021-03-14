@@ -433,3 +433,7 @@ class SMDParams:
         self.iouType = iouType
         # useSegm is deprecated
         self.useSegm = None
+
+
+class SmdDataset2(SmdDataset6):
+    CLASSES = ('Object',)

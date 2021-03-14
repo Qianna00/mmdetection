@@ -12,6 +12,7 @@ from .wider_face import WIDERFaceDataset
 from .xml_style import XMLDataset
 from .smd import SmdDataset
 from .smd import SmdDataset6
+from .smd import SmdDataset2
 
 __all__ = [
     'CustomDataset', 'XMLDataset', 'CocoDataset', 'DeepFashionDataset',
@@ -21,5 +22,5 @@ __all__ = [
     'DistributedGroupSampler', 'DistributedSampler', 'build_dataloader',
     'ConcatDataset', 'RepeatDataset', 'ClassBalancedDataset',
     'WIDERFaceDataset', 'DATASETS', 'PIPELINES', 'build_dataset', 'SmdDataset',
-    'SmdDataset6'
+    'SmdDataset6', 'SmdDataset2'
 ]
