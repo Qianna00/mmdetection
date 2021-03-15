@@ -12,6 +12,7 @@ from terminaltables import AsciiTable
 import os.path as osp
 import tempfile
 from lvis import LVISEval
+from lvis_ import LVISDataset
 
 
 @DATASETS.register_module()
@@ -444,31 +445,11 @@ class SmdDataset2(SmdDataset6):
 
 
 @DATASETS.register_module()
-class SmdDataset6Lvis(SmdDataset6):
-    def load_annotations(self, ann_file):
-        try:
-            from lvis import LVIS
-        except ImportError:
-            raise ImportError('Please follow config/lvis/README.md to '
-                              'install open-mmlab forked lvis first.')
-        self.coco = LVIS(ann_file)
-        assert not self.custom_classes, 'LVIS custom classes is not supported'
-        self.cat_ids = self.coco.get_cat_ids()
-        self.cat2label = {cat_id: i for i, cat_id in enumerate(self.cat_ids)}
-        self.img_ids = self.coco.get_img_ids()
-        data_infos = []
-        for i in self.img_ids:
-            info = self.coco.load_imgs([i])[0]
-            if info['file_name'].startswith('COCO'):
-                # Convert form the COCO 2014 file naming convention of
-                # COCO_[train/val/test]2014_000000000000.jpg to the 2017
-                # naming convention of 000000000000.jpg
-                # (LVIS v1 will fix this naming issue)
-                info['filename'] = info['file_name'][-16:]
-            else:
-                info['filename'] = info['file_name']
-            data_infos.append(info)
-        return data_infos
+class SmdDataset6Lvis(LVISDataset):
+
+    CLASSES = ('Ferry', 'Vessel/ship',
+               'Speed boat', 'Boat', 'Kayak',
+               'Sail boat')
 
     def evaluate(self,
                  results,
