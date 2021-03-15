@@ -100,7 +100,7 @@ splits = {}
 # splits['[10, 100)'] = np.array(bin100, dtype=np.int)
 splits['[100, 1000)'] = np.array(bin1000, dtype=np.int)
 splits['[1000, 10000)'] = np.array(bin10000, dtype=np.int)
-splits['[1000, ~)'] = np.array(binover, dtype=np.int)
+splits['[10000, ~)'] = np.array(binover, dtype=np.int)
 splits['normal'] = np.arange(1, 6)
 splits['background'] = np.zeros((1,), dtype=np.int)
 splits['all'] = np.arange(6)
