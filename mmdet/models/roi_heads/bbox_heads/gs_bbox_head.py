@@ -15,7 +15,7 @@ from mmdet.utils import get_root_logger
 from .convfc_bbox_head import Shared2FCBBoxHead
 
 
-@HEADS.register_module
+@HEADS.register_module()
 class GSBBoxHead(Shared2FCBBoxHead):
 
     def __init__(self,
