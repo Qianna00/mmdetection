@@ -14,6 +14,7 @@ from .smd import SmdDataset
 from .smd import SmdDataset6
 from .smd import SmdDataset2
 from .smd import SmdDataset6Lvis
+from .lvis_1 import LvisDataset1
 
 __all__ = [
     'CustomDataset', 'XMLDataset', 'CocoDataset', 'DeepFashionDataset',
@@ -23,5 +24,5 @@ __all__ = [
     'DistributedGroupSampler', 'DistributedSampler', 'build_dataloader',
     'ConcatDataset', 'RepeatDataset', 'ClassBalancedDataset',
     'WIDERFaceDataset', 'DATASETS', 'PIPELINES', 'build_dataset', 'SmdDataset',
-    'SmdDataset6', 'SmdDataset2', 'SmdDataset6Lvis'
+    'SmdDataset6', 'SmdDataset2', 'SmdDataset6Lvis', 'LvisDataset1'
 ]
