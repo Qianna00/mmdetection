@@ -111,7 +111,7 @@ model = dict(
         bbox_head=dict(
             type='GSBBoxHead',
             num_fcs=2,
-            in_channels=256,
+            in_channels=2048,
             fc_out_channels=1024,
             gs_config=dict(
                 label2binlabel='/root/data/zq/data/SMD/lvis/label2binlabel.pt',
@@ -127,7 +127,7 @@ model = dict(
                 ),
             ),
             roi_feat_size=7,
-            num_classes=1231,
+            num_classes=7,
             target_means=[0., 0., 0., 0.],
             target_stds=[0.1, 0.1, 0.2, 0.2],
             reg_class_agnostic=False,
