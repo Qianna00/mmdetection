@@ -9,6 +9,9 @@ import copy
 import itertools
 from mmcv.utils import print_log
 from terminaltables import AsciiTable
+import os.path as osp
+import tempfile
+from lvis import LVISEval
 
 
 @DATASETS.register_module()
@@ -438,3 +441,216 @@ class SMDParams:
 @DATASETS.register_module()
 class SmdDataset2(SmdDataset6):
     CLASSES = ('Object',)
+
+
+@DATASETS.register_module()
+class SmdDataset6Lvis(SmdDataset6):
+    def load_annotations(self, ann_file):
+        try:
+            from lvis import LVIS
+        except ImportError:
+            raise ImportError('Please follow config/lvis/README.md to '
+                              'install open-mmlab forked lvis first.')
+        self.coco = LVIS(ann_file)
+        assert not self.custom_classes, 'LVIS custom classes is not supported'
+        self.cat_ids = self.coco.get_cat_ids()
+        self.cat2label = {cat_id: i for i, cat_id in enumerate(self.cat_ids)}
+        self.img_ids = self.coco.get_img_ids()
+        data_infos = []
+        for i in self.img_ids:
+            info = self.coco.load_imgs([i])[0]
+            if info['file_name'].startswith('COCO'):
+                # Convert form the COCO 2014 file naming convention of
+                # COCO_[train/val/test]2014_000000000000.jpg to the 2017
+                # naming convention of 000000000000.jpg
+                # (LVIS v1 will fix this naming issue)
+                info['filename'] = info['file_name'][-16:]
+            else:
+                info['filename'] = info['file_name']
+            data_infos.append(info)
+        return data_infos
+
+    def evaluate(self,
+                 results,
+                 metric='bbox',
+                 logger=None,
+                 jsonfile_prefix=None,
+                 classwise=False,
+                 proposal_nums=(100, 300, 1000),
+                 iou_thrs=np.arange(0.5, 0.96, 0.05)):
+        """Evaluation in LVIS protocol.
+        Args:
+            results (list): Testing results of the dataset.
+            metric (str | list[str]): Metrics to be evaluated.
+            logger (logging.Logger | str | None): Logger used for printing
+                related information during evaluation. Default: None.
+            jsonfile_prefix (str | None):
+            classwise (bool): Whether to evaluating the AP for each class.
+            proposal_nums (Sequence[int]): Proposal number used for evaluating
+                recalls, such as recall@100, recall@1000.
+                Default: (100, 300, 1000).
+            iou_thrs (Sequence[float]): IoU threshold used for evaluating
+                recalls. If set to a list, the average recall of all IoUs will
+                also be computed. Default: 0.5.
+        Returns:
+            dict[str: float]
+        """
+        try:
+            from lvis import LVISResults, LVISEval
+        except ImportError:
+            raise ImportError('Please follow config/lvis/README.md to '
+                              'install open-mmlab forked lvis first.')
+        assert isinstance(results, list), 'results must be a list'
+        assert len(results) == len(self), (
+            'The length of results is not equal to the dataset len: {} != {}'.
+            format(len(results), len(self)))
+
+        metrics = metric if isinstance(metric, list) else [metric]
+        allowed_metrics = ['bbox', 'segm', 'proposal', 'proposal_fast']
+        for metric in metrics:
+            if metric not in allowed_metrics:
+                raise KeyError('metric {} is not supported'.format(metric))
+
+        if jsonfile_prefix is None:
+            tmp_dir = tempfile.TemporaryDirectory()
+            jsonfile_prefix = osp.join(tmp_dir.name, 'results')
+        else:
+            tmp_dir = None
+        result_files = self.results2json(results, jsonfile_prefix)
+
+        eval_results = {}
+        # get original api
+        lvis_gt = self.coco
+        for metric in metrics:
+            msg = 'Evaluating {}...'.format(metric)
+            if logger is None:
+                msg = '\n' + msg
+            print_log(msg, logger=logger)
+
+            if metric == 'proposal_fast':
+                ar = self.fast_eval_recall(
+                    results, proposal_nums, iou_thrs, logger='silent')
+                log_msg = []
+                for i, num in enumerate(proposal_nums):
+                    eval_results['AR@{}'.format(num)] = ar[i]
+                    log_msg.append('\nAR@{}\t{:.4f}'.format(num, ar[i]))
+                log_msg = ''.join(log_msg)
+                print_log(log_msg, logger=logger)
+                continue
+
+            if metric not in result_files:
+                raise KeyError('{} is not in results'.format(metric))
+            try:
+                lvis_dt = LVISResults(lvis_gt, result_files[metric])
+            except IndexError:
+                print_log(
+                    'The testing results of the whole dataset is empty.',
+                    logger=logger,
+                    level=logging.ERROR)
+                break
+
+            iou_type = 'bbox' if metric == 'proposal' else metric
+            lvis_eval = SMDLvisEval(lvis_gt, lvis_dt, iou_type)
+            lvis_eval.params.imgIds = self.img_ids
+            if metric == 'proposal':
+                lvis_eval.params.useCats = 0
+                lvis_eval.params.maxDets = list(proposal_nums)
+                lvis_eval.evaluate()
+                lvis_eval.accumulate()
+                lvis_eval.summarize()
+                for k, v in lvis_eval.get_results().items():
+                    if k.startswith('AR'):
+                        val = float('{:.3f}'.format(float(v)))
+                        eval_results[k] = val
+            else:
+                lvis_eval.evaluate()
+                lvis_eval.accumulate()
+                lvis_eval.summarize()
+                lvis_results = lvis_eval.get_results()
+                if classwise:  # Compute per-category AP
+                    # Compute per-category AP
+                    # from https://github.com/facebookresearch/detectron2/
+                    precisions = lvis_eval.eval['precision']
+                    # precision: (iou, recall, cls, area range, max dets)
+                    assert len(self.cat_ids) == precisions.shape[2]
+
+                    results_per_category = []
+                    for idx, catId in enumerate(self.cat_ids):
+                        # area range index 0: all area ranges
+                        # max dets index -1: typically 100 per image
+                        nm = self.coco.load_cats(catId)[0]
+                        precision = precisions[:, :, idx, 0, -1]
+                        precision = precision[precision > -1]
+                        if precision.size:
+                            ap = np.mean(precision)
+                        else:
+                            ap = float('nan')
+                        results_per_category.append(
+                            (f'{nm["name"]}', f'{float(ap):0.3f}'))
+
+                    num_columns = min(6, len(results_per_category) * 2)
+                    results_flatten = list(
+                        itertools.chain(*results_per_category))
+                    headers = ['category', 'AP'] * (num_columns // 2)
+                    results_2d = itertools.zip_longest(*[
+                        results_flatten[i::num_columns]
+                        for i in range(num_columns)
+                    ])
+                    table_data = [headers]
+                    table_data += [result for result in results_2d]
+                    table = AsciiTable(table_data)
+                    print_log('\n' + table.table, logger=logger)
+
+                for k, v in lvis_results.items():
+                    if k.startswith('AP'):
+                        key = '{}_{}'.format(metric, k)
+                        val = float('{:.3f}'.format(float(v)))
+                        eval_results[key] = val
+                ap_summary = ' '.join([
+                    '{}:{:.3f}'.format(k, float(v))
+                    for k, v in lvis_results.items() if k.startswith('AP')
+                ])
+                eval_results['{}_mAP_copypaste'.format(metric)] = ap_summary
+            lvis_eval.print_results()
+        if tmp_dir is not None:
+            tmp_dir.cleanup()
+        return eval_results
+
+
+class SMDLvisEval(LVISEval):
+    def __init__(self, lvis_gt=None, lvis_dt=None, iouType='segm'):
+        super(SMDLvisEval, self).__init__(lvis_gt, lvis_dt, iouType)
+        self.params = SMDLvisParams(iou_type=iouType)
+
+
+class SMDLvisParams:
+    def __init__(self, iou_type):
+        """Params for LVIS evaluation API."""
+        self.img_ids = []
+        self.cat_ids = []
+        # np.arange causes trouble.  the data point on arange is slightly
+        # larger than the true value
+        self.iou_thrs = np.linspace(0.3,
+                                    0.95,
+                                    int(np.round((0.95 - 0.5) / 0.05)) + 1,
+                                    endpoint=True)
+        self.rec_thrs = np.linspace(0.0,
+                                    1.00,
+                                    int(np.round((1.00 - 0.0) / 0.01)) + 1,
+                                    endpoint=True)
+        self.max_dets = 300
+        self.area_rng = [
+            [0 ** 2, 1e5 ** 2],
+            [0 ** 2, 32 ** 2],
+            [32 ** 2, 96 ** 2],
+            [96 ** 2, 1e5 ** 2],
+        ]
+        self.area_rng_lbl = ['all', 'small', 'medium', 'large']
+        self.use_cats = 1
+        # We bin categories in three bins based how many images of the training
+        # set the category is present in.
+        # r: Rare    :  < 10
+        # c: Common  : >= 10 and < 100
+        # f: Frequent: >= 100
+        self.img_count_lbl = ['r', 'c', 'f']
+        self.iou_type = iou_type

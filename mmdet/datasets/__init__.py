@@ -5,7 +5,7 @@ from .custom import CustomDataset
 from .dataset_wrappers import (ClassBalancedDataset, ConcatDataset,
                                RepeatDataset)
 from .deepfashion import DeepFashionDataset
-from .lvis import LVISDataset
+from .lvis_ import LVISDataset
 from .samplers import DistributedGroupSampler, DistributedSampler, GroupSampler
 from .voc import VOCDataset
 from .wider_face import WIDERFaceDataset
@@ -13,6 +13,7 @@ from .xml_style import XMLDataset
 from .smd import SmdDataset
 from .smd import SmdDataset6
 from .smd import SmdDataset2
+from .smd import SmdDataset6Lvis
 
 __all__ = [
     'CustomDataset', 'XMLDataset', 'CocoDataset', 'DeepFashionDataset',
@@ -22,5 +23,5 @@ __all__ = [
     'DistributedGroupSampler', 'DistributedSampler', 'build_dataloader',
     'ConcatDataset', 'RepeatDataset', 'ClassBalancedDataset',
     'WIDERFaceDataset', 'DATASETS', 'PIPELINES', 'build_dataset', 'SmdDataset',
-    'SmdDataset6', 'SmdDataset2'
+    'SmdDataset6', 'SmdDataset2', 'SmdDataset6Lvis'
 ]

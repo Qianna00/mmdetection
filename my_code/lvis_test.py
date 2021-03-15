@@ -1,4 +1,4 @@
-import mmlvis
+import lvis
 print("Successfully import lvis")
-import mmpycocotools
+import pycocotools
 print("Successfully import pycocotools")
