@@ -94,8 +94,6 @@ model = dict(
         loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
     roi_head=dict(
         type='StandardRoIHead',
-        num_classes=6,
-        feat_dim=1024,
         shared_head=dict(
             type='ResLayer',
             depth=50,
