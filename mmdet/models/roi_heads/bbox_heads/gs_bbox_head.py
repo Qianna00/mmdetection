@@ -48,7 +48,7 @@ class GSBBoxHead(Shared2FCBBoxHead):
         # self.fg_splits.append(torch.from_numpy(fg_split['(0, 10)']).cuda())
         self.fg_splits.append(torch.from_numpy(fg_split['[100, 1000)']).cuda())
         self.fg_splits.append(torch.from_numpy(fg_split['[1000, 10000)']).cuda())
-        self.fg_splits.append(torch.from_numpy(fg_split['[10000, ~)']).cuda())
+        self.fg_splits.append(torch.from_numpy(fg_split['[1000, ~)']).cuda())  # 笔误，实际应为[10000,~]
 
         # self.fg_splits.append(torch.from_numpy(fg_split['(0, 5)']).cuda())
         # self.fg_splits.append(torch.from_numpy(fg_split['(5, 10)']).cuda())
