@@ -110,7 +110,6 @@ model = dict(
             featmap_strides=[16]),
         bbox_head=dict(
             type='GSBBoxHead',
-            num_fcs=2,
             in_channels=2048,
             fc_out_channels=1024,
             gs_config=dict(
