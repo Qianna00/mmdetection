@@ -12,7 +12,7 @@ from terminaltables import AsciiTable
 import os.path as osp
 import tempfile
 from lvis import LVISEval
-from lvis_ import LVISDataset
+from .lvis_ import LVISDataset
 
 
 @DATASETS.register_module()
