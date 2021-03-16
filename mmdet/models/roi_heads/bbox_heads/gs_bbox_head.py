@@ -91,7 +91,6 @@ class GSBBoxHead(Shared2FCBBoxHead):
         return weight
 
     def _remap_labels(self, labels):
-        print("labels_type", type(labels))
 
         num_bins = self.label2binlabel.shape[0]
         new_labels = []
@@ -99,7 +98,7 @@ class GSBBoxHead(Shared2FCBBoxHead):
         new_avg = []
         for i in range(num_bins):
             mapping = self.label2binlabel[i]
-            new_bin_label = mapping[labels]
+            new_bin_label = mapping[labels.long()]
 
             if i < 1:
                 weight = torch.ones_like(new_bin_label)
