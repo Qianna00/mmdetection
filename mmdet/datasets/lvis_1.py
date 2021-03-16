@@ -39,13 +39,13 @@ class LvisDataset1(CustomDataset):
         return img_infos
 
     def get_ann_info(self, idx):
-        img_id = self.img_infos[idx]['id']
+        img_id = self.data_infos[idx]['id']
         ann_ids = self.lvis.get_ann_ids(img_ids=[img_id])
         ann_info = self.lvis.load_anns(ann_ids)
-        return self._parse_ann_info(self.img_infos[idx], ann_info)
+        return self._parse_ann_info(self.data_infos[idx], ann_info)
 
     def get_ann_info_withoutparse(self, idx):
-        img_id = self.img_infos[idx]['id']
+        img_id = self.data_infos[idx]['id']
         ann_ids = self.lvis.get_ann_ids(img_ids=[img_id])
         ann_info = self.lvis.load_anns(ann_ids)
         return ann_info
@@ -54,7 +54,7 @@ class LvisDataset1(CustomDataset):
         """Filter images too small or without ground truths."""
         valid_inds = []
         ids_with_ann = set(_['image_id'] for _ in self.lvis.anns.values())
-        for i, img_info in enumerate(self.img_infos):
+        for i, img_info in enumerate(self.data_infos):
             if self.img_ids[i] not in ids_with_ann:
                 continue
             if min(img_info['width'], img_info['height']) >= min_size:
