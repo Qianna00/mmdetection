@@ -34,7 +34,8 @@ class LvisDataset1(CustomDataset):
         img_infos = []
         for i in self.img_ids:
             info = self.lvis.load_imgs([i])[0]
-            info['filename'] = info['file_name'].split('_')[-1]
+            # info['filename'] = info['file_name'].split('_')[-1]
+            info['filename'] = info['file_name']
             img_infos.append(info)
         return img_infos
 
