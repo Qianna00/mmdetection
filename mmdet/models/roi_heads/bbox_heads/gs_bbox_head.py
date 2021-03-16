@@ -377,7 +377,8 @@ class GSBBoxHead(Shared2FCBBoxHead):
                        img_shape,
                        scale_factor,
                        rescale=False,
-                       cfg=None):
+                       cfg=None,
+                       gs_flag=True):
         if isinstance(cls_score, list):
             cls_score = sum(cls_score) / float(len(cls_score))
 
@@ -406,6 +407,6 @@ class GSBBoxHead(Shared2FCBBoxHead):
         else:
             det_bboxes, det_labels = multiclass_nms(bboxes, scores,
                                                     cfg.score_thr, cfg.nms,
-                                                    cfg.max_per_img)
+                                                    cfg.max_per_img, gs_flag=gs_flag)
 
             return det_bboxes, det_labels

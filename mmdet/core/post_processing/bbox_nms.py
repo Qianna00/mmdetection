@@ -8,7 +8,8 @@ def multiclass_nms(multi_bboxes,
                    score_thr,
                    nms_cfg,
                    max_num=-1,
-                   score_factors=None):
+                   score_factors=None,
+                   gs_flag=False):
     """NMS for multi-class bboxes.
 
     Args:
@@ -27,7 +28,11 @@ def multiclass_nms(multi_bboxes,
         tuple: (bboxes, labels), tensors of shape (k, 5) and (k, 1). Labels
             are 0-based.
     """
-    num_classes = multi_scores.size(1) - 1
+    if gs_flag:
+        num_classes = multi_scores.size(1)
+    else:
+        num_classes = multi_scores.size(1) - 1
+
     # exclude background category
     if multi_bboxes.shape[1] > 4:
         bboxes = multi_bboxes.view(multi_scores.size(0), -1, 4)
