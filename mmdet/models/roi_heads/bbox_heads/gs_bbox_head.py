@@ -91,6 +91,7 @@ class GSBBoxHead(Shared2FCBBoxHead):
         return weight
 
     def _remap_labels(self, labels):
+        print("labels_type", type(labels))
 
         num_bins = self.label2binlabel.shape[0]
         new_labels = []
