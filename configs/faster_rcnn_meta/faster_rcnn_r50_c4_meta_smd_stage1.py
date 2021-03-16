@@ -58,7 +58,7 @@ lr_config = dict(
     warmup_iters=500,
     warmup_ratio=0.001,
     step=[8, 11])
-total_epochs = 12
+total_epochs = 6
 
 # model settings
 norm_cfg = dict(type='BN', requires_grad=False)
