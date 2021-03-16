@@ -445,7 +445,7 @@ class SmdDataset2(SmdDataset6):
 
 
 @DATASETS.register_module()
-class SmdDataset6Lvis(LvisDataset1):
+class SmdDataset6Lvis(LvisDataset1, SmdDataset6):
 
     CLASSES = ('Ferry', 'Vessel/ship',
                'Speed boat', 'Boat', 'Kayak',
