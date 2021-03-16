@@ -38,8 +38,10 @@ def multiclass_nms(multi_bboxes,
         bboxes = multi_bboxes.view(multi_scores.size(0), -1, 4)
     else:
         bboxes = multi_bboxes[:, None].expand(-1, num_classes, 4)
-    scores = multi_scores[:, :-1]
-
+    if gs_flag:
+        scores = multi_scores
+    else:
+        scores = multi_scores[:, :-1]
     # filter out boxes with low scores
     valid_mask = scores > score_thr
     bboxes = bboxes[valid_mask]
