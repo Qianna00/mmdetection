@@ -79,7 +79,7 @@ class LvisDataset1(CustomDataset):
         # 1. mask: a binary map of the same size of the image.
         # 2. polys: each mask consists of one or several polys, each poly is a
         # list of float.
-        gt_masks = []
+        """gt_masks = []
 
         for i, ann in enumerate(ann_info):
             if ann.get('ignore', False):
@@ -95,7 +95,7 @@ class LvisDataset1(CustomDataset):
                 gt_bboxes.append(bbox)
                 gt_labels.append(self.cat2label[ann['category_id']])
 
-            gt_masks.append(self.lvis.ann_to_mask(ann))
+            gt_masks.append(self.lvis.ann_to_mask(ann))"""
 
         if gt_bboxes:
             gt_bboxes = np.array(gt_bboxes, dtype=np.float32)
@@ -109,13 +109,13 @@ class LvisDataset1(CustomDataset):
         else:
             gt_bboxes_ignore = np.zeros((0, 4), dtype=np.float32)
 
-        seg_map = img_info['filename'].replace('jpg', 'png')
+        # seg_map = img_info['filename'].replace('jpg', 'png')
 
         ann = dict(
             bboxes=gt_bboxes,
             labels=gt_labels,
-            bboxes_ignore=gt_bboxes_ignore,
-            masks=gt_masks,
-            seg_map=seg_map)
+            bboxes_ignore=gt_bboxes_ignore)
+            # masks=gt_masks,
+            # seg_map=seg_map)
 
         return ann
