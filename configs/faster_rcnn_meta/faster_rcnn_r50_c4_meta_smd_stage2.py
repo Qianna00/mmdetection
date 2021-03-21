@@ -43,8 +43,8 @@ data = dict(
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_train.json',
-        img_prefix=data_root + 'train/',
+        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_train_Qianna.json',
+        img_prefix=data_root + 'new_split/train/',
         pipeline=train_pipeline),
     test=dict(
         type=dataset_type,
@@ -53,13 +53,13 @@ data = dict(
         pipeline=test_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_test.json',
-        img_prefix=data_root + 'test/',
+        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_test_Qianna.json',
+        img_prefix=data_root + 'new_split/test/',
         pipeline=test_pipeline))
 centroids_cal=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_train.json',
-        img_prefix=data_root + 'train/',
+        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_train_Qianna.json',
+        img_prefix=data_root + 'new_split/train/',
         pipeline=pipeline_for_init_centroids)
 evaluation = dict(interval=1, metric='bbox')
 
@@ -79,7 +79,7 @@ total_epochs = 12
 norm_cfg = dict(type='BN', requires_grad=False)
 model = dict(
     type='FasterRCNNMetaEmbedding',
-    pretrained='/root/data/zq/smd_det/meta_embedding/stage1/meta_embedding_stage1_5epoch_modified.pth',
+    pretrained='/root/data/zq/smd_det/meta_embedding/6c_new_split/stage1/epoch_6_new_split_modified.pth',
     # pretrained='/root/data/zq/pretrained_models/resnet50_msra.pth',
     backbone=dict(
         type='ResNet',
