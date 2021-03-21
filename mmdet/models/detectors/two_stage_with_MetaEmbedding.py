@@ -43,6 +43,9 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
             rpn_head_ = rpn_head.copy()
             rpn_head_.update(train_cfg=rpn_train_cfg, test_cfg=test_cfg.rpn)
             self.rpn_head = build_head(rpn_head_)
+        if self.init_centroids:
+            for p in self.parameters():
+                p.requires_grad = False
 
         if roi_head is not None:
             # update train and test cfg here for now
