@@ -103,7 +103,6 @@ class StandardRoIHead(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
                 assign_result = self.bbox_assigner.assign(
                     proposal_list[i], gt_bboxes[i], gt_bboxes_ignore[i],
                     gt_labels[i])
-                print("assign_results.label:", assign_result.labels.size(), assign_result.labels)
                 sampling_result = self.bbox_sampler.sample(
                     assign_result,
                     proposal_list[i],
