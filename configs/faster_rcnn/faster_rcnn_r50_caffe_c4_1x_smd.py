@@ -33,7 +33,7 @@ data = dict(
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_train.json',
+        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_train_Qianna.json',
         img_prefix=data_root + 'train/',
         pipeline=train_pipeline),
     test=dict(
@@ -43,7 +43,7 @@ data = dict(
         pipeline=test_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_test.json',
+        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_test_Qianna.json',
         img_prefix=data_root + 'test/',
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric='bbox')
