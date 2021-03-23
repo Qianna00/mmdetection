@@ -7,8 +7,8 @@ import json
 import torch
 from pycocotools.coco import COCO
 
-train_ann_file = "/root/data/zq/data/SMD/lvis/SMD_VIS_6_class_train_lvis.json"
-"""with open(train_ann_file, 'r') as f:
+train_ann_file = "/root/data/zq/data/SMD/annotations/6c_SMD_VIS_6_class_train_Qianna.json"
+with open(train_ann_file, 'r') as f:
     gt_new = json.load(f)
 c = [0, 0, 0, 0, 0, 0]
 anns = gt_new["annotations"]
@@ -32,11 +32,12 @@ for i, cate in enumerate(categories):
     cate["instance_count"] = c[i]
     categories_new.append(cate)
 gt_new["categories"] = categories_new
-with open("/root/data/zq/data/SMD/lvis/SMD_VIS_6_class_train_lvis.json", 'w') as g:
-    json.dump(gt_new, g)"""
+with open("/root/data/zq/data/SMD/lvis/SMD_VIS_6_class_train_Qianna_lvis.json", 'w') as g:
+    json.dump(gt_new, g)
+lvis_ann_file = "/root/data/zq/data/SMD/lvis/SMD_VIS_6_class_train_Qianna_lvis.json"
 # test_ann_file = "/root/data/zq/data/SMD/annotations/6c/SMD_VIS_6_class_test.json"
 
-lvis_train = LVIS(train_ann_file)
+lvis_train = LVIS(lvis_ann_file)
 train_catsinfo = lvis_train.cats
 
 binlabel_count = [1, 1, 1, 1]
