@@ -7,7 +7,7 @@ import json
 import torch
 from pycocotools.coco import COCO
 
-train_ann_file = "/root/data/zq/data/SMD/annotations/6c_SMD_VIS_6_class_train_Qianna.json"
+train_ann_file = "/root/data/zq/data/SMD/annotations/6c/SMD_VIS_6_class_train_Qianna.json"
 with open(train_ann_file, 'r') as f:
     gt_new = json.load(f)
 c = [0, 0, 0, 0, 0, 0]
