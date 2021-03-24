@@ -41,7 +41,7 @@ lvis_train = LVIS(lvis_ann_file)
 train_catsinfo = lvis_train.cats
 
 binlabel_count = [1, 1, 1, 1]
-label2binlabel = np.zeros((4, 6), dtype=np.int)
+label2binlabel = np.zeros((4, 7), dtype=np.int)
 
 label2binlabel[0, :-1] = binlabel_count[0]
 binlabel_count[0] += 1
