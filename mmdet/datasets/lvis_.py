@@ -291,8 +291,8 @@ class LVISDataset(CocoDataset):
 
     def get_ann_info(self, idx):
         img_id = self.data_infos[idx]['id']
-        ann_ids = self.coco.get_ann_ids(imgIds=[img_id])
-        ann_info = self.coco.load_anns(ann_ids)
+        ann_ids = self.coco.get_ann_ids(img_ids=[img_id])
+        ann_info = self.coco.load_anns(ids=ann_ids)
         return self._parse_ann_info(self.data_infos[idx], ann_info)
 
     def evaluate(self,
