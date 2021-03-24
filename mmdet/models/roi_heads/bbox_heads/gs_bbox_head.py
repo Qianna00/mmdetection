@@ -281,8 +281,8 @@ class GSBBoxHead(Shared2FCBBoxHead):
         bg_score = new_scores[0]
         fg_score = new_scores[1:]
 
-        fg_merge = torch.zeros((num_proposals, self.num_classes)).cuda()
-        merge = torch.zeros((num_proposals, self.num_classes)).cuda()
+        fg_merge = torch.zeros((num_proposals, self.num_classes + 1)).cuda()
+        merge = torch.zeros((num_proposals, self.num_classes + 1)).cuda()
 
         # import pdb
         # pdb.set_trace()
