@@ -522,7 +522,7 @@ class SmdDataset6Lvis(LVISDataset):
             if metric not in result_files:
                 raise KeyError('{} is not in results'.format(metric))
             try:
-                lvis_dt = lvis_gt.loadRes(lvis_gt, result_files[metric])
+                lvis_dt = lvis_gt.loadRes(result_files[metric])
             except IndexError:
                 print_log(
                     'The testing results of the whole dataset is empty.',
