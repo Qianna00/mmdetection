@@ -100,7 +100,7 @@ class GSBBoxHead(Shared2FCBBoxHead):
             mapping = self.label2binlabel[i]
             new_bin_label = mapping[labels.long()]
 
-            if i < 1:
+            if i == self.num_classes:
                 weight = torch.ones_like(new_bin_label)
                 # weight = torch.zeros_like(new_bin_label)
             else:

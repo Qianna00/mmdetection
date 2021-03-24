@@ -28,10 +28,7 @@ def multiclass_nms(multi_bboxes,
         tuple: (bboxes, labels), tensors of shape (k, 5) and (k, 1). Labels
             are 0-based.
     """
-    if gs_flag:
-        num_classes = multi_scores.size(1)
-    else:
-        num_classes = multi_scores.size(1) - 1
+    num_classes = multi_scores.size(1) - 1
 
     # exclude background category
     if multi_bboxes.shape[1] > 4:
@@ -39,7 +36,7 @@ def multiclass_nms(multi_bboxes,
     else:
         bboxes = multi_bboxes[:, None].expand(-1, num_classes, 4)
     if gs_flag:
-        scores = multi_scores
+        scores = multi_scores[:, 1:]
     else:
         scores = multi_scores[:, :-1]
     # filter out boxes with low scores
