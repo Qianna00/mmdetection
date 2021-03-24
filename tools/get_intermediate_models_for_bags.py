@@ -41,22 +41,22 @@ lvis_train = LVIS(lvis_ann_file)
 train_catsinfo = lvis_train.cats
 
 binlabel_count = [1, 1, 1, 1]
-label2binlabel = np.zeros((4, 7), dtype=np.int)
+label2binlabel = np.zeros((4, 6), dtype=np.int)
 
-label2binlabel[0, 1:] = binlabel_count[0]
+label2binlabel[0, :-1] = binlabel_count[0]
 binlabel_count[0] += 1
 
 for cid, cate in train_catsinfo.items():
-    print(cate)
+    print(cid, cate)
     ins_count = cate['instance_count']
     if ins_count < 1000:
-        label2binlabel[1, cid] = binlabel_count[1]
+        label2binlabel[1, cid-1] = binlabel_count[1]
         binlabel_count[1] += 1
     elif ins_count < 10000:
-        label2binlabel[2, cid] = binlabel_count[2]
+        label2binlabel[2, cid-1] = binlabel_count[2]
         binlabel_count[2] += 1
     else:
-        label2binlabel[3, cid] = binlabel_count[3]
+        label2binlabel[3, cid-1] = binlabel_count[3]
         binlabel_count[3] += 1
 
 
@@ -102,9 +102,9 @@ splits = {}
 splits['[100, 1000)'] = np.array(bin1000, dtype=np.int)
 splits['[1000, 10000)'] = np.array(bin10000, dtype=np.int)
 splits['[10000, ~)'] = np.array(binover, dtype=np.int)
-splits['normal'] = np.arange(1, 6)
-splits['background'] = np.zeros((1,), dtype=np.int)
-splits['all'] = np.arange(6)
+splits['normal'] = np.arange(6)
+splits['background'] = int(6)
+splits['all'] = np.arange(7)
 
 split_file_name = '/root/data/zq/data/SMD/lvis/valsplit.pkl'
 with open(split_file_name, 'wb') as f:
