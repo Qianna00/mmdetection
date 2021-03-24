@@ -7,6 +7,8 @@ import numpy as np
 from mmcv.utils import print_log
 from terminaltables import AsciiTable
 
+from pycocotools.coco import COCO
+
 from .builder import DATASETS
 from .coco import CocoDataset
 
@@ -271,6 +273,7 @@ class LVISDataset(CocoDataset):
             raise ImportError('Please follow config/lvis/README.md to '
                               'install open-mmlab forked lvis first.')
         self.coco = LVIS(ann_file)
+        self.lvis = COCO(ann_file)
         assert not self.custom_classes, 'LVIS custom classes is not supported'
         self.cat_ids = self.coco.get_cat_ids()
         self.cat2label = {cat_id: i for i, cat_id in enumerate(self.cat_ids)}

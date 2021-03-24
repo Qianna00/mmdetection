@@ -456,7 +456,7 @@ class SmdDataset6Lvis(LVISDataset):
                  metric='bbox',
                  logger=None,
                  jsonfile_prefix=None,
-                 classwise=False,
+                 classwise=True,
                  proposal_nums=(100, 300, 1000),
                  iou_thrs=np.arange(0.5, 0.96, 0.05)):
         """Evaluation in LVIS protocol.
@@ -501,7 +501,7 @@ class SmdDataset6Lvis(LVISDataset):
 
         eval_results = {}
         # get original api
-        lvis_gt = self.coco
+        lvis_gt = self.lvis
         for metric in metrics:
             msg = 'Evaluating {}...'.format(metric)
             if logger is None:
@@ -522,7 +522,7 @@ class SmdDataset6Lvis(LVISDataset):
             if metric not in result_files:
                 raise KeyError('{} is not in results'.format(metric))
             try:
-                lvis_dt = LVISResults(lvis_gt, result_files[metric])
+                lvis_dt = lvis_gt.loadRes(lvis_gt, result_files[metric])
             except IndexError:
                 print_log(
                     'The testing results of the whole dataset is empty.',
@@ -531,7 +531,8 @@ class SmdDataset6Lvis(LVISDataset):
                 break
 
             iou_type = 'bbox' if metric == 'proposal' else metric
-            lvis_eval = SMDLvisEval(lvis_gt, lvis_dt, iou_type)
+            lvis_eval = SMDeval(lvis_gt, lvis_dt, iou_type)
+            lvis_eval.params.catIds = self.cat_ids
             lvis_eval.params.imgIds = self.img_ids
             if metric == 'proposal':
                 lvis_eval.params.useCats = 0
@@ -547,7 +548,6 @@ class SmdDataset6Lvis(LVISDataset):
                 lvis_eval.evaluate()
                 lvis_eval.accumulate()
                 lvis_eval.summarize()
-                lvis_results = lvis_eval.get_results()
                 if classwise:  # Compute per-category AP
                     # Compute per-category AP
                     # from https://github.com/facebookresearch/detectron2/
@@ -559,7 +559,7 @@ class SmdDataset6Lvis(LVISDataset):
                     for idx, catId in enumerate(self.cat_ids):
                         # area range index 0: all area ranges
                         # max dets index -1: typically 100 per image
-                        nm = self.lvis.load_cats(catId)[0]
+                        nm = self.coco.loadCats(catId)[0]
                         precision = precisions[:, :, idx, 0, -1]
                         precision = precision[precision > -1]
                         if precision.size:
@@ -582,20 +582,20 @@ class SmdDataset6Lvis(LVISDataset):
                     table = AsciiTable(table_data)
                     print_log('\n' + table.table, logger=logger)
 
-                for k, v in lvis_results.items():
-                    if k.startswith('AP'):
-                        key = '{}_{}'.format(metric, k)
-                        val = float('{:.3f}'.format(float(v)))
-                        eval_results[key] = val
-                ap_summary = ' '.join([
-                    '{}:{:.3f}'.format(k, float(v))
-                    for k, v in lvis_results.items() if k.startswith('AP')
-                ])
-                eval_results['{}_mAP_copypaste'.format(metric)] = ap_summary
-            lvis_eval.print_results()
-        if tmp_dir is not None:
-            tmp_dir.cleanup()
-        return eval_results
+                metric_items = [
+                    'mAP', 'mAP_30', 'mAP_50', 'mAP_s', 'mAP_m', 'mAP_l'
+                ]
+                for i in range(len(metric_items)):
+                    key = f'{metric}_{metric_items[i]}'
+                    val = float(f'{lvis_eval.stats[i]:.3f}')
+                    eval_results[key] = val
+                ap = lvis_eval.stats[:6]
+                eval_results[f'{metric}_mAP_copypaste'] = (
+                    f'{ap[0]:.3f} {ap[1]:.3f} {ap[2]:.3f} {ap[3]:.3f} '
+                    f'{ap[4]:.3f} {ap[5]:.3f}')
+            if tmp_dir is not None:
+                tmp_dir.cleanup()
+            return eval_results
 
 
 class SMDLvisEval(LVISEval):
