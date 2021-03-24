@@ -12,7 +12,7 @@ from terminaltables import AsciiTable
 import os.path as osp
 import tempfile
 from lvis import LVISEval
-from .lvis_1 import LvisDataset1
+from .lvis_ import LVISDataset
 
 
 @DATASETS.register_module()
@@ -445,7 +445,7 @@ class SmdDataset2(SmdDataset6):
 
 
 @DATASETS.register_module()
-class SmdDataset6Lvis(LvisDataset1, SmdDataset6):
+class SmdDataset6Lvis(LVISDataset):
 
     CLASSES = ('Ferry', 'Vessel/ship',
                'Speed boat', 'Boat', 'Kayak',
