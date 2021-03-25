@@ -74,7 +74,7 @@ model = dict(
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
-        norm_cfg=norm_cfg,
+        norm_cfg=dict(type='BN', requires_grad=True),
         norm_eval=True,
         style='pytorch'),
     neck=dict(
@@ -102,14 +102,15 @@ model = dict(
         type='StandardRoIHead',
         bbox_roi_extractor=dict(
             type='SingleRoIExtractor',
-            roi_layer=dict(type='RoIPool', out_size=7, use_torchvision=True),
+            roi_layer=dict(type='RoIAlign', out_size=7, sample_num=0),
             out_channels=256,
             featmap_strides=[4, 8, 16, 32]),
         bbox_head=dict(
-            type='BBoxHead',
-            roi_feat_size=7,
+            type='Shared2FCBBoxHead',
             in_channels=256,
-            num_classes=6,
+            fc_out_channels=1024,
+            roi_feat_size=7,
+            num_classes=80,
             bbox_coder=dict(
                 type='DeltaXYWHBBoxCoder',
                 target_means=[0., 0., 0., 0.],
