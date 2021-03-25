@@ -559,7 +559,7 @@ class SmdDataset6Lvis(LVISDataset):
                     for idx, catId in enumerate(self.cat_ids):
                         # area range index 0: all area ranges
                         # max dets index -1: typically 100 per image
-                        nm = self.coco.loadCats(catId)[0]
+                        nm = self.lvis.loadCats(catId)[0]
                         precision = precisions[:, :, idx, 0, -1]
                         precision = precision[precision > -1]
                         if precision.size:
