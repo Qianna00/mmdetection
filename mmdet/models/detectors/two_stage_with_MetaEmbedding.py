@@ -66,13 +66,14 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
         self.init_weights(pretrained=pretrained)
         if roi_head["type"] == "MetaEmbedding_RoIHead":
             # calculate init_centroids using training dataset
-            if init_centroids:
-                cfg = Config.fromfile(
-                    "/mmdetection/configs/faster_rcnn_meta/faster_rcnn_r50_c4_meta_smd_stage2.py")
-                dataset = build_dataset(cfg.centroids_cal)
-                # data = build_dataloader(dataset, samples_per_gpu=1, workers_per_gpu=0, num_gpus=1, shuffle=False)
-                # print(data[0])
-                self.roi_head.loss_feat.centroids.data = self.centroids_cal(dataset)
+            if self.train_cfg is not None:
+                if init_centroids:
+                    cfg = Config.fromfile(
+                        "/mmdetection/configs/faster_rcnn_meta/faster_rcnn_r50_c4_meta_smd_stage2.py")
+                    dataset = build_dataset(cfg.centroids_cal)
+                    # data = build_dataloader(dataset, samples_per_gpu=1, workers_per_gpu=0, num_gpus=1, shuffle=False)
+                    # print(data[0])
+                    self.roi_head.loss_feat.centroids.data = self.centroids_cal(dataset)
 
     @property
     def with_rpn(self):
