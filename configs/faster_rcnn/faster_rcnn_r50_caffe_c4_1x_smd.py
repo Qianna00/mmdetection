@@ -31,14 +31,6 @@ test_pipeline = [
 data = dict(
     samples_per_gpu=2,
     workers_per_gpu=2,
-    # train=dict(
-        # type="ClassBalancedDataset",
-        # oversample_thr=1e-3,
-        # dataset=dict(
-            # type=dataset_type,
-            # ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_train_Qianna.json',
-            # img_prefix=data_root + 'new_split/train/',
-            # pipeline=train_pipeline)),
     train=dict(
         type=dataset_type,
         ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_train_Qianna.json',
@@ -98,7 +90,7 @@ model = dict(
             target_means=[.0, .0, .0, .0],
             target_stds=[1.0, 1.0, 1.0, 1.0]),
         loss_cls=dict(
-            type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
+            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
         loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
     roi_head=dict(
         type='StandardRoIHead',
@@ -128,7 +120,7 @@ model = dict(
                 target_stds=[0.1, 0.1, 0.2, 0.2]),
             reg_class_agnostic=False,
             loss_cls=dict(
-                type='CBLoss', beta=0.999, gamma=2.0, loss_type='sigmoid'),
+                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
             loss_bbox=dict(type='L1Loss', loss_weight=1.0))))
 # model training and testing settings
 train_cfg = dict(
