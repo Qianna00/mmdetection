@@ -11,7 +11,7 @@ img_norm_cfg = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
+    # dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size_divisor=32),
@@ -22,7 +22,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=(1333, 800),
+        img_scale=(1920, 1080),
         flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=True),
@@ -35,7 +35,7 @@ test_pipeline = [
 ]
 
 dataset_type = 'CocoDataset'
-data_root = '/root/data/zq/data/SMD/'
+data_root = '/root/vsislab-2/zq/data/IKCEST3rd_bbox_detection/'
 
 
 data = dict(
@@ -43,18 +43,18 @@ data = dict(
     workers_per_gpu=1,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_2_train.json',
+        ann_file=data_root + 'annotations/ikcest_train_bbox_annotations.json',
         img_prefix=data_root + 'train/',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/Training/SMD_VIS_skip_2_val.json',
-        img_prefix=data_root + 'train/',
+        ann_file=data_root + 'annotations/ikcest_val_bbox_annotations.json',
+        img_prefix=data_root + 'val/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/Test/SMD_VIS_skip_2.json',
-        img_prefix=data_root + 'test/',
+        ann_file=data_root + 'annotations/ikcest_val_bbox_annotations.json',
+        img_prefix=data_root + 'val/',
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric='bbox')
 # optimizer
