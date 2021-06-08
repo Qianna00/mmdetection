@@ -29,13 +29,13 @@ test_pipeline = [
         ])
 ]
 
-dataset_type = 'CocoDataset'
+dataset_type = 'IKCESTDetDataset'
 data_root = '/root/vsislab-2/zq/data/IKCEST3rd_bbox_detection/'
 
 
 data = dict(
-    samples_per_gpu=1,
-    workers_per_gpu=1,
+    samples_per_gpu=4,
+    workers_per_gpu=2,
     train=dict(
         type=dataset_type,
         ann_file=data_root + 'annotations/ikcest_train_bbox_annotations.json',
