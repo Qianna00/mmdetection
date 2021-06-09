@@ -1,8 +1,8 @@
 # use caffe img_norm
-# img_norm_cfg = dict(
-    # mean=[103.530, 116.280, 123.675], std=[1.0, 1.0, 1.0], to_rgb=False)
 img_norm_cfg = dict(
-    mean=[132.6, 153.765, 177.48], std=[49.725, 42.177, 46.155], to_rgb=False)
+    mean=[103.530, 116.280, 123.675], std=[1.0, 1.0, 1.0], to_rgb=False)
+# img_norm_cfg = dict(
+    # mean=[132.6, 153.765, 177.48], std=[49.725, 42.177, 46.155], to_rgb=False)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
