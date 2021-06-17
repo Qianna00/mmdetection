@@ -157,7 +157,7 @@ class CARAFE(Module):
                                     self.group_size, self.scale_factor)
 
 
-@UPSAMPLE_LAYERS.register_module(name='carafe', force=True)
+@UPSAMPLE_LAYERS.register_module(name='carafe')
 class CARAFEPack(nn.Module):
     """ A unified package of CARAFE upsampler that contains:
     1) channel compressor 2) content encoder 3) CARAFE op
