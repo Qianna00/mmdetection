@@ -92,7 +92,6 @@ model = dict(
             out_channels=256,
             featmap_strides=[4, 8, 16, 32]),
         bbox_head=dict(
-            _delete_=True,
             type='DoubleConvFCBBoxHead',
             num_convs=4,
             num_fcs=2,
