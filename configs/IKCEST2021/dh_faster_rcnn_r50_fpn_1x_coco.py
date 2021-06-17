@@ -86,6 +86,11 @@ model = dict(
     roi_head=dict(
         type='DoubleHeadRoIHead',
         reg_roi_scale_factor=1.3,
+        bbox_roi_extractor=dict(
+            type='SingleRoIExtractor',
+            roi_layer=dict(type='RoIAlign', out_size=7, sample_num=0),
+            out_channels=256,
+            featmap_strides=[4, 8, 16, 32]),
         bbox_head=dict(
             _delete_=True,
             type='DoubleConvFCBBoxHead',
