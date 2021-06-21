@@ -33,4 +33,4 @@ bboxes = np.array(bbox_list)
 kmeans = KMeans(n_clusters=num_clusters)
 anchors = kmeans.fit(bboxes)
 
-print(anchors)
+print(anchors.cluster_centers_)
