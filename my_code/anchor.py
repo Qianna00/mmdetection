@@ -17,7 +17,7 @@ with open(annotationFile, 'r') as f:
 size_list = []
 
 for i, img in enumerate(annotations['images']):
-    img_size = np.array([img['width'], img['height']])
+    img_size = (img['width'], img['height'])
     if img_size not in size_list:
         size_list.append(img_size)
 print(size_list)
