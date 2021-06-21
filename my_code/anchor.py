@@ -17,13 +17,13 @@ with open(annotationFile, 'r') as f:
 size_list = []
 
 for i, img in enumerate(annotations['images']):
-    img_size = [img['width'], img['height']]
-    size_list.append(img_size)
-
-size_list = list(set(size_list))
+    img_size = np.array([img['width'], img['height']])
+    if img_size not in size_list:
+        size_list.append(img_size)
 print(size_list)
 
 bbox_list = []
 for i, ann in enumerate(annotations['annotations']):
     bbox = ann['bbox']
     bbox_list.append(bbox)
+bboxes = np.array(bbox_list)
