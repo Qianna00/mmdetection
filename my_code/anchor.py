@@ -20,5 +20,10 @@ for i, img in enumerate(annotations['images']):
     img_size = [img['width'], img['height']]
     size_list.append(img_size)
 
-size_list = set(size_list)
+size_list = list(set(size_list))
 print(size_list)
+
+bbox_list = []
+for i, ann in enumerate(annotations['annotations']):
+    bbox = ann['bbox']
+    bbox_list.append(bbox)
