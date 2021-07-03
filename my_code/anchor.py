@@ -32,7 +32,7 @@ bbox_list = []
     bbox_list.append(bbox[2:])"""
 for vid in os.listdir(data_root):
     vid_path = os.path.join(data_root, vid)
-    gt_path = vid_path + 'gt/gt.txt'
+    gt_path = vid_path + '/gt/gt.txt'
     with open(gt_path, 'r') as f:
         gt_list = f.readlines()
     for gt in gt_list:
