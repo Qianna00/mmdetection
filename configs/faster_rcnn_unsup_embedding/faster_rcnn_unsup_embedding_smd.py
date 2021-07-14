@@ -64,7 +64,7 @@ total_epochs = 12
 norm_cfg = dict(type='BN', requires_grad=False)
 model = dict(
     type='FasterRCNNUnsupEmbedding',
-    pretrained='/root/data/zq/mmdetection/checkpoints/resnet50_msra.pth',
+    pretrained='/root/data/zq/pretrained_models/resnet50_msra.pth',
     unsup_pretrained='/root/data/zq/pretrained_models/moco400k_epoch_50_modified.pth',
     backbone=dict(
         type='ResNet',
