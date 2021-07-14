@@ -133,7 +133,8 @@ model = dict(
             reg_class_agnostic=False,
             loss_cls=dict(
                 type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
-            loss_bbox=dict(type='L1Loss', loss_weight=1.0))))
+            loss_bbox=dict(type='L1Loss', loss_weight=1.0))),
+    with_unsup=True)
 # model training and testing settings
 train_cfg = dict(
     rpn=dict(

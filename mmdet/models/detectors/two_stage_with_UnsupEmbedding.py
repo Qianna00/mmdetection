@@ -158,7 +158,10 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         Returns:
             dict[str, Tensor]: a dictionary of loss components
         """
-        x = self.extract_feat(img)
+        if self.with_unsup is not None:
+            x = self.extract_unsup_feats(img)
+        else:
+            x = self.extract_feat(img)
 
         losses = dict()
 
@@ -207,7 +210,10 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         """Test without augmentation."""
         # assert self.with_bbox, 'Bbox head must be implemented.'
 
-        x = self.extract_feat(img)
+        if self.with_unsup is not None:
+            x = self.extract_unsup_feats(img)
+        else:
+            x = self.extract_feat(img)
 
         if proposals is None:
             proposal_list = self.rpn_head.simple_test_rpn(x, img_metas)
