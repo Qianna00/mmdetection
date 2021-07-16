@@ -97,8 +97,9 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
 
     def extract_unsup_feats(self, img):
         x = self.backbone(img)
-        x_sup = self.backbone_unsup(img)
-        x = 0.5 * x + 0.5 * x_sup
+        x_unsup = self.backbone_unsup(img)
+        for i in range(len(x)):
+            x[i] = 0.5 * x[i] + 0.5 * x_unsup[i]
         if self.with_neck:
             x = self.neck(x)
         return x
