@@ -214,7 +214,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         # assert self.with_bbox, 'Bbox head must be implemented.'
 
         if self.with_unsup is not None:
-            x = self.extract_unsup_feats(img)
+            x = self.extract_comb_feats(img)
         else:
             x = self.extract_feat(img)
 
