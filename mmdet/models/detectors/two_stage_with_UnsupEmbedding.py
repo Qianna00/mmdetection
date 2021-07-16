@@ -223,11 +223,8 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         else:
             proposal_list = proposals
 
-        return self.roi_head(x,
-                             centroids=self.centroids,
-                             proposal_list=proposal_list,
-                             img_metas=img_metas,
-                             test=True)
+        return self.roi_head.simple_test(
+            x, proposal_list, img_metas, rescale=rescale)
 
     def aug_test(self, imgs, img_metas, rescale=False):
         """Test with augmentations.
