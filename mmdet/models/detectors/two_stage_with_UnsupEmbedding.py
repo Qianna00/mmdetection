@@ -95,16 +95,16 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
             x = self.neck(x)
         return x
 
-    def extract_unsup_feats(self, img):
-        x = self.backbone(img)
+    def extract_comb_feats(self, img):
+        # x = self.backbone(img)
         x_unsup = self.backbone_unsup(img)
-        x_new = []
+        """x_new = []
         for i in range(len(x)):
             x_new.append(0.5 * x[i] + 0.5 * x_unsup[i])
         x = tuple(x_new)
         if self.with_neck:
-            x = self.neck(x)
-        return x
+            x = self.neck(x)"""
+        return x_unsup
 
     def forward_dummy(self, img):
         """Used for computing network flops.
@@ -162,7 +162,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
             dict[str, Tensor]: a dictionary of loss components
         """
         if self.with_unsup is not None:
-            x = self.extract_unsup_feats(img)
+            x = self.extract_comb_feats(img)
         else:
             x = self.extract_feat(img)
 
