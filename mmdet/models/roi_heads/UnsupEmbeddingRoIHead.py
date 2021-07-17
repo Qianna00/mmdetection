@@ -155,7 +155,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
         keys_memory = centroids.clone().cuda()
 
         distmat = (feats.clone().sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
-                   centroids.clone().sum(dim=1, keepdim=True)
+                  keys_memory.sum(dim=1, keepdim=True)
                    .expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).abs().sum(dim=3).dim(2)
         labels = distmat.argmin(dim=1)
         print(labels.size(), labels)
