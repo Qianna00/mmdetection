@@ -274,8 +274,6 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                     [data[i]['img_metas']]
                 # Calculate Features of each training data
                 feats = self.backbone(imgs)
-                print(imgs)
-                print(gt_labels)
                 print(gt_bboxes)
                 proposal_list = self.rpn_head.simple_test_rpn(feats, img_metas)
                 num_imgs = len(img_metas)
@@ -293,19 +291,25 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                         gt_labels[i],
                         feats=[lvl_feat[i][None] for lvl_feat in feats])
                     sampling_results.append(sampling_result)
+                print([res.bboxes for res in sampling_results])
 
                 rois = bbox2roi([res.bboxes for res in sampling_results])
+                # rois = bbox2roi(gt_bboxes)
                 bbox_feats = self.roi_head.std_roi_head.bbox_roi_extractor(
                     feats[:self.roi_head.std_roi_head.bbox_roi_extractor.num_inputs], rois)
 
-                labels = self.roi_head.std_roi_head.bbox_head.get_targets(sampling_results, gt_bboxes,
-                                                                                gt_labels, self.train_cfg.rcnn)[0]
+                """labels = self.roi_head.std_roi_head.bbox_head.get_targets(sampling_results, gt_bboxes,
+                                                                                gt_labels, self.train_cfg.rcnn)[0]"""
                 # Add all calculated features to center tensor
-                for i in range(len(labels)):
+                """for i in range(len(labels)):
                     label = labels[i]
                     if label < self.roi_head.num_classes:
                         centroids[label] += bbox_feats[i]
-                        class_data_num[label] += 1
+                        class_data_num[label] += 1"""
+                for j in range(len(gt_labels)):
+                    label = gt_labels[j]
+                    centroids[label] += bbox_feats[j]
+                    class_data_num[label] += 1
             for i in range(len(class_data_num)):
                 if class_data_num[i] == 0:
                     class_data_num[i] = 1
