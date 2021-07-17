@@ -266,7 +266,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         # Calculate initial centroids only on training data.
         with torch.set_grad_enabled(False):
             self.backbone_unsup.cuda()
-            self.rpn_head.cuda()
+            # self.rpn_head.cuda()
             self.roi_head.cuda()
             class_data_num = [0, 0, 0, 0, 0, 0]
             # class_data_num = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
