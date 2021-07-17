@@ -82,11 +82,11 @@ class UnsupEmbedding_RoIHead(nn.Module):
         if centroids is not None:
             if not test:
                 target_labels = bbox_targets[0]
-                print(target_labels)
                 pos_index = torch.nonzero(bbox_targets[0]-self.num_classes).squeeze(1)
                 # print("pos_index:", torch.nonzero(bbox_targets[0]-10).size())
                 bbox_feats_pos = bbox_feats[pos_index]
-                bbox_feats_pos = self.get_unsup_embedding_feature(bbox_feats_pos, centroids)
+                target_labels_pos = target_labels[pos_index]
+                bbox_feats_pos = self.get_unsup_embedding_feature(bbox_feats_pos, centroids, target_labels_pos)
                 bbox_feats[pos_index] = bbox_feats_pos
                 # print("labels:", bbox_targets[0][pos_index])
                 loss_attract, loss_repel = self.loss_feat(bbox_feats_pos, bbox_targets[0][pos_index])
@@ -143,7 +143,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
         else:
             raise TypeError('pretrained must be a str or None')
 
-    def get_unsup_embedding_feature(self, feats, centroids):
+    def get_unsup_embedding_feature(self, feats, centroids, target_labels=None):
 
         # storing direct feature
         direct_feature = feats.clone()
@@ -152,37 +152,21 @@ class UnsupEmbedding_RoIHead(nn.Module):
         # feat_size = x.size(1)
 
         # set up visual memory
-        # x_expand = x.clone().unsqueeze(1).expand(-1, self.num_classes, -1)
-        # centroids_expand = centroids.clone().unsqueeze(0).expand(batch_size, -1, -1)
         keys_memory = centroids.clone().cuda()
+        print(target_labels.size())
 
         pooled_feats = self.pool_meta_embedding(feats.clone()).squeeze()
         if len(pooled_feats.size()) != 2:
             pooled_feats = pooled_feats.unsqueeze(0)
 
-        # computing memory feature by querying and associating visual memory
-        # values_memory = self.fc_hallucinator(pooled_feats)
-        # print(pooled_feats.size(), values_memory.size())
-        # print(values_memory.size(), values_memory)
-        # values_memory = values_memory.softmax(dim=1)
-        # print("values_memory_softmax:", values_memory.size(), values_memory)
-        # print("values_memory_softmax_sum:", values_memory.sum(dim=1))
-        values_memory = self.conv_hallucinator(direct_feature)
-        values_memory = values_memory.softmax(dim=1)  # B*C*W*H
-        # memory_feature = torch.zeros((batch_size, self.feat_dim, 14, 14))  # B*D*W*H
-        memory_feature = torch.mul(values_memory.unsqueeze(2).expand(batch_size, self.num_classes,
-                                                                     self.feat_dim, 14, 14),
-                                   keys_memory.unsqueeze(0).expand(batch_size, self.num_classes,
-                                                                     self.feat_dim, 14, 14)).sum(dim=1)
-
-        # memory_feature = torch.mm(values_memory, keys_memory.view(self.num_classes, -1))
-
         # computing concept selector
         concept_selector = self.fc_selector(pooled_feats)
-        # concept_selector = self.conv_selector(direct_feature)
         concept_selector = concept_selector.tanh()
-        feats = direct_feature + concept_selector.unsqueeze(2).unsqueeze(3).expand(-1, -1, feats.size(2), feats.size(3))\
-                * memory_feature
+        # if target_labels is not None:
+
+
+        """feats = direct_feature + concept_selector.unsqueeze(2).unsqueeze(3).expand(-1, -1, feats.size(2), feats.size(3))\
+                * memory_feature"""
 
         # storing infused feature
         # infused_feature = concept_selector * memory_feature
