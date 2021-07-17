@@ -37,6 +37,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         self.backbone_unsup = build_backbone(backbone_unsup)
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.with_unsup = with_unsup
+        self.unsup_ratio = nn.Parameter(torch.rand(1,))
 
         if neck is not None:
             self.neck = build_neck(neck)

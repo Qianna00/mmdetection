@@ -49,7 +49,7 @@ data = dict(
 evaluation = dict(interval=1, metric='bbox')
 
 # optimizer
-optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
+optimizer = dict(type='SGD', lr=0.0001, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(
@@ -84,7 +84,7 @@ model = dict(
         strides=(1, 2, 2),
         dilations=(1, 1, 1),
         out_indices=(2, ),
-        frozen_stages=1,
+        frozen_stages=3,
         norm_cfg=norm_cfg,
         norm_eval=True,
         style='caffe'),
