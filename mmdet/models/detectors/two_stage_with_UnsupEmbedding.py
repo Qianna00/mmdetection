@@ -277,8 +277,8 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
                                                         inputs["img_metas"]"""
                 imgs, gt_labels, gt_bboxes, img_metas = \
                     torch.unsqueeze(data[i]['img'], 0).to(next(self.backbone_unsup.parameters()).device), \
-                    [data[i]['gt_labels'].to(next(self.backbone.parameters()).device)], \
-                    [data[i]['gt_bboxes'].to(next(self.backbone.parameters()).device)], \
+                    [data[i]['gt_labels'].to(next(self.backbone_unsup.parameters()).device)], \
+                    [data[i]['gt_bboxes'].to(next(self.backbone_unsup.parameters()).device)], \
                     [data[i]['img_metas']]
                 # Calculate Features of each training data
                 feats = self.backbone_unsup(imgs)
