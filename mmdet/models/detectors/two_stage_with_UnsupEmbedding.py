@@ -265,7 +265,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
 
         # Calculate initial centroids only on training data.
         with torch.set_grad_enabled(False):
-            self.backbone.cuda()
+            self.backbone_unsup.cuda()
             self.rpn_head.cuda()
             self.roi_head.cuda()
             class_data_num = [0, 0, 0, 0, 0, 0]
@@ -281,7 +281,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
                     [data[i]['gt_bboxes'].to(next(self.backbone.parameters()).device)], \
                     [data[i]['img_metas']]
                 # Calculate Features of each training data
-                feats = self.backbone(imgs)
+                feats = self.backbone_unsup(imgs)
                 """proposal_list = self.rpn_head.simple_test_rpn(feats, img_metas)
                 num_imgs = len(img_metas)
                 # if gt_bboxes_ignore is None:

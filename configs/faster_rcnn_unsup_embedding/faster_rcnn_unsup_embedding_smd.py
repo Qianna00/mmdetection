@@ -120,7 +120,9 @@ model = dict(
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
         loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
     roi_head=dict(
-        type='StandardRoIHead',
+        type='UnsupEmbedding_RoIHead',
+        num_classes=6,
+        feat_dim=1024,
         shared_head=dict(
             type='ResLayer',
             depth=50,
@@ -148,8 +150,13 @@ model = dict(
             reg_class_agnostic=False,
             loss_cls=dict(
                 type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
-            loss_bbox=dict(type='L1Loss', loss_weight=1.0))),
-    with_unsup=True)
+            loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
+        loss_feat=dict(
+            type="DiscCentroidsLoss",
+            num_classes=6,
+            feat_dim=1024,
+            size_average=True)),
+    init_centroids=True)
 # model training and testing settings
 train_cfg = dict(
     rpn=dict(
