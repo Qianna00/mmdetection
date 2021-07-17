@@ -154,13 +154,6 @@ class UnsupEmbedding_RoIHead(nn.Module):
         # set up visual memory
         keys_memory = centroids.clone().cuda()
 
-        distmat = (feats.clone().sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
-                  keys_memory.sum(dim=1, keepdim=True)
-                   .expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).abs().sum(dim=3).sum(dim=2)
-        labels = distmat.argmin(dim=1)
-        print(labels.size(), labels)
-        print(target_labels)
-
         pooled_feats = self.pool_meta_embedding(feats.clone()).squeeze()
         if len(pooled_feats.size()) != 2:
             pooled_feats = pooled_feats.unsqueeze(0)
@@ -169,7 +162,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
         concept_selector = self.fc_selector(pooled_feats)
         concept_selector = concept_selector.tanh()
 
-        """if target_labels is not None:
+        if target_labels is not None:
             for i in range(batch_size):
                 label = target_labels[i]
                 feats[i] = feats[i] + concept_selector * keys_memory[label]
@@ -178,7 +171,9 @@ class UnsupEmbedding_RoIHead(nn.Module):
                        self.centroids.clone().sum(dim=1, keepdim=True)
                        .expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).abs().sum(dim=3).dim(2)
             labels = distmat.argmin(dim=1)
-            print(labels)"""
+            for i in range(batch_size):
+                label = labels[i]
+                feats[i] = feats[i] + concept_selector * keys_memory[label]
 
         """feats = direct_feature + concept_selector.unsqueeze(2).unsqueeze(3).expand(-1, -1, feats.size(2), feats.size(3))\
                 * memory_feature"""
