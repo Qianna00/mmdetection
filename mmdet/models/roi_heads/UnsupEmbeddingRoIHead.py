@@ -81,15 +81,17 @@ class UnsupEmbedding_RoIHead(nn.Module):
 
         if centroids is not None:
             if not test:
+                target_labels = bbox_targets[0]
+                print(target_labels)
                 pos_index = torch.nonzero(bbox_targets[0]-self.num_classes).squeeze(1)
                 # print("pos_index:", torch.nonzero(bbox_targets[0]-10).size())
                 bbox_feats_pos = bbox_feats[pos_index]
-                bbox_feats_pos = self.get_meta_embedding_feature(bbox_feats_pos, centroids)
+                bbox_feats_pos = self.get_unsup_embedding_feature(bbox_feats_pos, centroids)
                 bbox_feats[pos_index] = bbox_feats_pos
                 # print("labels:", bbox_targets[0][pos_index])
                 loss_attract, loss_repel = self.loss_feat(bbox_feats_pos, bbox_targets[0][pos_index])
             else:
-                bbox_feats = self.get_meta_embedding_feature(bbox_feats, centroids)
+                bbox_feats = self.get_unsup_embedding_feature(bbox_feats, centroids)
 
         if self.std_roi_head.with_shared_head:
             bbox_feats = self.std_roi_head.shared_head(bbox_feats)
@@ -141,7 +143,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
         else:
             raise TypeError('pretrained must be a str or None')
 
-    def get_meta_embedding_feature(self, feats, centroids):
+    def get_unsup_embedding_feature(self, feats, centroids):
 
         # storing direct feature
         direct_feature = feats.clone()

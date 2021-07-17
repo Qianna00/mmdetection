@@ -23,21 +23,23 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
 
     def __init__(self,
                  backbone,
-                 backbone_unsup,
+                 backbone_unsup=None,
                  neck=None,
                  rpn_head=None,
                  roi_head=None,
                  train_cfg=None,
                  test_cfg=None,
-                 with_unsup=False,
+                 init_centroids=False,
                  pretrained=None,
                  unsup_pretrained=None):
         super(TwoStageDetectorUnsupEmbedding, self).__init__()
         self.backbone = build_backbone(backbone)
-        self.backbone_unsup = build_backbone(backbone_unsup)
+        self.with_unsup = False
+        if backbone_unsup is not None:
+            self.backbone_unsup = build_backbone(backbone_unsup)
+            self.with_unsup = True
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        self.with_unsup = with_unsup
-        self.unsup_ratio = nn.Parameter(torch.rand(1,))
+        self.init_centroids = init_centroids
 
         if neck is not None:
             self.neck = build_neck(neck)
@@ -59,10 +61,25 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
             roi_head.update(test_cfg=test_cfg.rcnn)
             self.roi_head = build_head(roi_head)
 
+        if self.init_centroids:
+            self.centroids = self.roi_head.loss_feat.centroids.data
+        else:
+            self.centroids = None
+
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
 
         self.init_weights(pretrained=pretrained, unsup_pretrained=unsup_pretrained)
+        if roi_head["type"] == "UnsupEmbedding_RoIHead":
+            # calculate init_centroids using training dataset
+            if self.train_cfg is not None:
+                if init_centroids:
+                    cfg = Config.fromfile(
+                        "/mmdetection/configs/faster_rcnn_unsup_embedding/faster_rcnn_unsup_embedding_smd.py")
+                    dataset = build_dataset(cfg.centroids_cal)
+                    # data = build_dataloader(dataset, samples_per_gpu=1, workers_per_gpu=0, num_gpus=1, shuffle=False)
+                    # print(data[0])
+                    self.roi_head.loss_feat.centroids.data = self.centroids_cal(dataset)
 
     @property
     def with_rpn(self):
@@ -95,17 +112,6 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         if self.with_neck:
             x = self.neck(x)
         return x
-
-    def extract_comb_feats(self, img):
-        # x = self.backbone(img)
-        x_unsup = self.backbone_unsup(img)
-        """x_new = []
-        for i in range(len(x)):
-            x_new.append(0.5 * x[i] + 0.5 * x_unsup[i])
-        x = tuple(x_new)
-        if self.with_neck:
-            x = self.neck(x)"""
-        return x_unsup
 
     def forward_dummy(self, img):
         """Used for computing network flops.
@@ -162,10 +168,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         Returns:
             dict[str, Tensor]: a dictionary of loss components
         """
-        if self.with_unsup is not None:
-            x = self.extract_comb_feats(img)
-        else:
-            x = self.extract_feat(img)
+        x = self.extract_feat(img)
 
         losses = dict()
 
@@ -184,10 +187,22 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         else:
             proposal_list = proposals
 
-        roi_losses = self.roi_head.forward_train(x, img_metas, proposal_list,
+        """roi_losses = self.roi_head.forward_train(x, img_metas, proposal_list,
                                                  gt_bboxes, gt_labels,
                                                  gt_bboxes_ignore, gt_masks,
-                                                 **kwargs)
+                                                 **kwargs)"""
+
+
+        roi_losses = self.roi_head(x,
+                                   centroids=self.centroids,
+                                   img_metas=img_metas,
+                                   proposal_list=proposal_list,
+                                   gt_bboxes=gt_bboxes,
+                                   gt_labels=gt_labels,
+                                   gt_bboxes_ignore=gt_bboxes_ignore,
+                                   gt_masks=gt_masks,
+                                   test=False,
+                                   **kwargs)
         losses.update(roi_losses)
 
         return losses
@@ -214,18 +229,18 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         """Test without augmentation."""
         # assert self.with_bbox, 'Bbox head must be implemented.'
 
-        if self.with_unsup is not None:
-            x = self.extract_comb_feats(img)
-        else:
-            x = self.extract_feat(img)
+        x = self.extract_feat(img)
 
         if proposals is None:
             proposal_list = self.rpn_head.simple_test_rpn(x, img_metas)
         else:
             proposal_list = proposals
 
-        return self.roi_head.simple_test(
-            x, proposal_list, img_metas, rescale=rescale)
+        return self.roi_head(x,
+                             centroids=self.centroids,
+                             proposal_list=proposal_list,
+                             img_metas=img_metas,
+                             test=True)
 
     def aug_test(self, imgs, img_metas, rescale=False):
         """Test with augmentations.
@@ -267,7 +282,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
                     [data[i]['img_metas']]
                 # Calculate Features of each training data
                 feats = self.backbone(imgs)
-                proposal_list = self.rpn_head.simple_test_rpn(feats, img_metas)
+                """proposal_list = self.rpn_head.simple_test_rpn(feats, img_metas)
                 num_imgs = len(img_metas)
                 # if gt_bboxes_ignore is None:
                 gt_bboxes_ignore = [None for _ in range(num_imgs)]
@@ -283,19 +298,25 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
                         gt_labels[i],
                         feats=[lvl_feat[i][None] for lvl_feat in feats])
                     sampling_results.append(sampling_result)
+                print([res.bboxes for res in sampling_results][0].size())
 
-                rois = bbox2roi([res.bboxes for res in sampling_results])
+                rois = bbox2roi([res.bboxes for res in sampling_results])"""
+                rois = bbox2roi(gt_bboxes)
                 bbox_feats = self.roi_head.std_roi_head.bbox_roi_extractor(
                     feats[:self.roi_head.std_roi_head.bbox_roi_extractor.num_inputs], rois)
 
-                labels = self.roi_head.std_roi_head.bbox_head.get_targets(sampling_results, gt_bboxes,
-                                                                                gt_labels, self.train_cfg.rcnn)[0]
+                """labels = self.roi_head.std_roi_head.bbox_head.get_targets(sampling_results, gt_bboxes,
+                                                                                gt_labels, self.train_cfg.rcnn)[0]"""
                 # Add all calculated features to center tensor
-                for i in range(len(labels)):
+                """for i in range(len(labels)):
                     label = labels[i]
                     if label < self.roi_head.num_classes:
                         centroids[label] += bbox_feats[i]
-                        class_data_num[label] += 1
+                        class_data_num[label] += 1"""
+                for j in range(len(gt_labels)):
+                    label = gt_labels[j]
+                    centroids[label] += bbox_feats[j]
+                    class_data_num[label] += 1
             for i in range(len(class_data_num)):
                 if class_data_num[i] == 0:
                     class_data_num[i] = 1

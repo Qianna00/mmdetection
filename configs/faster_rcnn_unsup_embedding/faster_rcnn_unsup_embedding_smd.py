@@ -28,6 +28,21 @@ test_pipeline = [
             dict(type='Collect', keys=['img']),
         ])
 ]
+pipeline_for_init_centroids = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True),
+    # dict(type='Resize', img_scale=(1920, 1080), keep_ratio=True),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(type='Normalize', **img_norm_cfg),
+    dict(type='Pad', size_divisor=32),
+    dict(type='DefaultFormatBundleTensor'),
+    dict(type='CollectTensor', keys=['img', 'gt_bboxes', 'gt_labels'])
+]
+centroids_cal=dict(
+        type=dataset_type,
+        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_train_Qianna.json',
+        img_prefix=data_root + 'new_split/train/',
+        pipeline=pipeline_for_init_centroids)
 data = dict(
     samples_per_gpu=2,
     workers_per_gpu=2,
