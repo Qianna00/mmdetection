@@ -159,12 +159,11 @@ class UnsupEmbedding_RoIHead(nn.Module):
         # computing concept selector
         concept_selector = self.fc_selector(pooled_feats)
         concept_selector = concept_selector.tanh()
-        print(concept_selector.size())
 
         if target_labels is not None:
             for i in range(batch_size):
                 label = target_labels[i]
-                feats[i] = feats[i] + concept_selector.unsqueeze(0).unsqueeze(2).unsqueeze(3)\
+                feats[i] = feats[i] + concept_selector.unsqueeze(2).unsqueeze(3)\
                     .expand(-1, -1, feats.size(2), feats.size(3)) * keys_memory[label]
         else:
             distmat = (feats.clone().sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
@@ -173,7 +172,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
             labels = distmat.argmin(dim=1)
             for i in range(batch_size):
                 label = labels[i]
-                feats[i] = feats[i] + concept_selector.unsqueeze(0).unsqueeze(2).unsqueeze(3)\
+                feats[i] = feats[i] + concept_selector.unsqueeze(2).unsqueeze(3)\
                     .expand(-1, -1, feats.size(2), feats.size(3)) * keys_memory[label]
 
         """feats = direct_feature + concept_selector.unsqueeze(2).unsqueeze(3).expand(-1, -1, feats.size(2), feats.size(3))\
