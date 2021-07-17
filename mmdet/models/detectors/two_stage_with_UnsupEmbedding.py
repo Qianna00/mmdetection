@@ -314,9 +314,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
                         centroids[label] += bbox_feats[i]
                         class_data_num[label] += 1"""
                 for j in range(len(gt_labels)):
-                    print(len(gt_labels))
-                    label = gt_labels[j]
-                    print(label)
+                    label = gt_labels[0][j]
                     centroids[label] += bbox_feats[j]
                     class_data_num[label] += 1
             for i in range(len(class_data_num)):
