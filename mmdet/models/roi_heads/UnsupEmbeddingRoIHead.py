@@ -159,6 +159,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
                    .expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).abs().sum(dim=3).sum(dim=2)
         labels = distmat.argmin(dim=1)
         print(labels.size(), labels)
+        print(target_labels)
 
         pooled_feats = self.pool_meta_embedding(feats.clone()).squeeze()
         if len(pooled_feats.size()) != 2:
