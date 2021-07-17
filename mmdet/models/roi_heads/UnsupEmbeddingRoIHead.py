@@ -163,8 +163,8 @@ class UnsupEmbedding_RoIHead(nn.Module):
         if target_labels is not None:
             for i in range(batch_size):
                 label = target_labels[i]
-                print(feats[i].size(), concept_selector.size(), keys_memory[label].size())
-                feats[i] = feats[i] + concept_selector * keys_memory[label]
+                feats[i] = feats[i] + concept_selector.unsqueeze(2).unsqueeze(3)\
+                    .expand(-1, -1, feats.size(2), feats.size(3)) * keys_memory[label]
         else:
             distmat = (feats.clone().sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
                        self.centroids.clone().sum(dim=1, keepdim=True)
@@ -172,7 +172,8 @@ class UnsupEmbedding_RoIHead(nn.Module):
             labels = distmat.argmin(dim=1)
             for i in range(batch_size):
                 label = labels[i]
-                feats[i] = feats[i] + concept_selector * keys_memory[label]
+                feats[i] = feats[i] + concept_selector.unsqueeze(2).unsqueeze(3)\
+                    .expand(-1, -1, feats.size(2), feats.size(3)) * keys_memory[label]
 
         """feats = direct_feature + concept_selector.unsqueeze(2).unsqueeze(3).expand(-1, -1, feats.size(2), feats.size(3))\
                 * memory_feature"""
