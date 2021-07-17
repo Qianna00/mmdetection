@@ -31,9 +31,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
         self.num_classes = num_classes
         self.feat_dim = feat_dim
         self.pool_meta_embedding = nn.AvgPool2d((14, 14))
-        # self.fc_hallucinator = nn.Linear(self.feat_dim, self.num_classes)
         self.fc_selector = nn.Linear(self.feat_dim, self.feat_dim)
-        self.conv_hallucinator = nn.Conv2d(self.feat_dim, self.num_classes, (1, 1))
         # self.conv_selector = nn.Conv2d(self.feat_dim, self.feat_dim, (1, 1))
         self.std_roi_head = StandardRoIHead(bbox_roi_extractor=bbox_roi_extractor,
                                             bbox_head=bbox_head,
@@ -165,6 +163,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
         if target_labels is not None:
             for i in range(batch_size):
                 label = target_labels[i]
+                print(feats[i].size(), concept_selector.size(), keys_memory[label.size()])
                 feats[i] = feats[i] + concept_selector * keys_memory[label]
         else:
             distmat = (feats.clone().sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
