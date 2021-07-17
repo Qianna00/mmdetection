@@ -274,7 +274,9 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                     [data[i]['img_metas']]
                 # Calculate Features of each training data
                 feats = self.backbone(imgs)
+                print(imgs)
                 print(gt_labels)
+                print(gt_bboxes)
                 proposal_list = self.rpn_head.simple_test_rpn(feats, img_metas)
                 num_imgs = len(img_metas)
                 # if gt_bboxes_ignore is None:
