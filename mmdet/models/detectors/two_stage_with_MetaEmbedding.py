@@ -291,7 +291,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                         gt_labels[i],
                         feats=[lvl_feat[i][None] for lvl_feat in feats])
                     sampling_results.append(sampling_result)
-                print([res.bboxes for res in sampling_results])
+                print(len([res.bboxes for res in sampling_results]))
 
                 rois = bbox2roi([res.bboxes for res in sampling_results])
                 # rois = bbox2roi(gt_bboxes)
