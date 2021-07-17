@@ -12,7 +12,7 @@ class FasterRCNNUnsupEmbedding(TwoStageDetectorUnsupEmbedding):
                  roi_head,
                  train_cfg,
                  test_cfg,
-                 with_unsup=False,
+                 init_centroids,
                  neck=None,
                  pretrained=None,
                  unsup_pretrained=None):
@@ -24,6 +24,6 @@ class FasterRCNNUnsupEmbedding(TwoStageDetectorUnsupEmbedding):
             roi_head=roi_head,
             train_cfg=train_cfg,
             test_cfg=test_cfg,
-            with_unsup=with_unsup,
+            init_centroids=init_centroids,
             pretrained=pretrained,
             unsup_pretrained=unsup_pretrained)
