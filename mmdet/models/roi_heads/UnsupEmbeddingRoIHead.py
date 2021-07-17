@@ -163,7 +163,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
         if target_labels is not None:
             for i in range(batch_size):
                 label = target_labels[i]
-                print(feats[i].size(), concept_selector.size(), keys_memory[label.size()])
+                print(feats[i].size(), concept_selector.size(), keys_memory[label].size())
                 feats[i] = feats[i] + concept_selector * keys_memory[label]
         else:
             distmat = (feats.clone().sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
