@@ -166,7 +166,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
                 feats[i] = feats[i] + concept_selector[i].unsqueeze(1).unsqueeze(2).expand(-1, feats.size(2), feats.size(3)) * keys_memory[label]
         else:
             distmat = (feats.clone().sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
-                       self.centroids.clone().sum(dim=1, keepdim=True)
+                       keys_memory.sum(dim=1, keepdim=True)
                        .expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).abs().sum(dim=3).dim(2)
             labels = distmat.argmin(dim=1)
             for i in range(batch_size):

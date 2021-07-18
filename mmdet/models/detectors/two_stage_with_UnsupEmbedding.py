@@ -313,7 +313,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
                     if label < self.roi_head.num_classes:
                         centroids[label] += bbox_feats[i]
                         class_data_num[label] += 1"""
-                for j in range(len(gt_labels)):
+                for j in range(len(gt_labels[0])):
                     label = gt_labels[0][j]
                     centroids[label] += bbox_feats[j]
                     class_data_num[label] += 1
