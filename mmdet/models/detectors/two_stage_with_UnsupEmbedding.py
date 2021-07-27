@@ -70,7 +70,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         self.test_cfg = test_cfg
 
         self.init_weights(pretrained=pretrained, unsup_pretrained=unsup_pretrained)
-        if roi_head["type"] == "UnsupEmbedding_RoIHead":
+        """if roi_head["type"] == "UnsupEmbedding_RoIHead":
             # calculate init_centroids using training dataset
             if self.train_cfg is not None:
                 if init_centroids:
@@ -79,7 +79,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
                     dataset = build_dataset(cfg.centroids_cal)
                     # data = build_dataloader(dataset, samples_per_gpu=1, workers_per_gpu=0, num_gpus=1, shuffle=False)
                     # print(data[0])
-                    self.roi_head.loss_feat.centroids.data = self.centroids_cal(dataset)
+                    self.roi_head.loss_feat.centroids.data = self.centroids_cal(dataset)"""
 
     @property
     def with_rpn(self):
