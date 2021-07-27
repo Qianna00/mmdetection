@@ -324,7 +324,6 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         # Average summed features with class count
         centroids /= torch.tensor(class_data_num).float().unsqueeze(1).unsqueeze(2).\
             unsqueeze(3).repeat(1, 1024, 14, 14).cuda()
-        print("class_data_num:", class_data_num)
 
         return centroids
 
