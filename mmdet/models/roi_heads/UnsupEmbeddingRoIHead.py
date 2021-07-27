@@ -167,7 +167,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
         else:
             distmat = (feats.clone().sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
                        keys_memory.sum(dim=1, keepdim=True)
-                       .expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).abs().sum(dim=3).dim(2)
+                       .expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).abs().sum(dim=3).sum(dim=2)
             labels = distmat.argmin(dim=1)
             for i in range(batch_size):
                 label = labels[i]
