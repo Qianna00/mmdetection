@@ -92,6 +92,7 @@ model = dict(
         norm_cfg=norm_cfg,
         norm_eval=True,
         style='caffe'),
+    backbone_unsup=None,
     rpn_head=dict(
         type='RPNHead',
         in_channels=1024,
