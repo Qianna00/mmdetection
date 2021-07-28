@@ -184,7 +184,8 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
                     gt_bboxes_ignore=gt_bboxes_ignore,
                     proposal_cfg=proposal_cfg)
             if self.with_unsup:
-                proposal_list = proposal_list.detach()
+                proposal_list_new = [proposal.detach() for proposal in proposal_list]
+                proposal_list = proposal_list_new
             losses.update(rpn_losses)
         else:
             proposal_list = proposals
