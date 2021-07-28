@@ -80,7 +80,7 @@ norm_cfg = dict(type='BN', requires_grad=False)
 model = dict(
     type='FasterRCNNUnsupEmbedding',
     pretrained='/root/vsislab-2/zq/smd_det/unsup_embedding/moco/temp/stage1/epoch_2.pth',
-    unsup_pretrained='/root/data/zq/pretrained_models/moco400k_epoch_50_modified.pth',
+    unsup_pretrained='/root/data/zq/pretrained_models/resnet50_marvel_35.pth',
     backbone=dict(
         type='ResNet',
         depth=50,
