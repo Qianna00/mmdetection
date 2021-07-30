@@ -87,7 +87,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
                 bbox_feats_pos = self.get_unsup_embedding_feature(bbox_feats_pos, centroids, target_labels_pos)
                 bbox_feats[pos_index] = bbox_feats_pos
                 # print("labels:", bbox_targets[0][pos_index])
-                loss_attract, loss_repel = self.loss_feat(bbox_feats_pos, bbox_targets[0][pos_index])
+                # loss_attract, loss_repel = self.loss_feat(bbox_feats_pos, bbox_targets[0][pos_index])
             else:
                 bbox_feats = self.get_unsup_embedding_feature(bbox_feats, centroids)
 
@@ -103,9 +103,9 @@ class UnsupEmbedding_RoIHead(nn.Module):
                                             *bbox_targets)
             roi_losses.update(loss_bbox)
 
-            if centroids is not None:
+            """if centroids is not None:
                 roi_losses.update(loss_attract=loss_attract)
-                roi_losses.update(loss_repel=loss_repel)
+                roi_losses.update(loss_repel=loss_repel)"""
                 # roi_losses.update(features=[direct_feature, infused_feature])
             return roi_losses
         else:
