@@ -38,6 +38,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
                                             shared_head=shared_head,
                                             train_cfg=train_cfg,
                                             test_cfg=test_cfg)
+        self.conv_cat = nn.Conv2d(self.feat_dim * 2, self.feat_dim, kernel_size=1)
         if loss_feat is not None:
             self.loss_feat = build_loss(loss_feat)
 
@@ -84,12 +85,12 @@ class UnsupEmbedding_RoIHead(nn.Module):
                 # print("pos_index:", torch.nonzero(bbox_targets[0]-10).size())
                 bbox_feats_pos = bbox_feats[pos_index]
                 target_labels_pos = target_labels[pos_index]
-                bbox_feats_pos = self.get_unsup_embedding_feature(bbox_feats_pos, centroids, target_labels_pos)
+                bbox_feats_pos = self.get_unsup_concate_feature(bbox_feats_pos, centroids, target_labels_pos)
                 bbox_feats[pos_index] = bbox_feats_pos
                 # print("labels:", bbox_targets[0][pos_index])
                 # loss_attract, loss_repel = self.loss_feat(bbox_feats_pos, bbox_targets[0][pos_index])
             else:
-                bbox_feats = self.get_unsup_embedding_feature(bbox_feats, centroids)
+                bbox_feats = self.get_unsup_concate_feature(bbox_feats, centroids)
 
         if self.std_roi_head.with_shared_head:
             bbox_feats = self.std_roi_head.shared_head(bbox_feats)
@@ -134,7 +135,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
         elif pretrained is None:
             # nn.init.normal_(self.fc_hallucinator.weight, 0, 0.01)
             # nn.init.constant_(self.fc_hallucinator.bias, 0)
-            kaiming_init(self.conv_hallucinator)
+            kaiming_init(self.conv_cat)
             nn.init.normal_(self.fc_selector.weight, 0, 0.001)
             nn.init.constant_(self.fc_selector.bias, 0)
             self.std_roi_head.init_weights(pretrained)
@@ -180,4 +181,41 @@ class UnsupEmbedding_RoIHead(nn.Module):
         # infused_feature = concept_selector * memory_feature
         return feats
 
-    # def get_unsup_concate_feature(self, feats, centroids, target_labels=None):
+    def get_unsup_concate_feature(self, feats, centroids, target_labels=None):
+        # storing direct feature
+        direct_feature = feats.clone()
+
+        batch_size = feats.size(0)
+        # feat_size = x.size(1)
+
+        # set up visual memory
+        keys_memory = centroids.clone().cuda()
+
+        """pooled_feats = self.pool_meta_embedding(feats.clone()).squeeze()
+        if len(pooled_feats.size()) != 2:
+            pooled_feats = pooled_feats.unsqueeze(0)
+
+        # computing concept selector
+        concept_selector = self.fc_selector(pooled_feats)
+        concept_selector = concept_selector.tanh()"""
+
+        if target_labels is not None:
+            for i in range(batch_size):
+                label = target_labels[i]
+                feats[i] =self.conv_cat(torch.cat([direct_feature[i], keys_memory[label]], 1))
+        else:
+            distmat = (direct_feature.sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
+                       keys_memory.sum(dim=1, keepdim=True)
+                       .expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).abs().sum(dim=3).sum(dim=2)
+            labels = distmat.argmin(dim=1)
+            for i in range(batch_size):
+                label = labels[i]
+                feats[i] =self.conv_cat(torch.cat([direct_feature[i], keys_memory[label]], 1))
+
+
+        """feats = direct_feature + concept_selector.unsqueeze(2).unsqueeze(3).expand(-1, -1, feats.size(2), feats.size(3))\
+                * memory_feature"""
+
+        # storing infused feature
+        # infused_feature = concept_selector * memory_feature
+        return feats
