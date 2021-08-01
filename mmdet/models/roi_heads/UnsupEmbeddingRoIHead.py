@@ -163,15 +163,15 @@ class UnsupEmbedding_RoIHead(nn.Module):
         if target_labels is not None:
             for i in range(batch_size):
                 label = target_labels[i]
-                feats[i] = feats[i] + concept_selector[i].unsqueeze(1).unsqueeze(2).expand(-1, feats.size(2), feats.size(3)) * keys_memory[label]
+                feats[i] = direct_feature[i] + concept_selector[i].unsqueeze(1).unsqueeze(2).expand(-1, feats.size(2), feats.size(3)) * keys_memory[label]
         else:
-            distmat = (feats.clone().sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
+            distmat = (direct_feature.sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
                        keys_memory.sum(dim=1, keepdim=True)
                        .expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).abs().sum(dim=3).sum(dim=2)
             labels = distmat.argmin(dim=1)
             for i in range(batch_size):
                 label = labels[i]
-                feats[i] = feats[i] + concept_selector[i].unsqueeze(1).unsqueeze(2).expand(-1, feats.size(2), feats.size(3)) * keys_memory[label]
+                feats[i] = direct_feature[i] + concept_selector[i].unsqueeze(1).unsqueeze(2).expand(-1, feats.size(2), feats.size(3)) * keys_memory[label]
 
         """feats = direct_feature + concept_selector.unsqueeze(2).unsqueeze(3).expand(-1, -1, feats.size(2), feats.size(3))\
                 * memory_feature"""
@@ -179,3 +179,5 @@ class UnsupEmbedding_RoIHead(nn.Module):
         # storing infused feature
         # infused_feature = concept_selector * memory_feature
         return feats
+
+    # def get_unsup_concate_feature(self, feats, centroids, target_labels=None):
