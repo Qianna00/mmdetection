@@ -202,7 +202,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
         if target_labels is not None:
             for i in range(batch_size):
                 label = target_labels[i]
-                feats[i] =self.conv_cat(torch.cat([direct_feature[i], keys_memory[label]], 1))
+                feats[i] =self.conv_cat(torch.cat([direct_feature[i], keys_memory[label]], 0))
         else:
             distmat = (direct_feature.sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
                        keys_memory.sum(dim=1, keepdim=True)
@@ -210,7 +210,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
             labels = distmat.argmin(dim=1)
             for i in range(batch_size):
                 label = labels[i]
-                feats[i] =self.conv_cat(torch.cat([direct_feature[i], keys_memory[label]], 1))
+                feats[i] =self.conv_cat(torch.cat([direct_feature[i], keys_memory[label]], 0))
 
 
         """feats = direct_feature + concept_selector.unsqueeze(2).unsqueeze(3).expand(-1, -1, feats.size(2), feats.size(3))\
