@@ -165,11 +165,6 @@ class UnsupEmbedding_RoIHead(nn.Module):
             for i in range(batch_size):
                 label = target_labels[i]
                 feats[i] = direct_feature[i] + concept_selector[i].unsqueeze(1).unsqueeze(2).expand(-1, feats.size(2), feats.size(3)) * keys_memory[label]
-            distmat = (direct_feature.sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
-                       keys_memory.sum(dim=1, keepdim=True)
-                       .expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).abs().sum(dim=3).sum(dim=2)
-            labels = distmat.argmin(dim=1)
-            print("target_labels:", target_labels, "predict_labels:", labels)
         else:
             distmat = (direct_feature.sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
                        keys_memory.sum(dim=1, keepdim=True)
@@ -208,6 +203,11 @@ class UnsupEmbedding_RoIHead(nn.Module):
             for i in range(batch_size):
                 label = target_labels[i]
                 feats[i] =self.conv_cat(torch.cat([direct_feature[i], keys_memory[label]], 0).unsqueeze(0)).squeeze()
+            distmat = (direct_feature.sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
+                       keys_memory.sum(dim=1, keepdim=True)
+                       .expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).abs().sum(dim=3).sum(dim=2)
+            labels = distmat.argmin(dim=1)
+            print("target_labels:", target_labels, "predict_labels:", labels)
         else:
             distmat = (direct_feature.sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
                        keys_memory.sum(dim=1, keepdim=True)
