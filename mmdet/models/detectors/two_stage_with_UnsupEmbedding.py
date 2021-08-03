@@ -61,12 +61,12 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
             roi_head.update(test_cfg=test_cfg.rcnn)
             self.roi_head = build_head(roi_head)
 
-        """if self.init_centroids:
+        if self.init_centroids:
             # self.centroids = self.roi_head.loss_feat.centroids.data
             self.centroids = self.roi_head.centroids.data
         else:
-            self.centroids = None"""
-        if self.init_centroids:
+            self.centroids = None
+        """if self.init_centroids:
             cfg = Config.fromfile(
                 "/mmdetection/configs/faster_rcnn_unsup_embedding/faster_rcnn_unsup_embedding_smd.py")
             dataset = build_dataset(cfg.centroids_cal)
@@ -74,7 +74,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
             # print(data[0])
             self.centroids = self.centroids_cal(dataset)
         else:
-            self.centroids = None
+            self.centroids = None"""
         # self.centroids = torch.rand(6, 1024, 14, 14)
 
         self.train_cfg = train_cfg
