@@ -95,8 +95,9 @@ class UnsupEmbedding_RoIHead(nn.Module):
                 centroids_norm = nn.functional.normalize(self.pool_meta_embedding(centroids).squeeze(), dim=1)\
                     .expand(N, self.num_classes, self.feat_dim)
                 labels_pos_expand = target_labels_pos.expand(self.num_classes, N).permute(1, 0)
-                centroids_pos = centroids_norm[labels_pos_expand==torch.arange(self.num_classes).expand(N, self.num_classes), :]
-                centroids_neg = centroids_norm[labels_pos_expand!=torch.arange(self.num_classes).expand(N, self.num_classes), :].resize_(N, self.num_classes-1, self.feat_dim)
+                mask = torch.arange(self.num_classes).expand(N, self.num_classes).cuda()
+                centroids_pos = centroids_norm[labels_pos_expand == mask, :]
+                centroids_neg = centroids_norm[labels_pos_expand != mask, :].resize_(N, self.num_classes-1, self.feat_dim)
                 logits_p = torch.einsum("bd,bd->b", bbox_feats_pos_norm, centroids_pos).unsqueeze(-1)
                 logits_n = torch.einsum("...ij,...jk->...ik", centroids_neg.permute(0, 2, 1), bbox_feats_pos_norm.unsqueeze(-1)).squeeze()
                 loss_feat = self.loss_feat(logits_p, logits_n)
