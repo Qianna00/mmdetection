@@ -222,10 +222,15 @@ class UnsupEmbedding_RoIHead(nn.Module):
             labels = distmat.argmin(dim=1)
             print("target_labels:", target_labels, "predict_labels:", labels)"""
         else:
-            distmat = (direct_feature.sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
+            centroids_norm = nn.functional.normalize(self.pool_meta_embedding(keys_memory).squeeze(), dim=1) \
+                .expand(batch_size, self.num_classes, self.feat_dim)
+            feats_norm = nn.functional.normalize(self.pool_meta_embedding(direct_feature))
+            logits = torch.einsum("...ij,...jk->...ik", centroids_norm, feats_norm.unsqueeze(-1)).squeeze()
+            """distmat = (direct_feature.sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
                        keys_memory.sum(dim=1, keepdim=True)
-                       .expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).abs().sum(dim=3).sum(dim=2)
-            labels = distmat.argmin(dim=1)
+                       .expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).abs().sum(dim=3).sum(dim=2)"""
+            # labels = distmat.argmin(dim=1)
+            labels = logits.argmax(dim=1)
             for i in range(batch_size):
                 label = labels[i]
                 feats[i] =self.conv_cat(torch.cat([direct_feature[i], keys_memory[label]], 0).unsqueeze(0)).squeeze()
