@@ -89,6 +89,16 @@ class UnsupEmbedding_RoIHead(nn.Module):
                 bbox_feats[pos_index] = bbox_feats_pos
                 # print("labels:", bbox_targets[0][pos_index])
                 # loss_attract, loss_repel = self.loss_feat(bbox_feats_pos, bbox_targets[0][pos_index])
+                N = bbox_feats_pos.size()[0]
+                bbox_feats_pos_norm = nn.functional.normalize(self.pool_meta_embedding(bbox_feats_pos).squeeze(), dim=1)
+                centroids_norm = nn.functional.normalize(self.pool_meta_embedding(centroids).squeeze(), dim=1)\
+                    .expand(N, self.num_classes, self.feat_dim)
+                labels_pos_expand = target_labels_pos.expand(self.num_classes, N).permute(1, 0)
+                centroids_pos = centroids_norm[labels_pos_expand==torch.arange(self.num_classes).expand(N, self.num_classes), :]
+                centroids_neg = centroids_norm[labels_pos_expand!=torch.arange(self.num_classes).expand(N, self.num_classes), :].resize_(N, self.num_classes-1, self.feat_dim)
+                logits_p = torch.einsum("bd,bd->b", bbox_feats_pos_norm, centroids_pos).unsqueeze(-1)
+                logits_n = torch.einsum("...ij,...jk->...ik", centroids_neg.permute(0, 2, 1), bbox_feats_pos_norm.unsqueeze(-1)).squeeze()
+                loss_feat = self.loss_feat(logits_p, logits_n)
             else:
                 bbox_feats = self.get_unsup_concate_feature(bbox_feats, centroids)
 
@@ -104,9 +114,10 @@ class UnsupEmbedding_RoIHead(nn.Module):
                                             *bbox_targets)
             roi_losses.update(loss_bbox)
 
-            """if centroids is not None:
-                roi_losses.update(loss_attract=loss_attract)
-                roi_losses.update(loss_repel=loss_repel)"""
+            if centroids is not None:
+                roi_losses.update(loss_feat=loss_feat)
+                # roi_losses.update(loss_attract=loss_attract)
+                # roi_losses.update(loss_repel=loss_repel)
                 # roi_losses.update(features=[direct_feature, infused_feature])
             return roi_losses
         else:
@@ -203,11 +214,11 @@ class UnsupEmbedding_RoIHead(nn.Module):
             for i in range(batch_size):
                 label = target_labels[i]
                 feats[i] =self.conv_cat(torch.cat([direct_feature[i], keys_memory[label]], 0).unsqueeze(0)).squeeze()
-            distmat = (direct_feature.sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
+            """distmat = (direct_feature.sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
                        keys_memory.sum(dim=1, keepdim=True)
                        .expand(self.num_classes, batch_size, 14, 14).permute(1, 0, 2, 3)).abs().sum(dim=3).sum(dim=2)
             labels = distmat.argmin(dim=1)
-            print("target_labels:", target_labels, "predict_labels:", labels)
+            print("target_labels:", target_labels, "predict_labels:", labels)"""
         else:
             distmat = (direct_feature.sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
                        keys_memory.sum(dim=1, keepdim=True)

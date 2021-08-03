@@ -152,10 +152,8 @@ model = dict(
                 type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
             loss_bbox=dict(type='L1Loss', loss_weight=5.0)),
         loss_feat=dict(
-            type="DiscCentroidsLoss",
-            num_classes=6,
-            feat_dim=1024,
-            size_average=True)),
+            type="ContrastiveLoss",
+            temperature=0.1)),
     init_centroids=True)
 # model training and testing settings
 train_cfg = dict(
