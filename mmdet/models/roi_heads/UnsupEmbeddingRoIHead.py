@@ -101,8 +101,8 @@ class UnsupEmbedding_RoIHead(nn.Module):
                 logits_p = torch.einsum("bd,bd->b", bbox_feats_pos_norm, centroids_pos).unsqueeze(-1)
                 logits_n = torch.einsum("...ij,...jk->...ik", centroids_neg, bbox_feats_pos_norm.unsqueeze(-1)).squeeze()
                 loss_feat = self.loss_feat(logits_p, logits_n)
-            else:
-                bbox_feats = self.get_unsup_concate_feature(bbox_feats, centroids)
+            """else:
+                bbox_feats = self.get_unsup_concate_feature(bbox_feats, centroids)"""
 
         if self.std_roi_head.with_shared_head:
             bbox_feats = self.std_roi_head.shared_head(bbox_feats)
