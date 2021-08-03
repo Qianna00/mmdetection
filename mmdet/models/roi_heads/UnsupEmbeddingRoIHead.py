@@ -30,6 +30,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
         super(UnsupEmbedding_RoIHead, self).__init__()
         self.num_classes = num_classes
         self.feat_dim = feat_dim
+        self.centroids = nn.Parameter(torch.randn(num_classes, feat_dim, 14, 14))
         self.pool_meta_embedding = nn.AvgPool2d((14, 14))
         self.fc_selector = nn.Linear(self.feat_dim, self.feat_dim)
         # self.conv_selector = nn.Conv2d(self.feat_dim, self.feat_dim, (1, 1))

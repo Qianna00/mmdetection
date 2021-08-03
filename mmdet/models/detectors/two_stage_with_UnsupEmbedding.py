@@ -62,7 +62,8 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
             self.roi_head = build_head(roi_head)
 
         if self.init_centroids:
-            self.centroids = self.roi_head.loss_feat.centroids.data
+            # self.centroids = self.roi_head.loss_feat.centroids.data
+            self.centroids = self.roi_head.centroids.data
         else:
             self.centroids = None
         """if self.init_centroids:
