@@ -338,6 +338,9 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         # Average summed features with class count
         centroids /= torch.tensor(class_data_num).float().unsqueeze(1).unsqueeze(2).\
             unsqueeze(3).repeat(1, 1024, 14, 14).cuda()
+        centroids_norm = nn.functional.normalize(self.roi_head.pool_meta_embedding(centroids).squeeze(), dim=1)
+        simlarity = torch.einsum("ik,jk->ij", centroids_norm, centroids_norm)
+        print("similarity:", simlarity)
 
         return centroids
 
