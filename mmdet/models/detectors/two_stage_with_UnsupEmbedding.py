@@ -185,9 +185,19 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
 
         # RPN forward and loss
         if self.with_rpn:
-            proposal_cfg = self.train_cfg.get('rpn_proposal',
+            """proposal_cfg = self.train_cfg.get('rpn_proposal',
                                               self.test_cfg.rpn)
             rpn_losses, proposal_list = self.rpn_head.forward_train(
+                    x,
+                    img_metas,
+                    gt_bboxes,
+                    gt_labels=None,
+                    gt_bboxes_ignore=gt_bboxes_ignore,
+                    proposal_cfg=proposal_cfg)"""
+            with torch.set_grad_enabled(False):
+                proposal_cfg = self.train_cfg.get('rpn_proposal',
+                                                  self.test_cfg.rpn)
+                rpn_losses, proposal_list = self.rpn_head.forward_train(
                     x,
                     img_metas,
                     gt_bboxes,
@@ -197,7 +207,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
             """if self.with_unsup:
                 proposal_list_new = [proposal.detach() for proposal in proposal_list]
                 proposal_list = proposal_list_new"""
-            losses.update(rpn_losses)
+            # losses.update(rpn_losses)
         else:
             proposal_list = proposals
 
