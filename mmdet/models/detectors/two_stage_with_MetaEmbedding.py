@@ -296,14 +296,18 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                 bbox_feats = self.roi_head.std_roi_head.bbox_roi_extractor(
                     feats[:self.roi_head.std_roi_head.bbox_roi_extractor.num_inputs], rois)
 
-                labels = self.roi_head.std_roi_head.bbox_head.get_targets(sampling_results, gt_bboxes,
+                """labels = self.roi_head.std_roi_head.bbox_head.get_targets(sampling_results, gt_bboxes,
                                                                                 gt_labels, self.train_cfg.rcnn)[0]
                 # Add all calculated features to center tensor
                 for i in range(len(labels)):
                     label = labels[i]
                     if label < self.roi_head.num_classes:
                         centroids[label] += bbox_feats[i]
-                        class_data_num[label] += 1
+                        class_data_num[label] += 1"""
+                for j in range(len(gt_labels[0])):
+                    label = gt_labels[0][j]
+                    centroids[label] += bbox_feats[j]
+                    class_data_num[label] += 1
             for i in range(len(class_data_num)):
                 if class_data_num[i] == 0:
                     class_data_num[i] = 1
