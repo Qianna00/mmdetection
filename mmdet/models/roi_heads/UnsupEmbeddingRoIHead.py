@@ -224,7 +224,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
         else:
             centroids_norm = nn.functional.normalize(self.pool_meta_embedding(keys_memory).squeeze(), dim=1) \
                 .expand(batch_size, self.num_classes, self.feat_dim)
-            feats_norm = nn.functional.normalize(self.pool_meta_embedding(direct_feature))
+            feats_norm = nn.functional.normalize(self.pool_meta_embedding(direct_feature).squeeze(), dim=1)
             logits = torch.einsum("...ij,...jk->...ik", centroids_norm, feats_norm.unsqueeze(-1)).squeeze()
             """distmat = (direct_feature.sum(dim=1, keepdim=True).expand(batch_size, self.num_classes, 14, 14) -
                        keys_memory.sum(dim=1, keepdim=True)
