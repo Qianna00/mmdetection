@@ -120,8 +120,8 @@ class UnsupEmbedding_RoIHead(nn.Module):
                 roi_losses.update(loss_feat=loss_feat)
                 # roi_losses.update(loss_attract=loss_attract)
                 # roi_losses.update(loss_repel=loss_repel)
-                # roi_losses.update(features=[direct_feature, infused_feature])
-            return roi_losses"""
+                # roi_losses.update(features=[direct_feature, infused_feature])"""
+            return roi_losses
         else:
             bbox_results = dict(
                 cls_score=cls_score,
