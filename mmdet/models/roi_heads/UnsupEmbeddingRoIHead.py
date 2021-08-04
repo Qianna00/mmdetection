@@ -90,7 +90,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
                 bbox_feats[pos_index] = bbox_feats_pos
                 # print("labels:", bbox_targets[0][pos_index])
                 # loss_attract, loss_repel = self.loss_feat(bbox_feats_pos, bbox_targets[0][pos_index])
-                N = bbox_feats_pos.size()[0]
+                """N = bbox_feats_pos.size()[0]
                 bbox_feats_pos_norm = nn.functional.normalize(self.pool_meta_embedding(bbox_feats_pos).squeeze(), dim=1)
                 centroids_norm = nn.functional.normalize(self.pool_meta_embedding(centroids).squeeze(), dim=1)\
                     .expand(N, self.num_classes, self.feat_dim)
@@ -102,7 +102,7 @@ class UnsupEmbedding_RoIHead(nn.Module):
                 logits_n = torch.einsum("...ij,...jk->...ik", centroids_neg, bbox_feats_pos_norm.unsqueeze(-1)).squeeze()
                 loss_feat = self.loss_feat(logits_p, logits_n)
             else:
-                bbox_feats = self.get_unsup_concate_feature(bbox_feats, centroids)
+                bbox_feats = self.get_unsup_concate_feature(bbox_feats, centroids)"""
 
         if self.std_roi_head.with_shared_head:
             bbox_feats = self.std_roi_head.shared_head(bbox_feats)
@@ -116,12 +116,12 @@ class UnsupEmbedding_RoIHead(nn.Module):
                                             *bbox_targets)
             roi_losses.update(loss_bbox)
 
-            if centroids is not None:
+            """if centroids is not None:
                 roi_losses.update(loss_feat=loss_feat)
                 # roi_losses.update(loss_attract=loss_attract)
                 # roi_losses.update(loss_repel=loss_repel)
                 # roi_losses.update(features=[direct_feature, infused_feature])
-            return roi_losses
+            return roi_losses"""
         else:
             bbox_results = dict(
                 cls_score=cls_score,
