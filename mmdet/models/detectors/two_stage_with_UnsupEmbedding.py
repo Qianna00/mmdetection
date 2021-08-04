@@ -197,7 +197,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
             """if self.with_unsup:
                 proposal_list_new = [proposal.detach() for proposal in proposal_list]
                 proposal_list = proposal_list_new"""
-            # losses.update(rpn_losses)
+            losses.update(rpn_losses)
         else:
             proposal_list = proposals
 
