@@ -274,7 +274,7 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                     [data[i]['img_metas']]
                 # Calculate Features of each training data
                 feats = self.backbone(imgs)
-                proposal_list = self.rpn_head.simple_test_rpn(feats, img_metas)
+                """proposal_list = self.rpn_head.simple_test_rpn(feats, img_metas)
                 num_imgs = len(img_metas)
                 # if gt_bboxes_ignore is None:
                 gt_bboxes_ignore = [None for _ in range(num_imgs)]
@@ -291,7 +291,8 @@ class TwoStageDetectorMetaEmbedding(BaseDetector):
                         feats=[lvl_feat[i][None] for lvl_feat in feats])
                     sampling_results.append(sampling_result)
 
-                rois = bbox2roi([res.bboxes for res in sampling_results])
+                rois = bbox2roi([res.bboxes for res in sampling_results])"""
+                rois = bbox2roi(gt_bboxes)
                 bbox_feats = self.roi_head.std_roi_head.bbox_roi_extractor(
                     feats[:self.roi_head.std_roi_head.bbox_roi_extractor.num_inputs], rois)
 
