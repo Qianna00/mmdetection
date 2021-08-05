@@ -263,7 +263,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         x_concat = tuple(x_concat)
 
         if proposals is None:
-            proposal_list = self.rpn_head.simple_test_rpn(x_concat, img_metas)
+            proposal_list = self.rpn_head.simple_test_rpn(x, img_metas)
         else:
             proposal_list = proposals
 
