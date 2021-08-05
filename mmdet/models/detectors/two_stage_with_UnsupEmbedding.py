@@ -199,7 +199,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
             proposal_cfg = self.train_cfg.get('rpn_proposal',
                                               self.test_cfg.rpn)
             rpn_losses, proposal_list = self.rpn_head.forward_train(
-                    x_concat,
+                    x,
                     img_metas,
                     gt_bboxes,
                     gt_labels=None,
