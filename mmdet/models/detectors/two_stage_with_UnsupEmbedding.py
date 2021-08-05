@@ -29,7 +29,6 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
                  roi_head=None,
                  train_cfg=None,
                  test_cfg=None,
-                 init_centroids=False,
                  pretrained=None,
                  unsup_pretrained=None):
         super(TwoStageDetectorUnsupEmbedding, self).__init__()
@@ -39,7 +38,8 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
             self.backbone_unsup = build_backbone(backbone_unsup)
             self.with_unsup = True
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        self.init_centroids = init_centroids
+        # self.init_centroids = init_centroids
+        self.conv_cat = nn.Conv2d(2048, 1024, kernel_size=1)
 
         if neck is not None:
             self.neck = build_neck(neck)
@@ -61,11 +61,11 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
             roi_head.update(test_cfg=test_cfg.rcnn)
             self.roi_head = build_head(roi_head)
 
-        if self.init_centroids:
+        """if self.init_centroids:
             # self.centroids = self.roi_head.loss_feat.centroids.data
             self.centroids = self.roi_head.centroids.data
         else:
-            self.centroids = None
+            self.centroids = None"""
         """if self.init_centroids:
             cfg = Config.fromfile(
                 "/mmdetection/configs/faster_rcnn_unsup_embedding/faster_rcnn_unsup_embedding_smd.py")
@@ -81,7 +81,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         self.test_cfg = test_cfg
 
         self.init_weights(pretrained=pretrained, unsup_pretrained=unsup_pretrained)
-        if roi_head["type"] == "UnsupEmbedding_RoIHead":
+        """if roi_head["type"] == "UnsupEmbedding_RoIHead":
             # calculate init_centroids using training dataset
             if self.train_cfg is not None:
                 if init_centroids:
@@ -90,7 +90,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
                     dataset = build_dataset(cfg.centroids_cal)
                     # data = build_dataloader(dataset, samples_per_gpu=1, workers_per_gpu=0, num_gpus=1, shuffle=False)
                     # print(data[0])
-                    self.roi_head.centroids.data = self.centroids_cal(dataset)
+                    self.roi_head.centroids.data = self.centroids_cal(dataset)"""
 
     @property
     def with_rpn(self):
@@ -123,6 +123,12 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         if self.with_neck:
             x = self.neck(x)
         return x
+
+    def extract_unsup_feat(self, img):
+        x_unsup = self.backbone_unsup(img)
+        if self.with_neck:
+            x_unsup = self.neck(x_unsup)
+        return x_unsup
 
     def forward_dummy(self, img):
         """Used for computing network flops.
@@ -179,7 +185,12 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         Returns:
             dict[str, Tensor]: a dictionary of loss components
         """
+        x_concat = []
         x = self.extract_feat(img)
+        x_unsup = self.extract_unsup_feat(img)
+        for i in range(len(x)):
+            x_concat.append(self.conv_cat(torch.cat([x[i], x_unsup[i]], dim=1)))
+        x_concat = tuple(x_concat)
 
         losses = dict()
 
@@ -188,7 +199,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
             proposal_cfg = self.train_cfg.get('rpn_proposal',
                                               self.test_cfg.rpn)
             rpn_losses, proposal_list = self.rpn_head.forward_train(
-                    x,
+                    x_concat,
                     img_metas,
                     gt_bboxes,
                     gt_labels=None,
@@ -201,13 +212,13 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         else:
             proposal_list = proposals
 
-        """roi_losses = self.roi_head.forward_train(x, img_metas, proposal_list,
+        roi_losses = self.roi_head.forward_train(x_concat, img_metas, proposal_list,
                                                  gt_bboxes, gt_labels,
                                                  gt_bboxes_ignore, gt_masks,
-                                                 **kwargs)"""
+                                                 **kwargs)
 
 
-        roi_losses = self.roi_head(x,
+        """roi_losses = self.roi_head(x,
                                    centroids=self.centroids,
                                    img_metas=img_metas,
                                    proposal_list=proposal_list,
@@ -216,7 +227,7 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
                                    gt_bboxes_ignore=gt_bboxes_ignore,
                                    gt_masks=gt_masks,
                                    test=False,
-                                   **kwargs)
+                                   **kwargs)"""
         losses.update(roi_losses)
 
         return losses
@@ -243,18 +254,26 @@ class TwoStageDetectorUnsupEmbedding(BaseDetector):
         """Test without augmentation."""
         # assert self.with_bbox, 'Bbox head must be implemented.'
 
+        # x = self.extract_feat(img)
+        x_concat = []
         x = self.extract_feat(img)
+        x_unsup = self.extract_unsup_feat(img)
+        for i in range(len(x)):
+            x_concat.append(self.conv_cat(torch.cat([x[i], x_unsup[i]], dim=1)))
+        x_concat = tuple(x_concat)
 
         if proposals is None:
-            proposal_list = self.rpn_head.simple_test_rpn(x, img_metas)
+            proposal_list = self.rpn_head.simple_test_rpn(x_concat, img_metas)
         else:
             proposal_list = proposals
 
-        return self.roi_head(x,
+        """return self.roi_head(x_concat,
                              centroids=self.centroids,
                              proposal_list=proposal_list,
                              img_metas=img_metas,
-                             test=True)
+                             test=True)"""
+        return self.roi_head.simple_test(
+            x_concat, proposal_list, img_metas, rescale=rescale)
 
     def aug_test(self, imgs, img_metas, rescale=False):
         """Test with augmentations.

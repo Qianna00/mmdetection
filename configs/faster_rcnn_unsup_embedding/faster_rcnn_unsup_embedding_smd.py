@@ -64,7 +64,7 @@ data = dict(
 evaluation = dict(interval=1, metric='bbox')
 
 # optimizer
-optimizer = dict(type='SGD', lr=0.0001, momentum=0.9, weight_decay=0.0001)
+optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(
@@ -80,7 +80,7 @@ norm_cfg = dict(type='BN', requires_grad=False)
 model = dict(
     type='FasterRCNNUnsupEmbedding',
     pretrained='/root/data/zq/pretrained_models/resnet50_msra.pth',
-    unsup_pretrained='/root/data/zq/pretrained_models/moco400k_epoch_50_modified.pth',
+    unsup_pretrained='/root/data/zq/pretrained_models/resnet50_marvel_35.pth',
     backbone=dict(
         type='ResNet',
         depth=50,
@@ -120,9 +120,7 @@ model = dict(
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
         loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
     roi_head=dict(
-        type='UnsupEmbedding_RoIHead',
-        num_classes=6,
-        feat_dim=1024,
+        type='StandardRoIHead',
         shared_head=dict(
             type='ResLayer',
             depth=50,
@@ -150,13 +148,7 @@ model = dict(
             reg_class_agnostic=False,
             loss_cls=dict(
                 type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
-            loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
-        loss_feat=dict(
-            type="DiscCentroidsLoss",
-            num_classes=6,
-            feat_dim=1024,
-            size_average=True)),
-    init_centroids=True)
+            loss_bbox=dict(type='L1Loss', loss_weight=1.0))))
 # model training and testing settings
 train_cfg = dict(
     rpn=dict(
