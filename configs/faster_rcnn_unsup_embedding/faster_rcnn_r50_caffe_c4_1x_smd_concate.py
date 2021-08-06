@@ -132,7 +132,7 @@ model = dict(
                 target_stds=[0.1, 0.1, 0.2, 0.2]),
             reg_class_agnostic=False,
             loss_cls=dict(
-                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=0.02),
+                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=0.01),
             loss_bbox=dict(type='L1Loss', loss_weight=1.0))))
 # model training and testing settings
 train_cfg = dict(
