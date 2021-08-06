@@ -156,7 +156,7 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
             x_extra = self.extract_extra_feats(img)
             x_new = []
             for i in range(len(x)):
-                x_new.append(self.conv_cat(torch.cat([x[i], x_extra[i]], dim=1)))
+                x_new.append(self.conv_cat(torch.cat([x[i], x_extra[i].detach()], dim=1)))
             x_concat = tuple(x_new)
 
         losses = dict()
