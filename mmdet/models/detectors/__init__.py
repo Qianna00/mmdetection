@@ -23,11 +23,14 @@ from .two_stage_with_MetaEmbedding import TwoStageDetectorMetaEmbedding
 from .faster_rcnn_with_meta_embedding import FasterRCNNMetaEmbedding
 from .two_stage_with_UnsupEmbedding import TwoStageDetectorUnsupEmbedding
 from .faster_rcnn_unsup_embedding import FasterRCNNUnsupEmbedding
+from .two_stage_extra_backbone import TwoStageDetectorWithExtraBackbone
+from .faster_rcnn_with_extra_backbone import FasterRCNNWithExtraBackbone
 
 __all__ = [
     'ATSS', 'BaseDetector', 'SingleStageDetector', 'TwoStageDetector', 'RPN',
     'FastRCNN', 'FasterRCNN', 'MaskRCNN', 'CascadeRCNN', 'HybridTaskCascade',
     'RetinaNet', 'FCOS', 'GridRCNN', 'MaskScoringRCNN', 'RepPointsDetector',
     'FOVEA', 'FSAF', 'NASFCOS', 'TwoStageGanDetector', 'FasterRCNNGan', 'FasterRCNNGane2e',
-    'FasterRCNNMetaEmbedding', 'TwoStageDetectorUnsupEmbedding', 'FasterRCNNUnsupEmbedding'
+    'FasterRCNNMetaEmbedding', 'TwoStageDetectorUnsupEmbedding', 'FasterRCNNUnsupEmbedding',
+    'TwoStageDetectorWithExtraBackbone', 'FasterRCNNWithExtraBackbone'
 ]
