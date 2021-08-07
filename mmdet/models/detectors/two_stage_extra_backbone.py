@@ -68,7 +68,6 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
     def init_weights(self, pretrained=None, pretrained_extra=None):
         # super(TwoStageDetectorWithExtraBackbone, self).init_weights(pretrained, pretrained_extra)
         self.backbone.init_weights(pretrained=pretrained)
-        self.extra_backbone.init_weights(pretrained=pretrained_extra)
         if self.with_neck:
             if isinstance(self.neck, nn.Sequential):
                 for m in self.neck:
@@ -80,6 +79,7 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
         if self.with_roi_head:
             self.roi_head.init_weights(pretrained)
         if self.with_conv_cat:
+            self.extra_backbone.init_weights(pretrained=pretrained_extra)
             kaiming_init(self.conv_cat)
 
     def extract_feat(self, img):
