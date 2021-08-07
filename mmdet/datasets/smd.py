@@ -34,7 +34,7 @@ class SmdDataset6(CocoDataset):
                  metric='bbox',
                  logger=None,
                  jsonfile_prefix=None,
-                 classwise=True,
+                 classwise=False,
                  proposal_nums=(100, 300, 1000),
                  iou_thrs=np.arange(0.5, 0.96, 0.05)):
         """Evaluation in COCO protocol.
