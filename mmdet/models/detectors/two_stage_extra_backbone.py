@@ -166,7 +166,7 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
             proposal_cfg = self.train_cfg.get('rpn_proposal',
                                               self.test_cfg.rpn)
             rpn_losses, proposal_list = self.rpn_head.forward_train(
-                    x,
+                    x_concat,
                     img_metas,
                     gt_bboxes,
                     gt_labels=None,
@@ -221,7 +221,7 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
             x_concat = tuple(x_new)
 
         if proposals is None:
-            proposal_list = self.rpn_head.simple_test_rpn(x, img_metas)
+            proposal_list = self.rpn_head.simple_test_rpn(x_concat, img_metas)
         else:
             proposal_list = proposals
 
