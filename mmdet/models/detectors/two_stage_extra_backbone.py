@@ -61,8 +61,8 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
         return hasattr(self, 'roi_head') and self.roi_head is not None
 
     @property
-    def with_conv_cat(self):
-        return hasattr(self, 'conv_cat') and self.conv_cat is not None
+    def with_extra_backbone(self):
+        return hasattr(self, 'extra_backbone') and self.extra_backbone is not None
 
     def init_weights(self, pretrained=None, pretrained_extra=None):
         # super(TwoStageDetectorWithExtraBackbone, self).init_weights(pretrained, pretrained_extra)
@@ -151,7 +151,7 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
             dict[str, Tensor]: a dictionary of loss components
         """
         x = self.extract_feat(img)
-        if self.with_conv_cat:
+        if self.with_extra_backbone:
             x_extra = self.extract_extra_feats(img)
 
         losses = dict()
@@ -171,7 +171,7 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
         else:
             proposal_list = proposals
 
-        if self.with_conv_cat:
+        if self.with_extra_backbone:
             roi_losses = self.roi_head.forward_train(x, x_extra, img_metas, proposal_list,
                                                      gt_bboxes, gt_labels,
                                                      gt_bboxes_ignore, gt_masks,
@@ -208,7 +208,7 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
         assert self.with_bbox, 'Bbox head must be implemented.'
 
         x = self.extract_feat(img)
-        if self.with_conv_cat:
+        if self.with_extra_backbone:
             x_extra = self.extract_extra_feats(img)
             x_new = []
             for i in range(len(x)):
@@ -220,7 +220,7 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
         else:
             proposal_list = proposals
 
-        if self.with_conv_cat:
+        if self.with_extra_backbone:
             return self.roi_head.simple_test(
                 x_concat, proposal_list, img_metas, rescale=rescale)
         else:
