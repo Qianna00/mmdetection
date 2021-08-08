@@ -77,9 +77,8 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
             self.rpn_head.init_weights()
         if self.with_roi_head:
             self.roi_head.init_weights(pretrained)
-        if self.with_conv_cat:
+        if self.with_extra_backbone:
             self.extra_backbone.init_weights(pretrained=pretrained_extra)
-            kaiming_init(self.conv_cat)
 
     def extract_feat(self, img):
         """Directly extract features from the backbone+neck
