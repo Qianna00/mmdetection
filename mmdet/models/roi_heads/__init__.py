@@ -15,6 +15,7 @@ from .shared_heads import ResLayer
 from .roi_head_with_gan_e2e import RoIHeadGane2e
 from .MetaEmbeddingRoIHead import MetaEmbedding_RoIHead
 from .UnsupEmbeddingRoIHead import UnsupEmbedding_RoIHead
+from .concat_roi_head import ConcatRoIHead
 
 __all__ = [
     'BaseRoIHead', 'CascadeRoIHead', 'DoubleHeadRoIHead', 'MaskScoringRoIHead',
@@ -22,5 +23,6 @@ __all__ = [
     'ConvFCBBoxHead', 'Shared2FCBBoxHead', 'Shared4Conv1FCBBoxHead',
     'DoubleConvFCBBoxHead', 'FCNMaskHead', 'HTCMaskHead', 'FusedSemanticHead',
     'GridHead', 'MaskIoUHead', 'SingleRoIExtractor', 'PISARoIHead', 'RoIHeadGan',
-    'RoIHeadGane2e', 'MetaEmbedding_RoIHead', 'UnsupEmbedding_RoIHead'
+    'RoIHeadGane2e', 'MetaEmbedding_RoIHead', 'UnsupEmbedding_RoIHead',
+    'ConcatRoIHead'
 ]

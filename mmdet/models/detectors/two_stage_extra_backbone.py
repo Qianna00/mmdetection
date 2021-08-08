@@ -29,7 +29,6 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
         self.backbone = build_backbone(backbone)
         if extra_backbone is not None:
             self.extra_backbone = build_backbone(extra_backbone)
-            self.conv_cat = nn.Conv2d(512, 256, kernel_size=1)
 
         if neck is not None:
             self.neck = build_neck(neck)
@@ -154,10 +153,6 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
         x = self.extract_feat(img)
         if self.with_conv_cat:
             x_extra = self.extract_extra_feats(img)
-            x_new = []
-            for i in range(len(x)):
-                x_new.append(self.conv_cat(torch.cat([x[i], x_extra[i].detach()], dim=1)))
-            x_concat = tuple(x_new)
 
         losses = dict()
 
@@ -166,7 +161,7 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
             proposal_cfg = self.train_cfg.get('rpn_proposal',
                                               self.test_cfg.rpn)
             rpn_losses, proposal_list = self.rpn_head.forward_train(
-                    x_concat,
+                    x,
                     img_metas,
                     gt_bboxes,
                     gt_labels=None,
@@ -177,7 +172,7 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
             proposal_list = proposals
 
         if self.with_conv_cat:
-            roi_losses = self.roi_head.forward_train(x_concat, img_metas, proposal_list,
+            roi_losses = self.roi_head.forward_train(x, x_extra, img_metas, proposal_list,
                                                      gt_bboxes, gt_labels,
                                                      gt_bboxes_ignore, gt_masks,
                                                      **kwargs)
@@ -221,7 +216,7 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
             x_concat = tuple(x_new)
 
         if proposals is None:
-            proposal_list = self.rpn_head.simple_test_rpn(x_concat, img_metas)
+            proposal_list = self.rpn_head.simple_test_rpn(x, img_metas)
         else:
             proposal_list = proposals
 
