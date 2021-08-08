@@ -5,6 +5,7 @@ from ..builder import HEADS, build_head, build_roi_extractor
 from .base_roi_head import BaseRoIHead
 from .test_mixins import BBoxTestMixin, MaskTestMixin
 import torch.nn as nn
+from mmcv.cnn import kaiming_init
 
 
 @HEADS.register_module()
@@ -47,6 +48,8 @@ class ConcatRoIHead(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             self.mask_head.init_weights()
             if not self.share_roi_extractor:
                 self.mask_roi_extractor.init_weights()
+        kaiming_init(self.conv_cat)
+
 
     def forward_dummy(self, x, proposals):
         # bbox head
