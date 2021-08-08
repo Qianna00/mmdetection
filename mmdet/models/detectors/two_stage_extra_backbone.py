@@ -209,22 +209,14 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
         x = self.extract_feat(img)
         if self.with_extra_backbone:
             x_extra = self.extract_extra_feats(img)
-            x_new = []
-            for i in range(len(x)):
-                x_new.append(self.conv_cat(torch.cat([x[i], x_extra[i]], dim=1)))
-            x_concat = tuple(x_new)
 
         if proposals is None:
             proposal_list = self.rpn_head.simple_test_rpn(x, img_metas)
         else:
             proposal_list = proposals
 
-        if self.with_extra_backbone:
-            return self.roi_head.simple_test(
-                x_concat, proposal_list, img_metas, rescale=rescale)
-        else:
-            return self.roi_head.simple_test(
-                x, proposal_list, img_metas, rescale=rescale)
+        return self.roi_head.simple_test(
+            x, x_extra, proposal_list, img_metas, rescale=rescale)
 
     def aug_test(self, imgs, img_metas, rescale=False):
         """Test with augmentations.
