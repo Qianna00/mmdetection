@@ -64,7 +64,7 @@ total_epochs = 12
 norm_cfg = dict(type='BN', requires_grad=False)
 model = dict(
     type='FasterRCNN',
-    pretrained='open-mmlab://detectron2/resnet101_caffe',
+    pretrained='/root/data/zq/pretrained_models/moco400k_epoch_50_modified.pth',
     backbone=dict(
         type='ResNet',
         depth=50,
