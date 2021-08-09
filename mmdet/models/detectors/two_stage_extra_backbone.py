@@ -92,7 +92,10 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
         x = self.extra_backbone(img)
         if self.with_neck:
             x = self.neck(x)
-        return x
+        x_new = []
+        for i in x:
+            x_new.append(i.detach())
+        return tuple(x)
 
     def forward_dummy(self, img):
         """Used for computing network flops.
