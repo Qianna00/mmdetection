@@ -29,6 +29,7 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
         self.backbone = build_backbone(backbone)
         if extra_backbone is not None:
             self.extra_backbone = build_backbone(extra_backbone)
+            self.conv_cat = nn.Conv2d(512, 256, kernel_size=1)
 
         if neck is not None:
             self.neck = build_neck(neck)
@@ -79,6 +80,7 @@ class TwoStageDetectorWithExtraBackbone(BaseDetector):
             self.roi_head.init_weights(pretrained)
         if self.with_extra_backbone:
             self.extra_backbone.init_weights(pretrained=pretrained_extra)
+            kaiming_init(self.conv_cat)
 
     def extract_feat(self, img):
         """Directly extract features from the backbone+neck
