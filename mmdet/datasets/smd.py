@@ -24,9 +24,9 @@ class SmdDataset(CocoDataset):
 
 
 @DATASETS.register_module()
-class SmdDataset6(CocoDataset):
-    CLASSES = ('Ferry', 'Vessel/ship',
-               'Speed boat', 'Boat', 'Kayak',
+class SmdDataset5(CocoDataset):
+    CLASSES = ('Ferry/Speed boat', 'Vessel/ship',
+               'Boat', 'Kayak',
                'Sail boat')
 
     def evaluate(self,
@@ -440,7 +440,7 @@ class SMDParams:
 
 
 @DATASETS.register_module()
-class SmdDataset2(SmdDataset6):
+class SmdDataset2(SmdDataset5):
     CLASSES = ('Object',)
 
 

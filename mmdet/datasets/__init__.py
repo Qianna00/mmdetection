@@ -11,7 +11,7 @@ from .voc import VOCDataset
 from .wider_face import WIDERFaceDataset
 from .xml_style import XMLDataset
 from .smd import SmdDataset
-from .smd import SmdDataset6
+from .smd import SmdDataset5
 from .smd import SmdDataset2
 from .smd import SmdDataset6Lvis
 from .lvis_1 import LvisDataset1
@@ -25,5 +25,5 @@ __all__ = [
     'DistributedGroupSampler', 'DistributedSampler', 'build_dataloader',
     'ConcatDataset', 'RepeatDataset', 'ClassBalancedDataset',
     'WIDERFaceDataset', 'DATASETS', 'PIPELINES', 'build_dataset', 'SmdDataset',
-    'SmdDataset6', 'SmdDataset2', 'SmdDataset6Lvis', 'LvisDataset1', 'IKCESTDetDataset'
+    'SmdDataset5', 'SmdDataset2', 'SmdDataset6Lvis', 'LvisDataset1', 'IKCESTDetDataset'
 ]
