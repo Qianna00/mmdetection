@@ -1,4 +1,4 @@
-dataset_type = 'SmdDataset6'
+dataset_type = 'SmdDataset5'
 data_root = '/root/data/zq/data/SMD/'
 # use caffe img_norm
 img_norm_cfg = dict(
@@ -33,17 +33,17 @@ data = dict(
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_train_Qianna.json',
+        ann_file=data_root + 'annotations/5c/SMD_VIS_5_class_train_Qianna.json',
         img_prefix=data_root + 'new_split/train/',
         pipeline=train_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_test_Qianna.json',
+        ann_file=data_root + 'annotations/5c/SMD_VIS_5_class_test_Qianna.json',
         img_prefix=data_root + 'new_split/test/',
         pipeline=test_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/6c/SMD_VIS_6_class_test_Qianna.json',
+        ann_file=data_root + 'annotations/5c/SMD_VIS_5_class_test_Qianna.json',
         img_prefix=data_root + 'new_split/test/',
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric='bbox')
@@ -63,7 +63,7 @@ total_epochs = 16
 # model settings
 model = dict(
     type='FasterRCNN',
-    pretrained='/root/data/zq/pretrained_models/moco400k_epoch_50_modified.pth',
+    pretrained='/root/data/zq/pretrained_models/resnet50_msra.pth',
     backbone=dict(
         type='ResNet',
         depth=50,
@@ -106,7 +106,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=6,
+            num_classes=5,
             bbox_coder=dict(
                 type='DeltaXYWHBBoxCoder',
                 target_means=[0., 0., 0., 0.],
