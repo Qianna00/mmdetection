@@ -63,7 +63,7 @@ total_epochs = 16
 # model settings
 model = dict(
     type='FasterRCNN',
-    pretrained='/root/data/zq/pretrained_models/resnet50_msra.pth',
+    pretrained='/root/data/zq/pretrained_models/moco400k_epoch_50_modified.pth',
     backbone=dict(
         type='ResNet',
         depth=50,
