@@ -57,14 +57,14 @@ lr_config = dict(
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=0.001,
-    step=[8, 11])
-total_epochs = 12
+    step=[12, 15])
+total_epochs = 16
 
 # model settings
 norm_cfg = dict(type='BN', requires_grad=False)
 model = dict(
     type='FasterRCNN',
-    pretrained='/root/data/zq/pretrained_models/resnet50_marvel5_imagenet_25.pth',
+    pretrained='/root/data/zq/pretrained_models/resnet50_marvel5_50_new1.pth',
     backbone=dict(
         type='ResNet',
         depth=50,
