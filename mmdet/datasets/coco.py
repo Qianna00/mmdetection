@@ -180,6 +180,8 @@ class CocoDataset(CustomDataset):
         for idx in range(len(self)):
             img_id = self.img_ids[idx]
             result = results[idx]
+            print(len(result))
+            print(self.cat_ids)
             for label in range(len(result)):
                 bboxes = result[label]
                 for i in range(bboxes.shape[0]):
