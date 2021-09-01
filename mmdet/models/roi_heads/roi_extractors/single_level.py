@@ -85,13 +85,13 @@ class SingleRoIExtractor(nn.Module):
         return new_rois
 
     @force_fp32(apply_to=('feats', ), out_fp16=True)
-    def forward(self, feats, rois, roi_scale_factor=None):
+    def forward(self, feats, rois, roi_scale_factor=None, feat_detach=False):
         out_size = self.roi_layers[0].out_size
         num_levels = len(feats)
         roi_feats = feats[0].new_zeros(
             rois.size(0), self.out_channels, *out_size)
 
-        if num_levels == 1:
+        """if num_levels == 1:
             if len(rois) == 0:
                 return roi_feats
             return self.roi_layers[0](feats[0], rois)
@@ -107,4 +107,41 @@ class SingleRoIExtractor(nn.Module):
                 roi_feats[inds] = roi_feats_t
             else:
                 roi_feats += sum(x.view(-1)[0] for x in self.parameters()) * 0.
-        return roi_feats
+        return roi_feats"""
+
+        if not feat_detach:
+            if num_levels == 1:
+                if len(rois) == 0:
+                    return roi_feats
+                return self.roi_layers[0](feats[0], rois)
+
+            target_lvls = self.map_roi_levels(rois, num_levels)
+            if roi_scale_factor is not None:
+                rois = self.roi_rescale(rois, roi_scale_factor)
+            for i in range(num_levels):
+                inds = target_lvls == i
+                if inds.any():
+                    rois_ = rois[inds, :]
+                    roi_feats_t = self.roi_layers[i](feats[i], rois_)
+                    roi_feats[inds] = roi_feats_t
+                else:
+                    roi_feats += sum(x.view(-1)[0] for x in self.parameters()) * 0.
+            return roi_feats
+        else:
+            if num_levels == 1:
+                if len(rois) == 0:
+                    return roi_feats
+                return self.roi_layers[0](feats[0].detach(), rois)
+
+            target_lvls = self.map_roi_levels(rois, num_levels)
+            if roi_scale_factor is not None:
+                rois = self.roi_rescale(rois, roi_scale_factor)
+            for i in range(num_levels):
+                inds = target_lvls == i
+                if inds.any():
+                    rois_ = rois[inds, :]
+                    roi_feats_t = self.roi_layers[i](feats[i].detach(), rois_)
+                    roi_feats[inds] = roi_feats_t
+                else:
+                    roi_feats += sum(x.view(-1)[0] for x in self.parameters()) * 0.
+            return roi_feats

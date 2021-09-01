@@ -143,7 +143,7 @@ class ConcatRoIHead(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         bbox_feats = self.bbox_roi_extractor(
             x[:self.bbox_roi_extractor.num_inputs], rois)
         bbox_feats_extra = self.bbox_roi_extractor(
-            x_extra[:self.bbox_roi_extractor.num_inputs].detach(), rois)
+            x_extra[:self.bbox_roi_extractor.num_inputs], rois, feat_detach=True)
         bbox_feats_concat = self.conv_cat(torch.cat([bbox_feats, bbox_feats_extra], dim=1))
         # if self.with_shared_head:
             # bbox_feats = self.shared_head(bbox_feats)
