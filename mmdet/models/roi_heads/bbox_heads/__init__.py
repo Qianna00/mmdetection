@@ -3,10 +3,10 @@ from .convfc_bbox_head import (ConvFCBBoxHead, Shared2FCBBoxHead,
                                Shared4Conv1FCBBoxHead)
 from .double_bbox_head import DoubleConvFCBBoxHead
 from .gs_bbox_head import GSBBoxHead
-from .bbox_head_separate import BBoxHeadSeparate
+from .bbox_head_separate import ConvFCBBoxHeadSeparate
 
 __all__ = [
     'BBoxHead', 'ConvFCBBoxHead', 'Shared2FCBBoxHead',
     'Shared4Conv1FCBBoxHead', 'DoubleConvFCBBoxHead', 'GSBBoxHead',
-    'BBoxHeadSeparate'
+    'ConvFCBBoxHeadSeparate'
 ]

@@ -63,7 +63,7 @@ total_epochs = 12
 # model settings
 model = dict(
     type='FasterRCNNWithExtraBackbone',
-    pretrained='/root/data/zq/pretrained_models/resnet50_marvel5_50_new1.pth',
+    pretrained='/root/data/zq/pretrained_models/resnet50_msra.pth',
     pretrained_extra='/root/data/zq/pretrained_models/resnet50_marvel5_50_new1.pth',
     backbone=dict(
         type='ResNet',
@@ -105,15 +105,16 @@ model = dict(
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
         loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
     roi_head=dict(
-        type='ConcatRoIHead',
+        type='ConcatRoIHeadSeparate',
         bbox_roi_extractor=dict(
             type='SingleRoIExtractor',
             roi_layer=dict(type='RoIAlign', out_size=7, sample_num=0),
             out_channels=256,
             featmap_strides=[4, 8, 16, 32]),
         bbox_head=dict(
-            type='Shared2FCBBoxHead',
-            in_channels=256,
+            type='ConvFCBBoxHeadSeparate',
+            num_cls_fcs=2,
+            num_reg_fcs=2,
             fc_out_channels=1024,
             roi_feat_size=7,
             num_classes=5,
@@ -123,8 +124,8 @@ model = dict(
                 target_stds=[0.1, 0.1, 0.2, 0.2]),
             reg_class_agnostic=False,
             loss_cls=dict(
-                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=0.1),
-            loss_bbox=dict(type='L1Loss', loss_weight=0.1))))
+                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
+            loss_bbox=dict(type='L1Loss', loss_weight=1.0))))
 # model training and testing settings
 train_cfg = dict(
     rpn=dict(
