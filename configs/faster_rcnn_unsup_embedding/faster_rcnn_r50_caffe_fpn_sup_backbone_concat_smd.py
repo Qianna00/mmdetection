@@ -56,7 +56,7 @@ lr_config = dict(
     policy='step',
     warmup='linear',
     warmup_iters=500,
-    warmup_ratio=0.0001,
+    warmup_ratio=0.001,
     step=[8, 11])
 total_epochs = 12
 
@@ -79,7 +79,7 @@ model = dict(
         depth=50,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
-        frozen_stages=4,
+        frozen_stages=3,
         norm_cfg=dict(type='BN', requires_grad=False),
         norm_eval=True,
         style='caffe'),
