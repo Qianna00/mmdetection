@@ -63,8 +63,8 @@ total_epochs = 12
 # model settings
 model = dict(
     type='FasterRCNNWithExtraBackbone',
-    pretrained='/root/data/zq/pretrained_models/moco400k_epoch_50_modified.pth',
-    pretrained_extra='/root/data/zq/pretrained_models/resnet50_marvel_35.pth',
+    pretrained='/root/data/zq/pretrained_models/resnet50_msra.pth',
+    pretrained_extra='/root/data/zq/pretrained_models/resnet50_marvel5_50_new1.pth',
     backbone=dict(
         type='ResNet',
         depth=50,
@@ -79,7 +79,7 @@ model = dict(
         depth=50,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
-        frozen_stages=3,
+        frozen_stages=4,
         norm_cfg=dict(type='BN', requires_grad=False),
         norm_eval=True,
         style='caffe'),
