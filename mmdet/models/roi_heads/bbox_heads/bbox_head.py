@@ -110,11 +110,11 @@ class BBoxHead(nn.Module):
             pos_weight = 1.0 if cfg.pos_weight <= 0 else cfg.pos_weight
             # label_weights[:num_pos] = pos_weight
             # set weights for classes separately
-            labels[torch.nonzero(labels == 0)] = 1
-            labels[torch.nonzero(labels == 1)] = 0.7
-            labels[torch.nonzero(labels == 2)] = 3
-            labels[torch.nonzero(labels == 3)] = 2
-            labels[torch.nonzero(labels == 4)] = 3
+            label_weights[torch.nonzero(labels == 0)] = 1
+            label_weights[torch.nonzero(labels == 1)] = 0.7
+            label_weights[torch.nonzero(labels == 2)] = 3
+            label_weights[torch.nonzero(labels == 3)] = 2
+            label_weights[torch.nonzero(labels == 4)] = 3
             if not self.reg_decoded_bbox:
                 pos_bbox_targets = self.bbox_coder.encode(
                     pos_bboxes, pos_gt_bboxes)
