@@ -49,7 +49,7 @@ class ConcatRoIHeadSeparate(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             if not self.share_roi_extractor:
                 self.mask_roi_extractor.init_weights()
         # kaiming_init(self.conv_cat)
-        self.conv_cat.weight.data = torch.cat((torch.ones(256, 256, 1, 1), torch.zeros(256, 256, 1, 1)), dim=1)
+        self.conv_cat.weight.data = torch.cat((torch.zeros(256, 256, 1, 1), torch.ones(256, 256, 1, 1)), dim=1)
         self.conv_cat.bias.data = torch.zeros(256)
 
 
