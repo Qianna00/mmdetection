@@ -49,8 +49,8 @@ class ConcatRoIHeadSeparate(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             if not self.share_roi_extractor:
                 self.mask_roi_extractor.init_weights()
         # kaiming_init(self.conv_cat)
-        self.conv_cat.weight.fill_(torch.cat((torch.ones(256, 256, 1, 1), torch.zeros(256, 256, 1, 1)), dim=1))
-        self.conv_cat.bias.fill_(torch.zeros(256))
+        self.conv_cat.weight.data = torch.cat((torch.ones(256, 256, 1, 1), torch.zeros(256, 256, 1, 1)), dim=1)
+        self.conv_cat.bias.data = torch.zeros(256)
 
 
     def forward_dummy(self, x, proposals):
