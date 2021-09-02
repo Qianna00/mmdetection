@@ -109,6 +109,12 @@ class BBoxHead(nn.Module):
             labels[:num_pos] = pos_gt_labels
             pos_weight = 1.0 if cfg.pos_weight <= 0 else cfg.pos_weight
             label_weights[:num_pos] = pos_weight
+            # set weights for classes separately
+            labels[torch.nonzero(labels == 0)] = 2
+            labels[torch.nonzero(labels == 1)] = 0.5
+            labels[torch.nonzero(labels == 2)] = 10
+            labels[torch.nonzero(labels == 3)] = 4
+            labels[torch.nonzero(labels == 4)] = 10
             if not self.reg_decoded_bbox:
                 pos_bbox_targets = self.bbox_coder.encode(
                     pos_bboxes, pos_gt_bboxes)
