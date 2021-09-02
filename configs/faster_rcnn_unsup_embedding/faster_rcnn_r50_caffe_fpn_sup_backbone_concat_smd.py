@@ -105,16 +105,15 @@ model = dict(
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
         loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
     roi_head=dict(
-        type='ConcatRoIHeadSeparate',
+        type='ConcatRoIHead',
         bbox_roi_extractor=dict(
             type='SingleRoIExtractor',
             roi_layer=dict(type='RoIAlign', out_size=7, sample_num=0),
             out_channels=256,
             featmap_strides=[4, 8, 16, 32]),
         bbox_head=dict(
-            type='ConvFCBBoxHeadSeparate',
-            num_cls_fcs=2,
-            num_reg_convs=2,
+            type='Shared2FCBBoxHead',
+            in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
             num_classes=5,
