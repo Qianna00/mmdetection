@@ -12,7 +12,8 @@ from .pipelines import Compose
 @DATASETS.register_module()
 class MarvelDataset(Dataset):
     def __init__(self, ann_file, pipeline, test_mode=False):
-        self.images = self.load_images(ann_file)
+        self.images = []
+        self.load_images(ann_file)
         self.pipeline = Compose(pipeline)
 
     def load_images(self, ann_file):
