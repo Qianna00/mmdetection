@@ -45,4 +45,5 @@ class MarvelDataset(Dataset):
         results['mask_fields'] = []
         results['seg_fields'] = []
         results['img_shape'] = (256, 256)
+        results['scale_factor'] = 1.0
 
