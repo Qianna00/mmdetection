@@ -44,4 +44,5 @@ class MarvelDataset(Dataset):
         results['bbox_fields'] = []
         results['mask_fields'] = []
         results['seg_fields'] = []
+        results['img_shape'] = (256, 256)
 

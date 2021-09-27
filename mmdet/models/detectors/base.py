@@ -131,7 +131,6 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
                 augs (multiscale, flip, etc.) and the inner list indicates
                 images in a batch.
         """
-        print(imgs.size())
         if isinstance(imgs, Tensor):
             imgs = [imgs]
             img_metas = [img_metas]
