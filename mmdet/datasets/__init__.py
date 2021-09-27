@@ -16,6 +16,7 @@ from .smd import SmdDataset2
 from .smd import SmdDataset6Lvis
 from .lvis_1 import LvisDataset1
 from .ikcest_bbox_detection import IKCESTDetDataset
+from .marvel import MarvelDataset
 
 __all__ = [
     'CustomDataset', 'XMLDataset', 'CocoDataset', 'DeepFashionDataset',
@@ -25,5 +26,6 @@ __all__ = [
     'DistributedGroupSampler', 'DistributedSampler', 'build_dataloader',
     'ConcatDataset', 'RepeatDataset', 'ClassBalancedDataset',
     'WIDERFaceDataset', 'DATASETS', 'PIPELINES', 'build_dataset', 'SmdDataset',
-    'SmdDataset5', 'SmdDataset2', 'SmdDataset6Lvis', 'LvisDataset1', 'IKCESTDetDataset'
+    'SmdDataset5', 'SmdDataset2', 'SmdDataset6Lvis', 'LvisDataset1', 'IKCESTDetDataset',
+    'MarvelDataset'
 ]
