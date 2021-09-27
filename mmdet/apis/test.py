@@ -7,6 +7,7 @@ import time
 import mmcv
 import torch
 import torch.distributed as dist
+from mmcv.parallel import DataContainer
 from mmcv.runner import get_dist_info
 
 from mmdet.core import encode_mask_results, tensor2imgs
@@ -100,8 +101,10 @@ def multi_gpu_test(model, data_loader, tmpdir=None, gpu_collect=False):
         results.append(result)
 
         if rank == 0:
-            print(data['img_metas'].data)
-            batch_size = len(data['img_metas'][0].data)
+            if isinstance(data['img_metas'], DataContainer):
+                batch_size = len(data['img_metas'].data)
+            else:
+                batch_size = len(data['img_metas'][0].data)
             for _ in range(batch_size * world_size):
                 prog_bar.update()
 
