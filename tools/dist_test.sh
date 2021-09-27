@@ -7,4 +7,5 @@ PORT=${PORT:-29500}
 
 PYTHONPATH="$(dirname $0)/..":$PYTHONPATH \
 python -m torch.distributed.launch --nproc_per_node=$GPUS --master_port 2201 \
-    $(dirname "$0")/test.py $CONFIG $CHECKPOINT --launcher pytorch --eval bbox ${@:4}
+    $(dirname "$0")/test.py $CONFIG $CHECKPOINT --launcher pytorch --format-only \
+    --work_dir /root/vsislab-2/zq/marvel_seg ${@:4}
