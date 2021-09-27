@@ -26,3 +26,6 @@ class MarvelDataset(Dataset):
 
     def __getitem__(self, idx):
         return self.pipeline(self.images[idx])
+
+    def __len__(self):
+        return len(self.images)
