@@ -6,6 +6,7 @@ import numpy as np
 import torch
 import torch.distributed as dist
 import torch.nn as nn
+from torch import Tensor
 from mmcv.utils import print_log
 
 from mmdet.core import auto_fp16
@@ -130,6 +131,10 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
                 augs (multiscale, flip, etc.) and the inner list indicates
                 images in a batch.
         """
+        print(imgs.size())
+        if isinstance(imgs, Tensor):
+            imgs = [imgs]
+            img_metas = [img_metas]
         for var, name in [(imgs, 'imgs'), (img_metas, 'img_metas')]:
             if not isinstance(var, list):
                 raise TypeError(f'{name} must be a list, but got {type(var)}')
