@@ -29,8 +29,8 @@ class MarvelDataset(Dataset):
             self.images.append(file_name)
 
     def __getitem__(self, idx):
-        img = self.images[idx]
-        results = dict(img_info=img)
+        img_info = dict(filename=self.images[idx])
+        results = dict(img_info=img_info)
         self.pre_pipeline(results)
         return self.pipeline(results)
 
