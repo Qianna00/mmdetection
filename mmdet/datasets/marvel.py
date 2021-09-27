@@ -15,7 +15,7 @@ class MarvelDataset(Dataset):
         self.images = self.load_images(ann_file)
         self.pipeline = Compose(pipeline)
 
-    def load_annotations(self, ann_file):
+    def load_images(self, ann_file):
         fh = open(ann_file, 'r')
         dataset = fh.readlines()
         for d in dataset:
