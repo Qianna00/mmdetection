@@ -144,7 +144,7 @@ test_pipeline = [
 ]
 
 dataset_type = 'MarvelDataset'
-ann_file = '/root/data/zq/data/marvel/final_400k_new.txt'
+ann_file = '/root/data/zq/data/marvel/marvel400k_split1.txt'
 
 data = dict(
     samples_per_gpu=16,
